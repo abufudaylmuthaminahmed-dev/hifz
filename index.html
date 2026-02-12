@@ -6,48 +6,61 @@
     <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Progress Tracker v2.2</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* ތިބާގެ ކުރީގެ ހުރިހާ CSS އެއް މިތަނަށް ކޮޕީކޮށްލާ - އަޅުގަނޑު ކޯޑު ކުރުކުރުމަށްޓަކައި މައިގަނޑު ބައިތައް މި ބަހައްޓަނީ */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         
         :root {
-            --primary-color: #2c3e50; --accent-color: #27ae60; --bg-color: #f4f7f6;
-            --sidebar-width: 280px; --mushaf-width: 35%;
+            --primary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --bg-color: #f4f7f6;
+            --sidebar-width: 280px;
+            --mushaf-width: 35%;
         }
 
-        body { font-family: 'Noto Sans Thaana', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body {
+            font-family: 'Noto Sans Thaana', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
+        }
 
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #2c3e50, #3498db); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; color: #333; }
+        /* Login Screen */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            z-index: 9999; display: flex; align-items: center; justify-content: center; color: white;
+        }
+        .login-box { background: white; padding: 40px; border-radius: 15px; width: 320px; color: #333; text-align: center; }
         .login-btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; padding: 15px; }
+        /* Layout */
+        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; }
         .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        
         .mushaf-panel { width: var(--mushaf-width); background: #2c3e50; display: none; flex-direction: column; border-right: 1px solid #ccc; }
-        .mushaf-header { background: #34495e; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        
+
+        /* UI Components */
         .entry-form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 12px; border: 2px solid transparent; background: #f9f9f9; }
-        .active-section { border-color: var(--accent-color); background: white; border-left: 5px solid var(--accent-color); }
+        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 12px; background: #f9f9f9; border-right: 5px solid #ddd; }
+        .active-section { border: 2px solid var(--accent-color); border-right: 5px solid var(--accent-color); background: white; }
         
-        .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
-        .btn-green { background: var(--accent-color); } .btn-blue { background: #3498db; }
+        .history-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--primary-color); position: relative; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-green { background: var(--accent-color); }
+        .btn-blue { background: #3498db; }
         
-        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; font-family: inherit; }
         body.parent-mode .teacher-only { display: none !important; }
-        .history-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        .mistake-badge { background: #ffebee; color: #c0392b; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް</h2>
+            <h2 style="margin-top:0;">ޙިފްޡް ޕްރޮގްރާމް</h2>
             <button class="login-btn" style="background:#27ae60; color:white;" onclick="loginAs('parent')">👨‍👩‍👧‍👦 ބެލެނިވެރިން</button>
             <button class="login-btn" style="background:#2c3e50; color:white;" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
@@ -55,26 +68,29 @@
 
     <div id="app-container" style="display:none; width:100%; height:100%; display:flex;">
         <div class="sidebar">
-            <h3 style="text-align:center;">ޤުރްއާން ޙިފްޡް</h3>
-            <select id="studentSelect" onchange="updateStudentHeader()" style="margin-bottom: 20px;">
-                <option value="">ދަރިވަރަކު އިޚްތިޔާރުކުރައްވާ...</option>
+            <h3 style="text-align:center; border-bottom: 2px solid var(--accent-color); padding-bottom:10px;">ޤުރްއާން ޙިފްޡް</h3>
+            <label>ދަރިވަރު:</label>
+            <select id="studentSelect" onchange="loadStudentData()">
+                <option value="">އިޚްތިޔާރު ކުރައްވާ...</option>
                 <option value="Ahmed">Ahmed</option>
                 <option value="Mohamed">Mohamed</option>
-                <option value="Ali">Ali</option>
+                <option value="Aishath">Aishath</option>
             </select>
-            <button class="btn btn-blue" onclick="logout()" style="background:#95a5a6;">🚪 Logout</button>
+            <div style="margin-top:auto;">
+                <button class="btn btn-blue" style="width:100%; background:#95a5a6;" onclick="location.reload()">🚪 Logout</button>
+            </div>
         </div>
 
         <div class="main-content">
             <div style="background:white; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 id="studentHeader">ދަރިވަރެއް ނެތް</h2>
+                <h2 id="studentHeader" style="margin:0;">ދަރިވަރެއް ނެތް</h2>
                 <button class="btn btn-blue" onclick="toggleMushaf()">📖 މުޞްޙަފް</button>
             </div>
 
             <div class="entry-form teacher-only">
                 <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <input type="date" id="entryDate">
-                    <input type="text" id="teacherName" placeholder="މުދައްރިސްގެ ނަން">
+                    <div style="flex:1;"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
+                    <div style="flex:1;"><label>މުދައްރިސް</label><input type="text" id="teacherName" placeholder="ނަން"></div>
                 </div>
                 
                 <div class="section-box active-section">
@@ -83,22 +99,22 @@
                         <input type="text" id="newSurah" placeholder="ސޫރަތް">
                         <input type="number" id="newStart" placeholder="ފެށި އާޔަތް">
                         <input type="number" id="newEnd" placeholder="ނިންމި އާޔަތް">
-                        <input type="number" id="newMistakes" placeholder="ކުށް" style="width:80px;">
+                        <input type="number" id="newMistakes" placeholder="ކުށް" value="0">
                     </div>
                 </div>
-                <button class="btn btn-green" style="width:100%" onclick="saveRecord()">ރެކޯޑް ސޭވް ކުރައްވާ</button>
+                <button class="btn btn-green" style="width:100%; font-size:16px;" onclick="saveToFirebase()">ރެކޯޑް ސޭވް ކުރައްވާ</button>
             </div>
 
-            <div id="historyContainer">
-                <h4>ކުރީގެ ރެކޯޑްތައް</h4>
+            <div id="historySection">
+                <h4 style="border-bottom: 1px solid #ddd; padding-bottom:5px;">ކުރީގެ ރެކޯޑްތައް</h4>
                 <div id="recordsList"></div>
             </div>
         </div>
 
         <div class="mushaf-panel" id="mushafPanel">
-            <div class="mushaf-header">
+            <div style="padding:10px; color:white; display:flex; justify-content:space-between; align-items:center; background:#34495e;">
                 <button class="btn" style="background:#555;" onclick="changePage(1)">ކުރިއަށް</button>
-                <span id="pageIndicator">Page 1</span>
+                <span id="pageIndicator" style="font-weight:bold;">Page 1</span>
                 <button class="btn" style="background:#555;" onclick="changePage(-1)">ފަހަތަށް</button>
             </div>
             <div style="flex:1; background:white; overflow:auto; display:flex; justify-content:center;">
@@ -108,9 +124,9 @@
     </div>
 
     <script>
-        // --- 1. FIREBASE CONFIG (މި ބައި ބަދަލުކުރޭ) ---
+        // 1. FIREBASE SETUP
         const firebaseConfig = {
-           apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
+            apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
   authDomain: "islam-portal-muthamin.firebaseapp.com",
   projectId: "islam-portal-muthamin",
   storageBucket: "islam-portal-muthamin.firebasestorage.app",
@@ -121,19 +137,16 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
 
-        // --- 2. APP FUNCTIONS ---
+        // 2. APP FUNCTIONS
         function loginAs(role) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-container').style.display = 'flex';
             if (role === 'parent') document.body.classList.add('parent-mode');
-            else document.body.classList.remove('parent-mode');
         }
 
-        function logout() { location.reload(); }
-
         function toggleMushaf() {
-            const panel = document.getElementById('mushafPanel');
-            panel.style.display = (panel.style.display === 'none') ? 'flex' : 'none';
+            const p = document.getElementById('mushafPanel');
+            p.style.display = (p.style.display === 'none') ? 'flex' : 'none';
         }
 
         let currentPage = 1;
@@ -145,94 +158,64 @@
             document.getElementById('mushafImg').src = `https://www.searchtruth.com/quran/images2/${currentPage}.png`;
         }
 
-        function updateStudentHeader() {
-            const student = document.getElementById('studentSelect').value;
-            document.getElementById('studentHeader').innerText = student || "ދަރިވަރެއް ނެތް";
-            if(student) loadRecords(student);
+        function loadStudentData() {
+            const name = document.getElementById('studentSelect').value;
+            document.getElementById('studentHeader').innerText = name || "ދަރިވަރެއް ނެތް";
+            if(name) fetchRecords(name);
         }
 
-        // --- 3. DATABASE LOGIC (ސޭވް އަދި ލޯޑް) ---
-        async function saveRecord() {
+        // 3. FIREBASE OPERATIONS
+        async function saveToFirebase() {
             const student = document.getElementById('studentSelect').value;
             const date = document.getElementById('entryDate').value;
             const teacher = document.getElementById('teacherName').value;
             const surah = document.getElementById('newSurah').value;
-            const startAya = document.getElementById('newStart').value;
-            const endAya = document.getElementById('newEnd').value;
+            const start = document.getElementById('newStart').value;
+            const end = document.getElementById('newEnd').value;
             const mistakes = document.getElementById('newMistakes').value;
 
-            if (!student || !date || !surah) {
-                alert("މައުލޫމާތު ފުރިހަމައެއް ނޫން!");
-                return;
-            }
+            if(!student || !date || !surah) { alert("މައުލޫމާތު ފުރިހަމައެއް ނޫން!"); return; }
 
             try {
                 await db.collection("hifz_records").add({
-                    student: student,
-                    date: date,
-                    teacher: teacher,
-                    surah: surah,
-                    range: `${startAya} - ${endAya}`,
+                    student, date, teacher, surah, 
+                    ayaRange: `${start}-${end}`,
                     mistakes: mistakes || 0,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ!");
-                loadRecords(student);
-            } catch (e) {
-                alert("މައްސަލައެއް ދިމާވެއްޖެ: " + e.message);
-            }
+                alert("ސޭވް ކުރެވިއްޖެ!");
+                fetchRecords(student);
+            } catch (e) { alert("Error: " + e.message); }
         }
 
-        async function loadRecords(studentName) {
+        async function fetchRecords(studentName) {
             const list = document.getElementById('recordsList');
-            list.innerHTML = "ލޯޑްވަނީ...";
-            
+            list.innerHTML = "<p>ލޯޑްވަނީ...</p>";
             try {
-                const snapshot = await db.collection("hifz_records")
+                const snap = await db.collection("hifz_records")
                     .where("student", "==", studentName)
-                    .orderBy("date", "desc")
-                    .get();
+                    .orderBy("date", "desc").get();
 
                 list.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                if(snap.empty) { list.innerHTML = "<p>ރެކޯޑެއް ނެތް.</p>"; return; }
+
+                snap.forEach(doc => {
+                    const d = doc.data();
                     const card = document.createElement('div');
                     card.className = 'history-card';
                     card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between;">
-                            <b>${data.date}</b>
-                            <span style="color:red;">ކުށް: ${data.mistakes}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>${d.date}</strong>
+                            <span class="mistake-badge">ކުށް: ${d.mistakes}</span>
                         </div>
-                        <div style="font-size:14px; margin-top:5px;">
-                            ${data.surah} (${data.range}) | <small>މުދައްރިސް: ${data.teacher}</small>
+                        <div style="margin-top:8px; font-size:14px;">
+                            ${d.surah} (${d.ayaRange}) | <small>${d.teacher}</small>
                         </div>
                     `;
                     list.appendChild(card);
                 });
-            } catch (e) {
-                list.innerHTML = "ޑޭޓާ ލޯޑެއް ނުކުރެވުނު.";
-                console.error(e);
-            }
+            } catch (e) { list.innerHTML = "<p>މައްސަލައެއް ދިމާވެއްޖެ.</p>"; console.log(e); }
         }
     </script>
-    <script>
-    // ފަޔަރބޭސް ކޮންފިގަރޭޝަން (މިތަނުގައި ތިބާގެ އަމިއްލަ ކީތައް ހުންނަންވާނެ)
-    const firebaseConfig = {
-       apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
-  authDomain: "islam-portal-muthamin.firebaseapp.com",
-  projectId: "islam-portal-muthamin",
-  storageBucket: "islam-portal-muthamin.firebasestorage.app",
-  messagingSenderId: "842342714257",
-  appId: "1:842342714257:web:2f839d6bf92dda92936830"
-    };
-
-    // ފަޔަރބޭސް ފަށައިގަތުން (Initialize Firebase)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
-    // މިތަނުން ތިރީގައި ދެން ހުރި ފަންކްޝަންތައް (loginAs, saveRecord) ކުރިއަށް ގެންދަވާ...
-</script>
 </body>
 </html>
