@@ -1465,13 +1465,46 @@
         document.getElementById('progressResult').style.display = 'block';
     }
 </script>
-    const firebaseConfig = {
-  apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
+   <script>
+  // 1. މިތަނަށް ތިބާގެ ފަޔަރބޭސް ކޮންފިގްރޭޝަން އަޅުއްވާ
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
   authDomain: "islam-portal-muthamin.firebaseapp.com",
   projectId: "islam-portal-muthamin",
   storageBucket: "islam-portal-muthamin.firebasestorage.app",
   messagingSenderId: "842342714257",
   appId: "1:842342714257:web:2f839d6bf92dda92936830"
+  };
+
+  // 2. ފަޔަރބޭސް ފަށްޓުން
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // 3. ސޭވް ކުރާ ފަންކްޝަން
+  async function saveRecord() {
+    const studentName = document.getElementById('studentHeader').innerText;
+    const entryDate = document.getElementById('entryDate').value;
+    const teacherName = document.getElementById('teacherName').value;
+
+    if(!entryDate || !teacherName || studentName === "ދަރިވަރެއް ނެތް") {
+        alert("މައުލޫމާތު ފުރިހަމައެއް ނޫން!");
+        return;
+    }
+
+    try {
+      await db.collection("hifz_records").add({
+        student: studentName,
+        date: entryDate,
+        teacher: teacherName,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert("ކާމިޔާބުކަމާއެކު ސޭވް ކުރެވިއްޖެ!");
+    } catch (e) {
+      console.error("Error: ", e);
+      alert("ސޭވް ކުރުމުގައި މައްސަލައެއް ދިމާވެއްޖެ!");
+    }
+  }
+</script>
 };
 
 // ފަޔަރބޭސް ފަށައިގަތުން
