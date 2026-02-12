@@ -4,1511 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Progress Tracker v2.2</title>
-    <!-- SheetJS for Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script
-                                                                                          
-   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
+        /* ތިބާގެ ކުރީގެ ހުރިހާ CSS އެއް މިތަނަށް ކޮޕީކޮށްލާ - އަޅުގަނޑު ކޯޑު ކުރުކުރުމަށްޓަކައި މައިގަނޑު ބައިތައް މި ބަހައްޓަނީ */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #27ae60;
-            --bg-color: #f4f7f6;
-            --sidebar-width: 280px;
-            --mushaf-width: 35%;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --primary-color: #2c3e50; --accent-color: #27ae60; --bg-color: #f4f7f6;
+            --sidebar-width: 280px; --mushaf-width: 35%;
         }
 
-        body {
-            font-family: 'Faruma', 'MV Faseyha', 'Noto Sans Thaana', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        body { font-family: 'Noto Sans Thaana', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        /* LOGIN SCREEN */
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            z-index: 9999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
-        }
-        .login-box {
-            background: white; padding: 40px; border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
-            width: 320px; color: #333;
-        }
-        .login-btn {
-            width: 100%; padding: 12px; margin: 10px 0; border: none;
-            border-radius: 8px; font-size: 16px; cursor: pointer;
-            font-family: inherit; font-weight: bold; transition: 0.2s;
-        }
-        .btn-teacher { background: #2c3e50; color: white; }
-        .btn-teacher:hover { background: #1a252f; }
-        .btn-parent { background: #27ae60; color: white; }
-        .btn-parent:hover { background: #219150; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #2c3e50, #3498db); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; color: #333; }
+        .login-btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* PARENT MODE HIDING */
+        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; padding: 15px; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        .mushaf-panel { width: var(--mushaf-width); background: #2c3e50; display: none; flex-direction: column; border-right: 1px solid #ccc; }
+        .mushaf-header { background: #34495e; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .entry-form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 12px; border: 2px solid transparent; background: #f9f9f9; }
+        .active-section { border-color: var(--accent-color); background: white; border-left: 5px solid var(--accent-color); }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-green { background: var(--accent-color); } .btn-blue { background: #3498db; }
+        
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
         body.parent-mode .teacher-only { display: none !important; }
-        body.parent-mode .delete-card-btn { display: none !important; }
-        body.parent-mode .entry-form { display: none !important; }
-        body.parent-mode .mushaf-panel { pointer-events: none; } 
-        
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: white;
-            border-left: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-            flex-shrink: 0;
-            z-index: 20;
-        }
-
-        .class-control-area {
-            background-color: #f8f9fa; padding: 10px; border-radius: 8px;
-            border: 1px solid #eee; margin-bottom: 15px;
-        }
-
-        .class-select {
-            width: 100%; padding: 10px; font-family: inherit; font-size: 14px; font-weight: bold;
-            color: #2c3e50; border: 2px solid #3498db; border-radius: 5px; background-color: white;
-            margin-bottom: 10px; cursor: pointer;
-        }
-
-        .manage-btn {
-            width: 100%; background: #e67e22; color: white; border: none; padding: 8px;
-            border-radius: 5px; cursor: pointer; font-size: 12px; display: flex;
-            align-items: center; justify-content: center; gap: 5px;
-        }
-        .manage-btn:hover { background: #d35400; }
-
-        .student-list-container { flex: 1; overflow-y: auto; }
-
-        .student-btn {
-            background: none; border: none; padding: 12px 10px; text-align: right; width: 100%;
-            cursor: pointer; font-family: inherit; font-size: 14px; border-radius: 6px;
-            margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; transition: 0.2s; color: #2c3e50;
-        }
-        .student-btn:hover { background-color: #e8f6ef; color: var(--accent-color); padding-right: 15px; }
-        .student-btn.active { 
-            background-color: var(--accent-color); color: white; font-weight: bold; 
-            padding-right: 15px; box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
-        }
-
-        /* --- MAIN CONTENT --- */
-        .main-content {
-            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
-        }
-
-        /* --- MUSHAF PANEL --- */
-        .mushaf-panel {
-            width: var(--mushaf-width); background: #2c3e50; display: flex; flex-direction: column;
-            transition: width 0.3s ease; border-right: 1px solid #ccc;
-        }
-        .mushaf-header {
-            background: #34495e; color: white; padding: 8px 15px; display: flex;
-            justify-content: space-between; align-items: center; border-bottom: 1px solid #222;
-        }
-        .mushaf-container {
-            flex: 1; overflow: auto; background: #fdfdfd; display: flex;
-            justify-content: center; position: relative;
-        }
-        .mushaf-wrapper { position: relative; display: inline-block; margin: 10px; }
-        .mushaf-page-img {
-            max-width: 100%; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            cursor: crosshair; border: 1px solid #ddd;
-        }
-        .mistake-dot {
-            position: absolute; width: 20px; height: 20px; background-color: rgba(231, 76, 60, 0.9);
-            border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
-            cursor: pointer; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* --- FORMS --- */
-        .entry-form {
-            background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
-        .form-group { flex: 1; }
-        label { display: block; margin-bottom: 5px; font-size: 12px; font-weight: bold; color: #555; }
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #dcdcdc; border-radius: 5px; box-sizing: border-box; font-family: inherit; font-size: 14px;}
-        .arabic-input { font-family: 'Amiri', serif; direction: rtl; }
-
-        /* Section Boxes */
-        .section-box {
-            padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 2px solid transparent; transition: 0.2s;
-        }
-        .section-new { background-color: #eafaf1; }
-        .section-short { background-color: #ebf5fb; }
-        .section-long { background-color: #fef9e7; }
-        
-        .section-box.active-section {
-            border-color: var(--accent-color); box-shadow: 0 0 10px rgba(39, 174, 96, 0.15);
-            background-color: white; border-left: 5px solid var(--accent-color);
-        }
-        
-        .radio-label {
-            display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.8);
-            padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer;
-            font-size: 12px; font-weight: bold; transition: 0.2s;
-        }
-        input[type="radio"] { accent-color: var(--accent-color); }
-        input[type="radio"]:checked + span { color: var(--accent-color); }
-
-        .mistake-wrapper { display: flex; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
-        .mistake-btn { width: 30px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-size: 14px;}
-        .mistake-display { text-align: center; font-weight: bold; width: 40px; border: none; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
-
-        /* --- EXAM SPECIFIC --- */
-        .exam-header { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 15px; border-bottom: 2px solid #f39c12; padding-bottom: 5px; display:flex; justify-content:space-between; align-items:center;}
-
-        /* --- HISTORY CARDS --- */
-        .history-card {
-            background: white; border-radius: 10px; box-shadow: var(--card-shadow);
-            margin-bottom: 15px; padding: 15px; border-right: 5px solid var(--primary-color);
-            position: relative; transition: transform 0.2s;
-        }
-        .history-card.exam-card { border-right-color: #f1c40f; background: #fffdf0; }
-        
-        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
-        .card-date { font-weight: bold; color: var(--primary-color); font-size: 16px; }
-        .card-teacher { font-size: 12px; color: #7f8c8d; background: #f0f0f0; padding: 2px 8px; border-radius: 10px;}
-        .card-body { display: flex; gap: 10px; flex-wrap: wrap; }
-        .card-section { flex: 1; min-width: 180px; padding: 10px; border-radius: 6px; font-size: 13px; }
-        .card-section.new { background-color: #eafaf1; color: #27ae60; }
-        .card-section.short { background-color: #ebf5fb; color: #2980b9; }
-        .card-section.long { background-color: #fef9e7; color: #d35400; }
-        .card-section.exam { background-color: #fff; border: 1px solid #f1c40f; color: #333; }
-
-        .section-label { font-weight: bold; margin-bottom: 5px; display: block; font-size: 11px; text-transform: uppercase; }
-        .surah-name { font-family: 'Amiri', serif; font-size: 14px; font-weight: bold;}
-        .mistake-badge { background: white; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 12px; }
-        .mistake-badge.red { color: #e74c3c; border: 1px solid #e74c3c; }
-        .mistake-badge.green { color: #27ae60; border: 1px solid #27ae60; }
-        .delete-card-btn { position: absolute; top: 10px; left: 10px; background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; opacity: 0.6; }
-
-        /* --- HIFZ LIST TABLE --- */
-        .hifz-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .hifz-table th { background: #eee; color: #333; padding: 10px; text-align: right; border-bottom: 2px solid #ccc; }
-        .hifz-table td { border-bottom: 1px solid #eee; padding: 10px; vertical-align: top;}
-        .hifz-table tr:hover { background-color: #f9f9f9; }
-
-        /* --- MODAL STYLES IMPROVED --- */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background-color: white; padding: 0; border-radius: 10px; width: 550px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #3498db; overflow: hidden; display:flex; flex-direction:column; max-height:90vh;}
-        
-        .modal-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
-        .modal-body { padding: 20px; overflow-y: auto; }
-        .close-modal { font-size: 24px; cursor: pointer; color: #7f8c8d; }
-
-        .tab-header { display: flex; background: #eee; border-bottom: 1px solid #ddd; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #555; background:#eee;}
-        .tab-btn.active { background: white; color: var(--primary-color); border-bottom: 3px solid #3498db; }
-        .tab-content { display: none; padding-top: 15px; }
-        .tab-content.active { display: block; }
-
-        textarea { width: 100%; height: 120px; margin: 10px 0; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-family: monospace; font-size: 13px;}
-
-        /* Student List in Modal */
-        .modal-student-list { max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px; margin-top: 15px; }
-        .modal-student-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
-        .modal-student-item:last-child { border-bottom: none; }
-        .modal-student-item:hover { background: #f9f9f9; }
-        .btn-del-mini { background: #ffebee; color: #c0392b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
-        .btn-del-mini:hover { background: #e74c3c; color: white; }
-
-        .btn { padding: 8px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-family: inherit; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;}
-        .btn-green { background: var(--accent-color); }
-        .btn-blue { background: #3498db; }
-        .btn-red { background: #e74c3c; }
-        .btn-grey { background: #95a5a6; color: white; }
-
-        .loader-spin { border: 2px solid #f3f3f3; border-top: 2px solid #3498db; border-radius: 50%; width: 12px; height: 12px; animation: spin 1s linear infinite; display: inline-block; margin-right: 5px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .filter-btn { background: #eee; color: #555; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:12px; transition:0.2s; white-space: nowrap; margin-bottom: 5px;}
-        .filter-btn:hover { background: #ddd; }
-        .filter-btn.active { background: var(--primary-color); color: white; }
+        .history-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--primary-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="color:var(--primary-color); margin-top:0;">ޙިފްޡް ޕްރޮގްރާމް</h2>
-            <p style="font-size:14px; margin-bottom:20px;">ކުރިއަށް ވަޑައިގަތުމަށް ޚިޔާރުކުރައްވާ</p>
-            
-            <button class="login-btn btn-parent" onclick="loginAs('parent')">👨‍👩‍👧‍👦 ބެލެނިވެރިން</button>
-            <div style="margin: 15px 0; border-bottom: 1px solid #eee;"></div>
-            <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
+            <h2>ޙިފްޡް ޕްރޮގްރާމް</h2>
+            <button class="login-btn" style="background:#27ae60; color:white;" onclick="loginAs('parent')">👨‍👩‍👧‍👦 ބެލެނިވެރިން</button>
+            <button class="login-btn" style="background:#2c3e50; color:white;" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v2.2</p>
     </div>
 
-    <!-- APP CONTENT (Initially Hidden) -->
     <div id="app-container" style="display:none; width:100%; height:100%; display:flex;">
-        <!-- SIDEBAR -->
         <div class="sidebar">
-            <h3 style="text-align:center; color:var(--primary-color); margin-top:0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">
-                ޤުރްއާން ޙިފްޡް
-            </h3>
-            
-            <div class="class-control-area">
-                <label style="color:#7f8c8d; margin-bottom: 5px;">ކްލާސް:</label>
-                <select id="classSelect" class="class-select" onchange="switchClass(this.value)">
-                    <!-- JS will fill this -->
-                </select>
-                <button class="manage-btn teacher-only" onclick="openModal()">
-                    <span>⚙️</span> ކްލާސް / ކުދިން މެނޭޖްކުރަން
-                </button>
-            </div>
-            
-            <h4 style="margin: 10px 0; color:#555; border-bottom:1px solid #eee; padding-bottom:5px;">ދަރިވަރުން</h4>
-            <div id="studentListContainer" class="student-list-container">
-                <!-- JS will fill this -->
-            </div>
-            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; width:100%; justify-content:center; font-size:12px;">🚪 Logout</button>
+            <h3 style="text-align:center;">ޤުރްއާން ޙިފްޡް</h3>
+            <select id="studentSelect" onchange="updateStudentHeader()" style="margin-bottom: 20px;">
+                <option value="">ދަރިވަރަކު އިޚްތިޔާރުކުރައްވާ...</option>
+                <option value="Ahmed">Ahmed</option>
+                <option value="Mohamed">Mohamed</option>
+                <option value="Ali">Ali</option>
+            </select>
+            <button class="btn btn-blue" onclick="logout()" style="background:#95a5a6;">🚪 Logout</button>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="main-content">
-            <!-- Header -->
-            <div style="background:white; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <small style="color:#7f8c8d; font-weight:bold; display:block;" id="currentClassDisplay">Class: -</small>
-                    <div style="display:flex; align-items:baseline; gap:10px;">
-                        <h2 id="studentHeader" style="margin:0; color:var(--primary-color); font-size: 24px;">ދަރިވަރެއް ނެތް</h2>
-                        <span id="classTeacherDisplay" style="font-size:13px; color:#27ae60; background:#eafaf1; padding:2px 8px; border-radius:10px; display:none;"></span>
-                    </div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-green teacher-only" onclick="exportExcel()">📥 Excel</button>
-                    <button class="btn btn-blue" style="background:#8e44ad;" onclick="openProgressModal()">📈 ޕްރޮގްރެސް</button>
-                    <button class="btn btn-blue" onclick="toggleMushaf()">📖 މުޞްޙަފް</button>
-                </div>
+            <div style="background:white; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="studentHeader">ދަރިވަރެއް ނެތް</h2>
+                <button class="btn btn-blue" onclick="toggleMushaf()">📖 މުޞްޙަފް</button>
             </div>
 
-            <!-- Entry Form (TEACHER ONLY) -->
             <div class="entry-form teacher-only">
-                <div class="form-row">
-                    <div class="form-group" style="flex:0.5"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
-                    <div class="form-group"><label>މުދައްރިސް</label><input type="text" id="teacherName" placeholder="ނަން ލިޔުއްވާ"></div>
-                    <div class="form-group" style="flex:0.5">
-                        <label>ވައްތަރު</label>
-                        <select id="lessonType" onchange="toggleFormSection(this.value)">
-                            <option value="daily">ފިލާވަޅުތައް</option>
-                            <option value="exam">ޖުޒުއު އިމްތިޙާން</option>
-                        </select>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <input type="date" id="entryDate">
+                    <input type="text" id="teacherName" placeholder="މުދައްރިސްގެ ނަން">
+                </div>
+                
+                <div class="section-box active-section">
+                    <label><b>އާ ފިލާވަޅު</b></label>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="newSurah" placeholder="ސޫރަތް">
+                        <input type="number" id="newStart" placeholder="ފެށި އާޔަތް">
+                        <input type="number" id="newEnd" placeholder="ނިންމި އާޔަތް">
+                        <input type="number" id="newMistakes" placeholder="ކުށް" style="width:80px;">
                     </div>
                 </div>
-
-                <!-- DAILY LESSONS CONTAINER -->
-                <div id="container-daily">
-                    <!-- New Lesson -->
-                    <div id="box-new" class="section-box section-new active-section">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#27ae60; font-size:16px;">އާ ފިލާވަޅު <span id="loader-new" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label">
-                                <input type="radio" name="activeSec" value="new" checked onchange="setActiveSection('new')">
-                                <span>މިބަޔަށް ކުށްޖެހުން</span>
-                            </label>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:0.6"><input type="number" id="newPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('new')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
-                            <div style="flex:2"><select id="newSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="newStart" placeholder="ފެށި އާޔަތް"></div>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:2.6"><select id="newEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="newEnd" placeholder="ނިންމި އާޔަތް"></div>
-                            <div>
-                                <div class="mistake-wrapper">
-                                    <button class="mistake-btn plus" onclick="adjustMistake('newMistakes', 1)">+</button>
-                                    <input id="newMistakes" class="mistake-display" value="0" readonly>
-                                    <button class="mistake-btn minus" onclick="adjustMistake('newMistakes', -1)">-</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Short Revision -->
-                    <div id="box-short" class="section-box section-short">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#2980b9; font-size:16px;">ކުރު މުރާޖަޢާ <span id="loader-short" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label">
-                                <input type="radio" name="activeSec" value="short" onchange="setActiveSection('short')">
-                                <span>މިބަޔަށް ކުށްޖެހުން</span>
-                            </label>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:0.6"><input type="number" id="shortPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('short')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
-                            <div style="flex:2"><select id="shortSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="shortStart" placeholder="ފެށި އާޔަތް"></div>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:2.6"><select id="shortEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="shortEnd" placeholder="ނިންމި އާޔަތް"></div>
-                            <div>
-                                <div class="mistake-wrapper">
-                                    <button class="mistake-btn plus" onclick="adjustMistake('shortMistakes', 1)">+</button>
-                                    <input id="shortMistakes" class="mistake-display" value="0" readonly>
-                                    <button class="mistake-btn minus" onclick="adjustMistake('shortMistakes', -1)">-</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Long Revision -->
-                    <div id="box-long" class="section-box section-long">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#d35400; font-size:16px;">ދިގު މުރާޖަޢާ <span id="loader-long" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label">
-                                <input type="radio" name="activeSec" value="long" onchange="setActiveSection('long')">
-                                <span>މިބަޔަށް ކުށްޖެހުން</span>
-                            </label>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:0.6"><input type="number" id="longPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('long')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
-                            <div style="flex:2"><select id="longSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="longStart" placeholder="ފެށި އާޔަތް"></div>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:2.6"><select id="longEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:0.8"><input type="number" id="longEnd" placeholder="ނިންމި އާޔަތް"></div>
-                            <div>
-                                <div class="mistake-wrapper">
-                                    <button class="mistake-btn plus" onclick="adjustMistake('longMistakes', 1)">+</button>
-                                    <input id="longMistakes" class="mistake-display" value="0" readonly>
-                                    <button class="mistake-btn minus" onclick="adjustMistake('longMistakes', -1)">-</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- EXAM CONTAINER (Initially Hidden) -->
-                <div id="container-exam" style="display:none;">
-                    <div id="box-exam" class="section-box section-exam active-section">
-                        <div class="exam-header">
-                            <span>🏆 ޖުޒުއު އިމްތިޙާން</span>
-                            <span id="totalExamScore" style="font-size:24px; color:#2c3e50;">100%</span>
-                        </div>
-
-                        <!-- Top Row: Surah & Time -->
-                        <div class="form-row">
-                            <div style="flex:2">
-                                <label>އިމްތިޙާން ކުރެވޭ ބައި (ޖުޒުއު/ސޫރަތް):</label>
-                                <input type="text" id="examJuzu" placeholder="މިސާލު: 30 ވަނަ ޖުޒުއު">
-                            </div>
-                            <!-- NEW: Examiner Name -->
-                            <div style="flex:2">
-                                <label>އިމްތިޙާން ކުރި ފަރާތް:</label>
-                                <input type="text" id="examExaminer" placeholder="ނަން">
-                            </div>
-                        </div>
-                        <div class="form-row" style="background:white; padding:10px; border-radius:6px; border:1px solid #ddd;">
-                            <div style="flex:1">
-                                <label>ފަށާ ގަޑި:</label>
-                                <input type="time" id="examStartTime" onchange="calculateDuration()">
-                            </div>
-                            <div style="flex:1">
-                                <label>ނިންމާ ގަޑި:</label>
-                                <input type="time" id="examEndTime" onchange="calculateDuration()">
-                            </div>
-                            <div style="flex:0.5; text-align:center;">
-                                <label>މިނެޓް</label>
-                                <span id="examDuration" style="font-weight:bold; color:blue; font-size:18px;">0</span>
-                            </div>
-                        </div>
-
-                        <!-- Mistakes Calculation Area -->
-                        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
-                            <h5 style="margin:5px 0;">ހިފްޡް ކުށްތައް (ޖުމްލަ 80 މާކްސް)</h5>
-                            <div style="display:flex; gap:15px; margin-bottom:15px;">
-                                <div style="flex:1; background:#ffebee; padding:10px; border-radius:5px;">
-                                    <label style="color:#c0392b;">މުދައްރިސް ރަނގަޅުކުރި (-2)</label>
-                                    <div class="mistake-wrapper">
-                                        <button class="mistake-btn" onclick="updateExamMistake('teacher', 1)">+</button>
-                                        <input id="examTeacherMistakes" class="mistake-display" value="0" readonly>
-                                        <button class="mistake-btn" onclick="updateExamMistake('teacher', -1)">-</button>
-                                    </div>
-                                </div>
-                                <div style="flex:1; background:#fff8e1; padding:10px; border-radius:5px;">
-                                    <label style="color:#d35400;">އަމިއްލައަށް ރަނގަޅުކުރި (-1)</label>
-                                    <div class="mistake-wrapper">
-                                        <button class="mistake-btn" onclick="updateExamMistake('self', 1)">+</button>
-                                        <input id="examSelfMistakes" class="mistake-display" value="0" readonly>
-                                        <button class="mistake-btn" onclick="updateExamMistake('self', -1)">-</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Other Marks -->
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>މުތަޝާބިހް 1 (2.5)</label>
-                                <input type="number" id="markMutha1" step="0.5" max="2.5" value="2.5" onchange="calculateExamScore()">
-                            </div>
-                            <div class="form-group">
-                                <label>މުތަޝާބިހް 2 (2.5)</label>
-                                <input type="number" id="markMutha2" step="0.5" max="2.5" value="2.5" onchange="calculateExamScore()">
-                            </div>
-                            <div class="form-group">
-                                <label>ތަޖްވީދު (10)</label>
-                                <input type="number" id="markTajweed" step="0.5" max="10" value="10" onchange="calculateExamScore()">
-                            </div>
-                            <div class="form-group">
-                                <label>ފަރިތަކަން (5)</label>
-                                <input type="number" id="markFluency" step="0.5" max="5" value="5" onchange="calculateExamScore()">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn btn-green" style="flex:1; justify-content: center; font-size:16px;" onclick="saveRecord()">ރެކޯޑް ސޭވް ކުރައްވާ</button>
-                    <button class="btn btn-red" style="width:auto; justify-content: center;" onclick="clearForm()">ފޯމު ސާފުކުރޭ</button>
-                </div>
+                <button class="btn btn-green" style="width:100%" onclick="saveRecord()">ރެކޯޑް ސޭވް ކުރައްވާ</button>
             </div>
 
-            <!-- HISTORY SECTION -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px 0; border-bottom: 2px solid #eee; padding-bottom:8px; flex-wrap:wrap; gap:5px;">
-                <h4 style="margin:0; color:#555;">ރެކޯޑް ތާވަލް (History)</h4>
-                <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                    <button class="filter-btn active" id="btnFilterAll" onclick="setHistoryFilter('all')">ހުރިހާ</button>
-                    <button class="filter-btn" id="btnFilterNew" onclick="setHistoryFilter('new')">އާ ފިލާވަޅު</button>
-                    <button class="filter-btn" id="btnFilterShort" onclick="setHistoryFilter('short')">ކުރު</button>
-                    <button class="filter-btn" id="btnFilterLong" onclick="setHistoryFilter('long')">ދިގު</button>
-                    <button class="filter-btn" id="btnFilterExam" onclick="setHistoryFilter('exam')">އިމްތިޙާން</button>
-                </div>
-            </div>
-            
-            <!-- HISTORY CONTENT -->
-            <div id="historyContainer" class="history-container">
-                <!-- Content injected here -->
+            <div id="historyContainer">
+                <h4>ކުރީގެ ރެކޯޑްތައް</h4>
+                <div id="recordsList"></div>
             </div>
         </div>
 
-        <!-- MUSHAF PANEL -->
         <div class="mushaf-panel" id="mushafPanel">
             <div class="mushaf-header">
-                <span id="pageIndicator" style="font-weight:bold; font-size:16px;">Page 1</span>
-                <div style="display:flex; gap:5px;">
-                    <button class="btn" style="background:#555; padding:0 10px;" onclick="changePage(1)">ކުރިއަށް &gt;</button>
-                    <input type="number" id="navPage" style="width:60px; text-align:center; color:black; padding:5px; border-radius:4px; border:none;" min="1" max="604" onchange="loadMushaf(this.value)">
-                    <button class="btn" style="background:#555; padding:0 10px;" onclick="changePage(-1)">&lt; ފަހަތަށް</button>
-                </div>
+                <button class="btn" style="background:#555;" onclick="changePage(1)">ކުރިއަށް</button>
+                <span id="pageIndicator">Page 1</span>
+                <button class="btn" style="background:#555;" onclick="changePage(-1)">ފަހަތަށް</button>
             </div>
-            <div class="mushaf-container">
-                <div class="mushaf-wrapper" id="mushafWrapper" onclick="onImageClick(event)">
-                    <img id="mushafImg" class="mushaf-page-img" src="" alt="Quran Page">
-                </div>
+            <div style="flex:1; background:white; overflow:auto; display:flex; justify-content:center;">
+                <img id="mushafImg" src="https://www.searchtruth.com/quran/images2/1.png" style="max-width:100%;">
             </div>
         </div>
     </div>
 
-    <!-- SETTINGS MODAL (REDESIGNED) -->
-    <div id="classModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 style="margin:0; color:var(--primary-color);">⚙️ ކްލާސް & ކުދިން މެނޭޖްކުރުން</h3>
-                <span class="close-modal" onclick="closeModal()">&times;</span>
-            </div>
-            
-            <div class="tab-header">
-                <div class="tab-btn active" onclick="switchTab('tab-students')">ކުދިން (Students)</div>
-                <div class="tab-btn" onclick="switchTab('tab-class')">ކްލާސް (Class)</div>
-                <div class="tab-btn" onclick="switchTab('tab-data')">ބެކަޕް (Backup)</div>
-            </div>
-
-            <div class="modal-body">
-                <!-- TAB 1: Add/Edit Students -->
-                <div id="tab-students" class="tab-content active">
-                    <label>ކްލާސް އިޚްތިޔާރުކުރައްވާ:</label>
-                    <select id="modalClassSelect" class="class-select" style="margin-bottom:15px;" onchange="renderModalStudentList()"></select>
-                    
-                    <div style="background:#f9f9f9; padding:10px; border:1px solid #eee; border-radius:5px;">
-                        <label style="color:#2c3e50; font-weight:bold;">ކުދިން އިތުރުކުރުން (Bulk Import):</label>
-                        <p style="font-size:11px; color:#555; margin:5px 0 8px 0;">
-                            <b>ފޯމެޓް:</b> <code>ނަން, އައިޑީ</code> ނުވަތަ <code>ނަން - އައިޑީ</code> (އެކްސެލް އިން ކޮޕީކުރިޔަސް ރަނގަޅުވާނެ)
-                        </p>
-                        <textarea id="bulkStudents" placeholder="Ali Ahmed, 100123&#10;Fathimath (202022)&#10;Hassan - 330022"></textarea>
-                        <button class="btn btn-green" style="width:100%; justify-content: center;" onclick="importStudents()">➕ ކުދިން އެޑް ކުރޭ</button>
-                    </div>
-
-                    <label style="margin-top:15px; font-weight:bold;">މި ކްލާހުގެ ކުދިން:</label>
-                    <div id="modalStudentList" class="modal-student-list">
-                        <!-- List populated by JS -->
-                        <div style="padding:10px; text-align:center; color:#999;">Loading...</div>
-                    </div>
-                </div>
-
-                <!-- TAB 2: Class Management -->
-                <div id="tab-class" class="tab-content">
-                    <div style="background:#eafaf1; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #27ae60;">
-                        <label style="font-size:14px; color:#27ae60;">އާ ކްލާހެއް ހެދުން:</label>
-                        
-                        <div style="margin-top:10px;">
-                            <label>ކްލާހުގެ ނަން:</label>
-                            <input type="text" id="newClassName" placeholder="މިސާލު: Grade 1">
-                        </div>
-                        <div style="margin-top:10px;">
-                            <label>ކްލާސް ޓީޗަރު:</label>
-                            <input type="text" id="newClassTeacher" placeholder="މުދައްރިސްގެ ނަން">
-                        </div>
-
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn btn-blue" style="flex:1; justify-content:center;" onclick="createClass()">ކްލާސް ހަދާ</button>
-                        </div>
-                    </div>
-                    
-                    <div class="danger-zone" style="margin-top:25px; padding: 15px; border: 1px dashed #e74c3c; border-radius: 8px; background: #fff5f5;">
-                        <label style="color:#c0392b; font-weight:bold;">ކްލާސް ފޮހެލުން (Danger Zone):</label>
-                        <select id="deleteClassSelect" class="class-select" style="margin-bottom:10px; border-color:#e74c3c; margin-top:5px;"></select>
-                        <button class="btn btn-red" style="width:100%; justify-content: center;" onclick="deleteSelectedClass()">މި ކްލާސް ފޮހެލާ</button>
-                    </div>
-                </div>
-
-                 <!-- TAB 3: Data Backup -->
-                 <div id="tab-data" class="tab-content">
-                    <div style="background:#f0f8ff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #3498db;">
-                        <h4 style="margin:0 0 10px 0;">ބެކަޕް ނެގުން (Download)</h4>
-                        <p style="font-size:12px; margin-bottom:10px;">މި ބަޓަނަށް ފިތާލުމުން، ހުރިހާ ޑޭޓާއެއް ފައިލްއެއްގެ ގޮތުގައި ލިބޭނެއެވެ. މި ފައިލް އެހެން މީހަކަށް ފޮނުވިދާނެއެވެ.</p>
-                        <button class="btn btn-blue" style="width:100%; justify-content:center;" onclick="downloadBackup()">📥 ބެކަޕް ޑައުންލޯޑް</button>
-                    </div>
-
-                    <div style="background:#fff0f0; padding:15px; border-radius:8px; border:1px solid #e74c3c;">
-                        <h4 style="margin:0 0 10px 0;">ރީސްޓޯރ (Restore)</h4>
-                        <p style="font-size:12px; margin-bottom:10px;">ޑައުންލޯޑް ކޮށްފައިވާ ބެކަޕް ފައިލް މިތަނަށް ލުމުން، ޑޭޓާ އަލުން އަޅާލެވޭނެއެވެ.</p>
-                        <input type="file" id="restoreFile" style="margin-bottom:10px;">
-                        <button class="btn btn-red" style="width:100%; justify-content:center;" onclick="restoreBackup()">📤 ޑޭޓާ އަޅާލާ</button>
-                    </div>
-
-                    <div style="margin-top:20px; text-align:center; border-top:1px solid #eee; padding-top:10px;">
-                        <button style="font-size:11px; color:red; border:none; background:none; cursor:pointer; text-decoration:underline;" onclick="hardReset()">⚠️ ހުރިހާ ޑޭޓާއެއް ރިސެޓްކުރޭ (All Reset)</button>
-                   </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PROGRESS MODAL -->
-    <div id="progressModal" class="modal">
-        <div class="modal-content" style="width:400px;">
-            <div class="modal-header">
-                <h3 style="margin:0; color:var(--primary-color);">ޕްރޮގްރެސް ޓްރެކަރ</h3>
-                <span class="close-modal" onclick="closeProgressModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div style="margin-bottom:15px;">
-                    <label>ފެށޭ ތާރީޚް:</label>
-                    <input type="date" id="progStartDate">
-                </div>
-                <div style="margin-bottom:15px;">
-                    <label>ނިންމާ ތާރީޚް:</label>
-                    <input type="date" id="progEndDate">
-                </div>
-                <button class="btn btn-blue" style="width:100%; justify-content:center;" onclick="calculateProgress()">ބަލާލުމަށް</button>
-                
-                <div id="progressResult" style="margin-top:20px; padding:15px; background:#f0f8ff; border-radius:8px; text-align:center; display:none;">
-                    <div style="font-size:14px; color:#555;">މި މުއްދަތުގައި ކިޔާފައިވާ ޖުމްލަ ޞަފްޙާ:</div>
-                    <div style="font-size:36px; font-weight:bold; color:#2c3e50; margin:10px 0;" id="progCount">0</div>
-                    <div style="font-size:12px; color:#7f8c8d;">(އާ ފިލާވަޅު ރެކޯޑްތައް)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<script>
-    // --- Config ---
-    const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الخشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
-    const STORAGE_CLASSES = 'hifz_v5_classes';
-    const STORAGE_RECORDS = 'hifz_v5_records';
-    const TEACHER_PASSWORD = "1234"; // PASSWORD
-
-    let classes = {}; 
-    // Data Structure: 
-    // { "Grade 1": { teacher: "Mr. Ahmed", students: ["Ali (123)", "Hassan (124)"] } }
-    
-    let records = [];
-    let currentClass = "";
-    let currentStudent = null;
-    let currentActiveSection = 'new';
-    let currentPage = 1;
-    let historyFilter = 'all'; 
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadData();
-        populateSurahSelects();
-        refreshClassDropdowns();
-        document.getElementById('entryDate').valueAsDate = new Date();
-        loadMushaf(1);
-    });
-
-    // --- LOGIN SYSTEM ---
-    function loginAs(type) {
-        if(type === 'teacher') {
-            const pwd = prompt("ޕާސްވޯޑް ޖައްސަވާ:");
-            if(pwd === TEACHER_PASSWORD) {
-                document.body.classList.remove('parent-mode');
-                showApp();
-            } else {
-                alert("ޕާސްވޯޑް ނުބައި");
-            }
-        } else {
-            document.body.classList.add('parent-mode');
-            showApp();
-            alert("ބެލެނިވެރިންގެ ބަޔަށް މަރުޙަބާ.\nދަރިވަރުގެ ނަން ނެގުމަށްފަހު، އެކުއްޖާގެ ޙާޟިރީ އާއި ރެކޯޑްތައް ބެއްލެވޭނެއެވެ.");
-        }
-    }
-
-    function showApp() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'flex';
-    }
-
-    function logout() {
-        location.reload();
-    }
-
-    // --- DATA HANDLING ---
-    function loadData() {
-        try {
-            const cls = localStorage.getItem(STORAGE_CLASSES);
-            classes = cls ? JSON.parse(cls) : { "Default Class": { teacher: "", students: [] } };
-            
-            // MIGRATION for old array format to new object format
-            if(classes && typeof classes === 'object') {
-                Object.keys(classes).forEach(k => {
-                    if (Array.isArray(classes[k])) {
-                        classes[k] = { teacher: "", students: classes[k] };
-                    }
-                });
-            } else {
-                classes = { "Default Class": { teacher: "", students: [] } };
-            }
-
-            const rec = localStorage.getItem(STORAGE_RECORDS);
-            records = rec ? JSON.parse(rec) : [];
-        } catch(e) {
-            console.error(e);
-            classes = { "Default Class": { teacher: "", students: [] } };
-            records = [];
-        }
-    }
-
-    function saveData() {
-        localStorage.setItem(STORAGE_CLASSES, JSON.stringify(classes));
-        localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-    }
-
-    function populateSurahSelects() {
-        const ids = ['newSurah', 'newEndSurah','shortSurah', 'shortEndSurah','longSurah', 'longEndSurah'];
-        ids.forEach(id => {
-            const sel = document.getElementById(id);
-            if(!sel) return;
-            sel.innerHTML = sel.innerHTML; 
-            surahNames.forEach((s, i) => {
-                let opt = document.createElement('option');
-                opt.value = i + 1;
-                opt.innerText = (i+1) + ". " + s;
-                sel.appendChild(opt);
-            });
-        });
-    }
-
-    // --- Class & Student Logic ---
-    function refreshClassDropdowns() {
-        const mainSel = document.getElementById('classSelect');
-        const modalSel = document.getElementById('modalClassSelect');
-        const deleteSel = document.getElementById('deleteClassSelect');
-        [mainSel, modalSel, deleteSel].forEach(sel => sel.innerHTML = '');
-
-        const keys = Object.keys(classes);
-        if(keys.length === 0) {
-            classes = {"Default Class": { teacher: "", students: [] }};
-            keys.push("Default Class");
-            saveData();
-        }
-
-        keys.forEach(k => {
-            [mainSel, modalSel, deleteSel].forEach(sel => {
-                let opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = k;
-                sel.appendChild(opt);
-            });
-        });
-
-        if(keys.includes(currentClass)) mainSel.value = currentClass;
-        else {
-            mainSel.value = keys[0];
-            currentClass = keys[0];
-        }
-        switchClass(mainSel.value);
-    }
-
-    function switchClass(className) {
-        currentClass = className;
-        document.getElementById('currentClassDisplay').innerText = "Class: " + currentClass;
-        
-        // Show Teacher Name
-        const teacherDisplay = document.getElementById('classTeacherDisplay');
-        const teacherName = classes[currentClass].teacher;
-        if(teacherName) {
-            teacherDisplay.style.display = 'inline-block';
-            teacherDisplay.innerText = "Tr. " + teacherName;
-            document.getElementById('teacherName').value = teacherName; // Auto-fill entry form
-        } else {
-            teacherDisplay.style.display = 'none';
-        }
-
-        const list = document.getElementById('studentListContainer');
-        list.innerHTML = '';
-        currentStudent = null;
-        document.getElementById('studentHeader').innerText = "ދަރިވަރެއް ނެތް";
-        document.getElementById('historyContainer').innerHTML = ''; 
-
-        const students = classes[currentClass].students || [];
-        if(students.length === 0) {
-            list.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">މި ކްލާހުގައި ކުއްޖަކު ނެތް</div>';
-        } else {
-            students.forEach(s => {
-                const btn = document.createElement('button');
-                btn.className = 'student-btn';
-                btn.innerText = s;
-                btn.onclick = () => selectStudent(s, btn);
-                list.appendChild(btn);
-            });
-        }
-    }
-
-    function selectStudent(name, btnEl) {
-        currentStudent = name;
-        document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
-        if(btnEl) btnEl.classList.add('active');
-        document.getElementById('studentHeader').innerText = name;
-        
-        // Auto fill next lesson
-        autoFillNextLesson();
-        renderHistory();
-    }
-
-    // --- AUTO FILL NEXT LESSON ---
-    async function autoFillNextLesson() {
-        if(!currentStudent) return;
-        const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
-        studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
-
-        if(studentRecords.length === 0) return;
-        const lastRecord = studentRecords[0];
-        
-        if(lastRecord.new && lastRecord.new.s && lastRecord.new.en) {
-            const lastEndSurahName = lastRecord.new.es || lastRecord.new.s;
-            const lastEndVerse = parseInt(lastRecord.new.en);
-            if(!lastEndSurahName || !lastEndVerse) return;
-
-            const surahIndex = surahNames.indexOf(lastEndSurahName) + 1;
-            if(surahIndex === 0) return; 
-
-            const nextVerse = lastEndVerse + 1;
-            const loader = document.getElementById('loader-new');
-            if(loader) loader.style.display = 'inline-block';
-
-            try {
-                const res = await fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex}:${nextVerse}?fields=page_number`);
-                if(res.ok) {
-                    const data = await res.json();
-                    if(data.verse) {
-                        document.getElementById('newSurah').value = surahIndex;
-                        document.getElementById('newStart').value = nextVerse;
-                        if(data.verse.page_number) {
-                            loadMushaf(data.verse.page_number);
-                            document.getElementById('newPage').value = data.verse.page_number;
-                        }
-                    }
-                } else {
-                    if(surahIndex < 114) {
-                        const nextSurahIndex = surahIndex + 1;
-                        document.getElementById('newSurah').value = nextSurahIndex;
-                        document.getElementById('newStart').value = 1;
-                        const res2 = await fetch(`https://api.quran.com/api/v4/verses/by_key/${nextSurahIndex}:1?fields=page_number`);
-                        const data2 = await res2.json();
-                        if(data2.verse && data2.verse.page_number) {
-                            loadMushaf(data2.verse.page_number);
-                            document.getElementById('newPage').value = data2.verse.page_number;
-                        }
-                    }
-                }
-                setActiveSection('new');
-                document.querySelector(`input[name="activeSec"][value="new"]`).checked = true;
-            } catch(e) { } finally { if(loader) loader.style.display = 'none'; }
-        }
-    }
-
-    // --- Modal Logic ---
-    function openModal() { 
-        document.getElementById('classModal').style.display = 'flex'; 
-        document.getElementById('modalClassSelect').value = currentClass;
-        renderModalStudentList();
-    }
-    function closeModal() { document.getElementById('classModal').style.display = 'none'; }
-    
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if(tabId === 'tab-students') document.querySelector('.tab-btn:first-child').classList.add('active');
-        else if (tabId === 'tab-class') document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        else document.querySelector('.tab-btn:last-child').classList.add('active');
-    }
-
-    function createClass() {
-        const name = document.getElementById('newClassName').value.trim();
-        const teacher = document.getElementById('newClassTeacher').value.trim();
-        
-        if(!name) return;
-        if(classes[name]) return alert("މި ކްލާސް އެބައިން");
-        
-        classes[name] = { teacher: teacher, students: [] };
-        saveData();
-        
-        document.getElementById('newClassName').value = '';
-        document.getElementById('newClassTeacher').value = '';
-        
-        refreshClassDropdowns();
-        document.getElementById('classSelect').value = name;
-        switchClass(name);
-        alert("ކްލާސް ހެދިއްޖެ: " + name);
-        closeModal();
-    }
-
-    function importStudents() {
-        const cls = document.getElementById('modalClassSelect').value;
-        const txt = document.getElementById('bulkStudents').value;
-        if(!txt.trim()) return;
-        
-        const lines = txt.split('\n');
-        let count = 0;
-
-        lines.forEach(line => {
-            if(!line.trim()) return;
-            // Robust parsing: Handles comma, tab (excel), hyphen
-            // Matches: "Name, 123" or "Name 123" or "Name - 123"
-            
-            let parts = line.split(/[\t,]+/); // Split by tab or comma first
-            if(parts.length < 2 && line.includes('-')) {
-                parts = line.split('-');
-            }
-
-            let name = parts[0].trim();
-            // Clean name from trailing/leading brackets if user pasted "Name (ID)"
-            name = name.replace(/\(\d+\)$/, '').trim();
-
-            let id = "";
-            if(parts.length > 1) {
-                id = parts[1].trim().replace(/[\(\)]/g, ''); // Remove brackets if present
-            }
-            
-            // Re-format consistently
-            let fullName = id ? `${name} (${id})` : name;
-
-            if(!classes[cls].students.includes(fullName)) {
-                classes[cls].students.push(fullName);
-                count++;
-            }
-        });
-
-        saveData();
-        document.getElementById('bulkStudents').value = '';
-        
-        renderModalStudentList(); // Update the list inside modal
-        if(currentClass === cls) switchClass(cls); // Update main list
-        alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
-    }
-
-    function renderModalStudentList() {
-        const cls = document.getElementById('modalClassSelect').value;
-        const listDiv = document.getElementById('modalStudentList');
-        listDiv.innerHTML = '';
-        
-        const students = classes[cls] ? classes[cls].students : [];
-        if(students.length === 0) {
-            listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:#ccc;">ކުއްޖަކު ނެތް</div>';
-        } else {
-            students.forEach(s => {
-                const item = document.createElement('div');
-                item.className = 'modal-student-item';
-                item.innerHTML = `
-                    <span>${s}</span>
-                    <button class="btn-del-mini" onclick="deleteStudent('${s}')">Delete</button>
-                `;
-                listDiv.appendChild(item);
-            });
-        }
-    }
-
-    function deleteStudent(studentName) {
-        const cls = document.getElementById('modalClassSelect').value;
-        if(confirm(`"${studentName}" ފޮހެލަން ބޭނުންތަ؟`)) {
-            classes[cls].students = classes[cls].students.filter(s => s !== studentName);
-            saveData();
-            renderModalStudentList();
-            if(currentClass === cls) switchClass(cls);
-        }
-    }
-
-    function deleteSelectedClass() {
-        const cls = document.getElementById('deleteClassSelect').value;
-        if(Object.keys(classes).length <= 1) return alert("މިއީ ހަމައެކަނި އިން ކްލާސް. ފޮހެއެއް ނުލެވޭނެ.");
-        if(confirm(cls + " ފޮހެލަން ބޭނުންތަ؟")) {
-            delete classes[cls];
-            saveData();
-            refreshClassDropdowns();
-            alert("ކްލާސް ފޮހެލެވިއްޖެ");
-        }
-    }
-
-    function hardReset() {
-        if(confirm("ހުރިހާ ޑޭޓާއެއް ފޮހެވޭނެ! ޔަގީންތަ؟")) {
-            localStorage.removeItem(STORAGE_CLASSES);
-            localStorage.removeItem(STORAGE_RECORDS);
-            location.reload();
-        }
-    }
-
-    // --- DATA BACKUP & RESTORE ---
-    function downloadBackup() {
-        const backup = { classes: classes, records: records, version: "v2.0", date: new Date().toISOString() };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "hifz_backup.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    function restoreBackup() {
-        const fileInput = document.getElementById('restoreFile');
-        const file = fileInput.files[0];
-        if (!file) { alert("ބެކަޕް ފައިލް (JSON) ނަގާ"); return; }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const content = JSON.parse(e.target.result);
-                // Simple validation
-                if (content.classes && content.records) {
-                    if(confirm("މިހާރު ހުރި ޑޭޓާ ފޮހެވި، ބެކަޕް ޑޭޓާ އެޅޭނެ. ކުރިއަށް ދާނަންތަ؟")) {
-                        classes = content.classes; records = content.records;
-                        // Fix migration if backup is from v1
-                         if(classes && typeof classes === 'object') {
-                            Object.keys(classes).forEach(k => {
-                                if (Array.isArray(classes[k])) {
-                                    classes[k] = { teacher: "", students: classes[k] };
-                                }
-                            });
-                        }
-                        saveData(); location.reload();
-                    }
-                } else { alert("މިއީ ރަނގަޅު ބެކަޕް ފައިލްއެއް ނޫން"); }
-            } catch (err) { alert("ފައިލް މައްސަލައެއް އުޅޭ: " + err); }
-        };
-        reader.readAsText(file);
-    }
-
-
-    // --- Mushaf & Auto-Fill ---
-    function loadMushaf(p, sync = true) {
-        if(p < 1 || p > 604) return;
-        currentPage = parseInt(p);
-        document.getElementById('navPage').value = currentPage;
-        document.getElementById('pageIndicator').innerText = "Page " + currentPage;
-        const img = document.getElementById('mushafImg');
-        img.src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
-        clearDots();
-        
-        if (sync && document.getElementById('lessonType').value !== 'exam') {
-            const pageInput = document.getElementById(currentActiveSection + 'Page');
-            if(pageInput) {
-                pageInput.value = currentPage;
-                fillSurahFromPage(currentPage, currentActiveSection);
-            }
-        }
-    }
-
-    function changePage(delta) {
-        loadMushaf(currentPage + delta, false);
-    }
-
-    function goToPage() { 
-        loadMushaf(document.getElementById('navPage').value, true); 
-    }
-    
-    function toggleMushaf() {
-        const w = getComputedStyle(document.documentElement).getPropertyValue('--mushaf-width').trim();
-        document.documentElement.style.setProperty('--mushaf-width', w === '0px' ? '35%' : '0px');
-    }
-
-    function setActiveSection(sec) {
-        currentActiveSection = sec;
-        document.querySelectorAll('.section-box').forEach(b => b.classList.remove('active-section'));
-        document.getElementById('box-'+sec).classList.add('active-section');
-    }
-
-    async function autoLoadPage(sec) {
-        const p = document.getElementById(sec+'Page').value;
-        if(!p) return;
-        loadMushaf(p, true);
-        setActiveSection(sec);
-        document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
-    }
-
-    async function fillSurahFromPage(page, section) {
-        const loader = document.getElementById('loader-' + section);
-        if(loader) loader.style.display = 'inline-block';
-        
-        try {
-            const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`);
-            const d = await res.json();
-            
-            if(d.verses && d.verses.length > 0) {
-                const first = d.verses[0].verse_key.split(':');
-                document.getElementById(section+'Surah').value = first[0];
-                document.getElementById(section+'Start').value = first[1];
-
-                const last = d.verses[d.verses.length - 1].verse_key.split(':');
-                document.getElementById(section+'EndSurah').value = last[0];
-                document.getElementById(section+'End').value = last[1];
-            }
-        } catch(e) {
-            console.log("Error fetching data");
-        } finally {
-            if(loader) loader.style.display = 'none';
-        }
-    }
-
-    function onImageClick(e) {
-        // Disable click in parent mode
-        if (document.body.classList.contains('parent-mode')) return;
-
-        if(e.target.classList.contains('mistake-dot')) return;
-        const rect = document.getElementById('mushafWrapper').getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const dot = document.createElement('div');
-        dot.className = 'mistake-dot';
-        dot.style.left = x+'px'; dot.style.top = y+'px';
-        const target = currentActiveSection + 'Mistakes';
-        const isExam = document.getElementById('lessonType').value === 'exam';
-        
-        dot.onclick = (ev) => { ev.stopPropagation(); dot.remove(); 
-            if(isExam) updateExamMistake('teacher', -1);
-            else adjustMistake(target, -1); 
-        };
-        
-        document.getElementById('mushafWrapper').appendChild(dot);
-        if(isExam) updateExamMistake('teacher', 1);
-        else adjustMistake(target, 1);
-    }
-
-    function adjustMistake(id, delta) {
-        const el = document.getElementById(id);
-        let v = parseInt(el.value) || 0;
-        v += delta; if(v < 0) v = 0;
-        el.value = v;
-    }
-    
-    function updateExamMistake(type, delta) {
-        const id = type === 'teacher' ? 'examTeacherMistakes' : 'examSelfMistakes';
-        const el = document.getElementById(id);
-        let v = parseInt(el.value) || 0;
-        v += delta; if(v < 0) v = 0;
-        el.value = v;
-        calculateExamScore();
-    }
-
-    function calculateDuration() {
-        const start = document.getElementById('examStartTime').value;
-        const end = document.getElementById('examEndTime').value;
-        if(start && end) {
-            const s = new Date("01/01/2000 " + start);
-            const e = new Date("01/01/2000 " + end);
-            const diff = (e - s) / 60000; 
-            document.getElementById('examDuration').innerText = diff > 0 ? diff : 0;
-        }
-    }
-
-    function calculateExamScore() {
-        const teacherMistakes = parseInt(document.getElementById('examTeacherMistakes').value) || 0;
-        const selfMistakes = parseInt(document.getElementById('examSelfMistakes').value) || 0;
-        let hifzScore = 80 - (teacherMistakes * 2) - (selfMistakes * 1);
-        if(hifzScore < 0) hifzScore = 0;
-        const m1 = parseFloat(document.getElementById('markMutha1').value) || 0;
-        const m2 = parseFloat(document.getElementById('markMutha2').value) || 0;
-        const tajweed = parseFloat(document.getElementById('markTajweed').value) || 0;
-        const fluency = parseFloat(document.getElementById('markFluency').value) || 0;
-        const total = hifzScore + m1 + m2 + tajweed + fluency;
-        document.getElementById('totalExamScore').innerText = total + "%";
-    }
-
-    function clearDots() { document.querySelectorAll('.mistake-dot').forEach(d => d.remove()); }
-
-    function clearForm() {
-        ['new','short','long'].forEach(s => {
-            document.getElementById(s+'Mistakes').value = 0;
-            document.getElementById(s+'Page').value = '';
-            document.getElementById(s+'Start').value = '';
-            document.getElementById(s+'End').value = '';
-            document.getElementById(s+'Surah').value = '';
-            document.getElementById(s+'EndSurah').value = '';
-        });
-        document.getElementById('examJuzu').value = '';
-        document.getElementById('examExaminer').value = '';
-        document.getElementById('examStartTime').value = '';
-        document.getElementById('examEndTime').value = '';
-        document.getElementById('examDuration').innerText = '0';
-        document.getElementById('examTeacherMistakes').value = 0;
-        document.getElementById('examSelfMistakes').value = 0;
-        document.getElementById('markMutha1').value = 2.5;
-        document.getElementById('markMutha2').value = 2.5;
-        document.getElementById('markTajweed').value = 10;
-        document.getElementById('markFluency').value = 5;
-        calculateExamScore();
-        clearDots();
-    }
-
-    // --- VIEW LOGIC ---
-    function toggleFormSection(val) {
-        const dailyContainer = document.getElementById('container-daily');
-        const examContainer = document.getElementById('container-exam');
-        if (val === 'exam') {
-            dailyContainer.style.display = 'none';
-            examContainer.style.display = 'block';
-            setActiveSection('exam');
-        } else {
-            dailyContainer.style.display = 'block';
-            examContainer.style.display = 'none';
-            setActiveSection('new');
-        }
-    }
-    
-    // --- History Filtering ---
-    function setHistoryFilter(type) {
-        historyFilter = type;
-        const buttons = document.querySelectorAll('.filter-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        
-        let activeBtnId = 'btnFilterAll';
-        if(type === 'new') activeBtnId = 'btnFilterNew';
-        if(type === 'short') activeBtnId = 'btnFilterShort';
-        if(type === 'long') activeBtnId = 'btnFilterLong';
-        if(type === 'exam') activeBtnId = 'btnFilterExam';
-        
-        document.getElementById(activeBtnId).classList.add('active');
-        renderHistory();
-    }
-
-    // --- Save & Display ---
-    function saveRecord() {
-        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
-        
-        const type = document.getElementById('lessonType').value;
-        const getV = id => document.getElementById(id).value;
-        const getS = id => {
-            const el = document.getElementById(id);
-            if(!el.value) return "";
-            return el.options[el.selectedIndex].text.split('. ')[1] || "";
-        };
-
-        const base = {
-            id: Date.now(),
-            class: currentClass,
-            student: currentStudent,
-            date: getV('entryDate'),
-            teacher: getV('teacherName')
-        };
-        
-        let rec = {};
-
-        if (type === 'exam') {
-            rec = {
-                ...base,
-                type: 'exam',
-                juzu: getV('examJuzu'),
-                examiner: getV('examExaminer'),
-                duration: document.getElementById('examDuration').innerText,
-                mistakes: { teacher: getV('examTeacherMistakes'), self: getV('examSelfMistakes') },
-                scores: { 
-                    mutha1: getV('markMutha1'), 
-                    mutha2: getV('markMutha2'), 
-                    tajweed: getV('markTajweed'), 
-                    fluency: getV('markFluency'),
-                    total: document.getElementById('totalExamScore').innerText
-                }
-            };
-        } else {
-            rec = {
-                ...base,
-                type: 'daily',
-                new: { s: getS('newSurah'), es: getS('newEndSurah'), st: getV('newStart'), en: getV('newEnd'), m: getV('newMistakes'), p: getV('newPage') },
-                short: { s: getS('shortSurah'), es: getS('shortEndSurah'), st: getV('shortStart'), en: getV('shortEnd'), m: getV('shortMistakes') },
-                long: { s: getS('longSurah'), es: getS('longEndSurah'), st: getV('longStart'), en: getV('longEnd'), m: getV('longMistakes') }
-            };
-        }
-
-        records.push(rec);
-        saveData();
-        renderHistory();
-        if(type === 'daily') autoFillNextLesson();
-        alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ");
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('historyContainer');
-        container.innerHTML = '';
-        const data = records.filter(r => r.class === currentClass && r.student === currentStudent);
-        data.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        // Filter Logic
-        let filteredData = data;
-        if(historyFilter !== 'all') {
-            filteredData = data.filter(r => {
-                if(r.type === 'exam') return historyFilter === 'exam';
-                // For daily, check if the specific section has data
-                if(historyFilter === 'new') return (r.new.s || r.new.st);
-                if(historyFilter === 'short') return (r.short.s || r.short.st);
-                if(historyFilter === 'long') return (r.long.s || r.long.st);
-                return false;
-            });
-        }
-
-        if (filteredData.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:20px;">ރެކޯޑެއް ނެތް</div>';
-            return;
-        }
-
-        // Render Table or Cards based on Filter
-        if (['new', 'short', 'long'].includes(historyFilter)) {
-            const table = document.createElement('table');
-            table.className = 'hifz-table';
-            
-            let headerColor = '#27ae60';
-            if(historyFilter === 'short') headerColor = '#2980b9';
-            if(historyFilter === 'long') headerColor = '#d35400';
-            
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th style="background:${headerColor}; color:white;">ތާރީޚް</th>
-                        <th style="background:${headerColor}; color:white;">ސޫރަތް</th>
-                        <th style="background:${headerColor}; color:white;">އާޔަތް</th>
-                        <th style="background:${headerColor}; color:white;">ކުށް</th>
-                        <th style="background:${headerColor}; color:white;"></th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            `;
-            
-            filteredData.forEach(r => {
-                const tr = document.createElement('tr');
-                const obj = r[historyFilter]; 
-                
-                let surahDisplay = obj.s || '-';
-                if(obj.es && obj.es !== obj.s) { surahDisplay += " - " + obj.es; }
-                
-                const mistakeClass = obj.m > 0 ? 'color:red;font-weight:bold' : 'color:green';
-                
-                tr.innerHTML = `
-                    <td>${r.date}</td>
-                    <td style="font-family:'Amiri'">${surahDisplay}</td>
-                    <td>${obj.st || '-'} - ${obj.en || '-'}</td>
-                    <td style="${mistakeClass}">${obj.m}</td>
-                    <td><button class="delete-card-btn" onclick="delRec(${r.id})" style="color:red;border:none;background:none;cursor:pointer;">&times;</button></td>
-                `;
-                table.querySelector('tbody').appendChild(tr);
-            });
-            container.appendChild(table);
-        } 
-        else {
-            filteredData.forEach(r => {
-                const card = document.createElement('div');
-                
-                if (r.type === 'exam') {
-                    card.className = 'history-card exam-card';
-                    card.innerHTML = `
-                        <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
-                        <div class="card-header" style="border-color:#f1c40f;">
-                            <span class="card-date">🏆 އިމްތިޙާން (${r.juzu}) - ${r.date}</span>
-                            <span class="card-teacher" style="background:#fff8e1; color:#d35400;">${r.scores.total}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-section exam">
-                                <div style="font-size:12px;">
-                                    <div>އިމްތިޙާން ކުރީ: ${r.examiner || '-'}</div>
-                                    <div style="margin-top:5px; color:#e74c3c;">ކުށް: T(${r.mistakes.teacher}) S(${r.mistakes.self})</div>
-                                </div>
-                            </div>
-                        </div>`;
-                } else {
-                    card.className = 'history-card';
-                    const buildSec = (label, obj, typeClass) => {
-                        if(!obj || (!obj.s && !obj.st && obj.m == 0)) return '';
-                        const mistakeClass = obj.m > 0 ? 'red' : 'green';
-                        let surahDisplay = obj.s || '-';
-                        if(obj.es && obj.es !== obj.s) { surahDisplay += " - " + obj.es; }
-    
-                        return `
-                            <div class="card-section ${typeClass}">
-                                <span class="section-label">${label}</span>
-                                <div class="section-content">
-                                    <div class="surah-info">
-                                        <span class="surah-name">${surahDisplay}</span>
-                                        <span class="ayah-range">އާޔަތް: ${obj.st || '0'} - ${obj.en || '0'}</span>
-                                    </div>
-                                    <span class="mistake-badge ${mistakeClass}">${obj.m} ކުށް</span>
-                                </div>
-                            </div>`;
-                    };
-    
-                    card.innerHTML = `
-                        <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
-                        <div class="card-header">
-                            <span class="card-date">📅 ${r.date}</span>
-                            <span class="card-teacher">👨‍🏫 ${r.teacher || '-'}</span>
-                        </div>
-                        <div class="card-body">
-                            ${buildSec('އާ ފިލާވަޅު', r.new, 'new')}
-                            ${buildSec('ކުރު މުރާޖަޢާ', r.short, 'short')}
-                            ${buildSec('ދިގު މުރާޖަޢާ', r.long, 'long')}
-                        </div>`;
-                }
-                container.appendChild(card);
-            });
-        }
-    }
-
-    function delRec(id) {
-        if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
-            records = records.filter(r => r.id !== id);
-            saveData();
-            renderHistory();
-        }
-    }
-
-    function exportExcel() {
-        if(records.length === 0) return alert("ނޯ ޑޭޓާ");
-        const data = records.filter(r => r.class === currentClass).map(r => {
-            if (r.type === 'exam') {
-                 return {
-                    "ތާރީޚް": r.date, "ދަރިވަރު": r.student, "ބާވަތް": "އިމްތިޙާން",
-                    "ބައި": r.juzu, "އިމްތިޙާން ކުރީ": r.examiner, "ޖުމްލަ": r.scores.total, 
-                    "ތަޖްވީދު": r.scores.tajweed, "ފަރިތަކަން": r.scores.fluency,
-                    "މުތަޝާބިހް": parseFloat(r.scores.mutha1)+parseFloat(r.scores.mutha2),
-                    "ވަގުތު": r.duration
-                };
-            } else {
-                const sText = (obj) => (obj.es && obj.es !== obj.s) ? `${obj.s} - ${obj.es}` : obj.s;
-                return {
-                    "ތާރީޚް": r.date, "ދަރިވަރު": r.student, "ބާވަތް": "ކިޔަވައިދިނުން",
-                    "އާ - ސޫރަތް": sText(r.new), "އާ - އާޔަތް": `${r.new.st}-${r.new.en}`, "އާ - ކުށް": r.new.m,
-                    "ކުރު - ސޫރަތް": sText(r.short), "ކުރު - އާޔަތް": `${r.short.st}-${r.short.en}`, "ކުރު - ކުށް": r.short.m,
-                    "ދިގު - ސޫރަތް": sText(r.long), "ދިގު - އާޔަތް": `${r.long.st}-${r.long.en}`, "ދިގު - ކުށް": r.long.m
-                };
-            }
-        });
-        
-        if(data.length === 0) return alert("މި ކްލާހުގެ ރެކޯޑެއް ނެތް");
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, currentClass);
-        XLSX.writeFile(wb, `Hifz_${currentClass}.xlsx`);
-    }
-
-    // --- Progress Logic ---
-    function openProgressModal() { document.getElementById('progressModal').style.display = 'flex'; }
-    function closeProgressModal() { document.getElementById('progressModal').style.display = 'none'; }
-
-    function calculateProgress() {
-        const start = new Date(document.getElementById('progStartDate').value);
-        const end = new Date(document.getElementById('progEndDate').value);
-        
-        if (isNaN(start) || isNaN(end)) return alert("ތާރީޚް އިޚްތިޔާރުކުރައްވާ");
-
-        const studentRecords = records.filter(r => 
-            r.class === currentClass && 
-            r.student === currentStudent && 
-            r.type === 'daily' &&
-            // Check if there is actual content in 'new' section
-            (r.new.s || r.new.st)
-        );
-
-        let count = 0;
-        studentRecords.forEach(r => {
-            const d = new Date(r.date);
-            if (d >= start && d <= end) {
-                count++;
-            }
-        });
-
-        document.getElementById('progCount').innerText = count;
-        document.getElementById('progressResult').style.display = 'block';
-    }
-</script>
-   <script>
-  // 1. މިތަނަށް ތިބާގެ ފަޔަރބޭސް ކޮންފިގްރޭޝަން އަޅުއްވާ
-  const firebaseConfig = {
-    apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
+    <script>
+        // --- 1. FIREBASE CONFIG (މި ބައި ބަދަލުކުރޭ) ---
+        const firebaseConfig = {
+           apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
   authDomain: "islam-portal-muthamin.firebaseapp.com",
   projectId: "islam-portal-muthamin",
   storageBucket: "islam-portal-muthamin.firebasestorage.app",
   messagingSenderId: "842342714257",
   appId: "1:842342714257:web:2f839d6bf92dda92936830"
-  };
+        };
 
-  // 2. ފަޔަރބޭސް ފަށްޓުން
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
 
-  // 3. ސޭވް ކުރާ ފަންކްޝަން
-  async function saveRecord() {
-    const studentName = document.getElementById('studentHeader').innerText;
-    const entryDate = document.getElementById('entryDate').value;
-    const teacherName = document.getElementById('teacherName').value;
+        // --- 2. APP FUNCTIONS ---
+        function loginAs(role) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            if (role === 'parent') document.body.classList.add('parent-mode');
+            else document.body.classList.remove('parent-mode');
+        }
 
-    if(!entryDate || !teacherName || studentName === "ދަރިވަރެއް ނެތް") {
-        alert("މައުލޫމާތު ފުރިހަމައެއް ނޫން!");
-        return;
-    }
+        function logout() { location.reload(); }
 
-    try {
-      await db.collection("hifz_records").add({
-        student: studentName,
-        date: entryDate,
-        teacher: teacherName,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      alert("ކާމިޔާބުކަމާއެކު ސޭވް ކުރެވިއްޖެ!");
-    } catch (e) {
-      console.error("Error: ", e);
-      alert("ސޭވް ކުރުމުގައި މައްސަލައެއް ދިމާވެއްޖެ!");
-    }
-  }
-</script>
-};
+        function toggleMushaf() {
+            const panel = document.getElementById('mushafPanel');
+            panel.style.display = (panel.style.display === 'none') ? 'flex' : 'none';
+        }
 
-// ފަޔަރބޭސް ފަށައިގަތުން
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+        let currentPage = 1;
+        function changePage(step) {
+            currentPage += step;
+            if(currentPage < 1) currentPage = 1;
+            if(currentPage > 604) currentPage = 604;
+            document.getElementById('pageIndicator').innerText = "Page " + currentPage;
+            document.getElementById('mushafImg').src = `https://www.searchtruth.com/quran/images2/${currentPage}.png`;
+        }
+
+        function updateStudentHeader() {
+            const student = document.getElementById('studentSelect').value;
+            document.getElementById('studentHeader').innerText = student || "ދަރިވަރެއް ނެތް";
+            if(student) loadRecords(student);
+        }
+
+        // --- 3. DATABASE LOGIC (ސޭވް އަދި ލޯޑް) ---
+        async function saveRecord() {
+            const student = document.getElementById('studentSelect').value;
+            const date = document.getElementById('entryDate').value;
+            const teacher = document.getElementById('teacherName').value;
+            const surah = document.getElementById('newSurah').value;
+            const startAya = document.getElementById('newStart').value;
+            const endAya = document.getElementById('newEnd').value;
+            const mistakes = document.getElementById('newMistakes').value;
+
+            if (!student || !date || !surah) {
+                alert("މައުލޫމާތު ފުރިހަމައެއް ނޫން!");
+                return;
+            }
+
+            try {
+                await db.collection("hifz_records").add({
+                    student: student,
+                    date: date,
+                    teacher: teacher,
+                    surah: surah,
+                    range: `${startAya} - ${endAya}`,
+                    mistakes: mistakes || 0,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ!");
+                loadRecords(student);
+            } catch (e) {
+                alert("މައްސަލައެއް ދިމާވެއްޖެ: " + e.message);
+            }
+        }
+
+        async function loadRecords(studentName) {
+            const list = document.getElementById('recordsList');
+            list.innerHTML = "ލޯޑްވަނީ...";
+            
+            try {
+                const snapshot = await db.collection("hifz_records")
+                    .where("student", "==", studentName)
+                    .orderBy("date", "desc")
+                    .get();
+
+                list.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'history-card';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <b>${data.date}</b>
+                            <span style="color:red;">ކުށް: ${data.mistakes}</span>
+                        </div>
+                        <div style="font-size:14px; margin-top:5px;">
+                            ${data.surah} (${data.range}) | <small>މުދައްރިސް: ${data.teacher}</small>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (e) {
+                list.innerHTML = "ޑޭޓާ ލޯޑެއް ނުކުރެވުނު.";
+                console.error(e);
+            }
+        }
+    </script>
 </body>
 </html>
