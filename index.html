@@ -682,7 +682,7 @@
 
     // *** IMPORTANT: REPLACE THIS OBJECT WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE ***
     const firebaseConfig = {
-     apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
+        apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
   authDomain: "hifz-cde3b.firebaseapp.com",
   projectId: "hifz-cde3b",
   storageBucket: "hifz-cde3b.firebasestorage.app",
@@ -692,8 +692,8 @@
 
     let app, db;
     try {
-        // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
     } catch(e) {
         console.error("Firebase Init Error:", e);
         alert("Firebase Config Error! Please edit the HTML file and add your Firebase Config.");
