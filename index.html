@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online Database v4.1</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Progress Tracker v2.2</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- FIREBASE SDK (COMPAT VERSION - WORKS BETTER FOR LOCAL FILES) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         
@@ -30,13 +26,6 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
-        }
-
-        /* LOADING OVERLAY */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 10000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
         }
 
         /* LOGIN SCREEN */
@@ -178,18 +167,6 @@
         /* --- EXAM SPECIFIC --- */
         .exam-header { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 15px; border-bottom: 2px solid #f39c12; padding-bottom: 5px; display:flex; justify-content:space-between; align-items:center;}
 
-        /* STOPWATCH STYLES */
-        .stopwatch-container {
-            background: #2c3e50; color: white; padding: 15px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: space-between; gap: 15px;
-            margin-bottom: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-        }
-        .timer-display { font-family: monospace; font-size: 28px; font-weight: bold; color: #f1c40f; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .btn-timer { padding: 8px 15px; font-size: 14px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; display:flex; align-items:center; gap:5px; transition: 0.2s;}
-        .btn-timer:hover { opacity: 0.9; transform: scale(1.05); }
-        .btn-start { background: #27ae60; color: white; }
-        .btn-stop { background: #e74c3c; color: white; }
-
         /* --- HISTORY CARDS --- */
         .history-card {
             background: white; border-radius: 10px; box-shadow: var(--card-shadow);
@@ -221,7 +198,7 @@
         .hifz-table td { border-bottom: 1px solid #eee; padding: 10px; vertical-align: top;}
         .hifz-table tr:hover { background-color: #f9f9f9; }
 
-        /* --- MODAL STYLES --- */
+        /* --- MODAL STYLES IMPROVED --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background-color: white; padding: 0; border-radius: 10px; width: 550px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #3498db; overflow: hidden; display:flex; flex-direction:column; max-height:90vh;}
         
@@ -257,34 +234,21 @@
         .filter-btn { background: #eee; color: #555; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:12px; transition:0.2s; white-space: nowrap; margin-bottom: 5px;}
         .filter-btn:hover { background: #ddd; }
         .filter-btn.active { background: var(--primary-color); color: white; }
-
-        /* Report Table */
-        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .report-table th, .report-table td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 13px; }
-        .report-table th { background-color: #f2f2f2; color: #333; }
-        .report-table td { vertical-align: middle; }
     </style>
 </head>
 <body>
 
-    <!-- LOADING -->
-    <div id="loading-overlay">
-        <div class="loader-spin" style="width:40px; height:40px; border-width:4px;"></div>
-        <p style="margin-top:10px; font-weight:bold; color:#555;">ޑޭޓާބޭސް އަށް ގުޅަނީ...</p>
-        <p style="font-size:11px; color:#999; margin-top:5px;">(ތިބޭފުޅާގެ ކޮންފިގްރޭޝަން ޗެކްކޮށްލައްވާ)</p>
-    </div>
-
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" style="display:none;">
+    <div id="login-screen">
         <div class="login-box">
-            <h2 style="color:var(--primary-color); margin-top:0;">ޙިފްޡް ޕްރޮގްރާމް (Online)</h2>
+            <h2 style="color:var(--primary-color); margin-top:0;">ޙިފްޡް ޕްރޮގްރާމް</h2>
             <p style="font-size:14px; margin-bottom:20px;">ކުރިއަށް ވަޑައިގަތުމަށް ޚިޔާރުކުރައްވާ</p>
             
             <button class="login-btn btn-parent" onclick="loginAs('parent')">👨‍👩‍👧‍👦 ބެލެނިވެރިން</button>
             <div style="margin: 15px 0; border-bottom: 1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v4.1</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v2.2</p>
     </div>
 
     <!-- APP CONTENT (Initially Hidden) -->
@@ -435,19 +399,6 @@
                             <span>🏆 ޖުޒުއު އިމްތިޙާން</span>
                             <span id="totalExamScore" style="font-size:24px; color:#2c3e50;">100%</span>
                         </div>
-                        
-                        <!-- STOPWATCH AREA -->
-                        <div class="stopwatch-container">
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <div class="timer-display" id="timerDisplay">00:00</div>
-                                <button class="btn-timer btn-start" onclick="startTimer()">▶ ފަށާ</button>
-                                <button class="btn-timer btn-stop" onclick="stopTimer()">⏹ ހުއްޓާ</button>
-                            </div>
-                            <div style="text-align:right;">
-                                <label style="color:#bdc3c7;">ހޭދަވި ވަގުތު (މިނެޓް):</label>
-                                <input type="number" id="examDurationInput" style="width:80px; text-align:center; padding:5px; border-radius:4px; border:none; color:black;" placeholder="0">
-                            </div>
-                        </div>
 
                         <!-- Top Row: Surah & Time -->
                         <div class="form-row">
@@ -455,20 +406,24 @@
                                 <label>އިމްތިޙާން ކުރެވޭ ބައި (ޖުޒުއު/ސޫރަތް):</label>
                                 <input type="text" id="examJuzu" placeholder="މިސާލު: 30 ވަނަ ޖުޒުއު">
                             </div>
-                            <!-- Exam Portion Selection -->
-                            <div style="flex:1.5">
-                                <label>މިންވަރު:</label>
-                                <select id="examPortion">
-                                    <option value="whole">މުޅި ޖުޒުއު</option>
-                                    <option value="half">1/2 (ދެބައިކުޅަ އެއްބައި)</option>
-                                    <option value="third">1/3 (ތިންބައިކުޅަ އެއްބައި)</option>
-                                    <option value="quarter">1/4 (ހަތަރުބައިކުޅަ އެއްބައި)</option>
-                                </select>
-                            </div>
-                            <!-- Examiner Name -->
+                            <!-- NEW: Examiner Name -->
                             <div style="flex:2">
                                 <label>އިމްތިޙާން ކުރި ފަރާތް:</label>
                                 <input type="text" id="examExaminer" placeholder="ނަން">
+                            </div>
+                        </div>
+                        <div class="form-row" style="background:white; padding:10px; border-radius:6px; border:1px solid #ddd;">
+                            <div style="flex:1">
+                                <label>ފަށާ ގަޑި:</label>
+                                <input type="time" id="examStartTime" onchange="calculateDuration()">
+                            </div>
+                            <div style="flex:1">
+                                <label>ނިންމާ ގަޑި:</label>
+                                <input type="time" id="examEndTime" onchange="calculateDuration()">
+                            </div>
+                            <div style="flex:0.5; text-align:center;">
+                                <label>މިނެޓް</label>
+                                <span id="examDuration" style="font-weight:bold; color:blue; font-size:18px;">0</span>
                             </div>
                         </div>
 
@@ -525,10 +480,7 @@
 
             <!-- HISTORY SECTION -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px 0; border-bottom: 2px solid #eee; padding-bottom:8px; flex-wrap:wrap; gap:5px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <h4 style="margin:0; color:#555;">ރެކޯޑް ތާވަލް (History)</h4>
-                    <button class="btn btn-blue" style="padding:4px 8px; font-size:12px;" onclick="openExamReport()">📊 އިމްތިޙާން ރިޕޯޓް</button>
-                </div>
+                <h4 style="margin:0; color:#555;">ރެކޯޑް ތާވަލް (History)</h4>
                 <div style="display:flex; gap:5px; flex-wrap:wrap;">
                     <button class="filter-btn active" id="btnFilterAll" onclick="setHistoryFilter('all')">ހުރިހާ</button>
                     <button class="filter-btn" id="btnFilterNew" onclick="setHistoryFilter('new')">އާ ފިލާވަޅު</button>
@@ -562,7 +514,7 @@
         </div>
     </div>
 
-    <!-- SETTINGS MODAL -->
+    <!-- SETTINGS MODAL (REDESIGNED) -->
     <div id="classModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -573,6 +525,7 @@
             <div class="tab-header">
                 <div class="tab-btn active" onclick="switchTab('tab-students')">ކުދިން (Students)</div>
                 <div class="tab-btn" onclick="switchTab('tab-class')">ކްލާސް (Class)</div>
+                <div class="tab-btn" onclick="switchTab('tab-data')">ބެކަޕް (Backup)</div>
             </div>
 
             <div class="modal-body">
@@ -622,6 +575,26 @@
                         <button class="btn btn-red" style="width:100%; justify-content: center;" onclick="deleteSelectedClass()">މި ކްލާސް ފޮހެލާ</button>
                     </div>
                 </div>
+
+                 <!-- TAB 3: Data Backup -->
+                 <div id="tab-data" class="tab-content">
+                    <div style="background:#f0f8ff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #3498db;">
+                        <h4 style="margin:0 0 10px 0;">ބެކަޕް ނެގުން (Download)</h4>
+                        <p style="font-size:12px; margin-bottom:10px;">މި ބަޓަނަށް ފިތާލުމުން، ހުރިހާ ޑޭޓާއެއް ފައިލްއެއްގެ ގޮތުގައި ލިބޭނެއެވެ. މި ފައިލް އެހެން މީހަކަށް ފޮނުވިދާނެއެވެ.</p>
+                        <button class="btn btn-blue" style="width:100%; justify-content:center;" onclick="downloadBackup()">📥 ބެކަޕް ޑައުންލޯޑް</button>
+                    </div>
+
+                    <div style="background:#fff0f0; padding:15px; border-radius:8px; border:1px solid #e74c3c;">
+                        <h4 style="margin:0 0 10px 0;">ރީސްޓޯރ (Restore)</h4>
+                        <p style="font-size:12px; margin-bottom:10px;">ޑައުންލޯޑް ކޮށްފައިވާ ބެކަޕް ފައިލް މިތަނަށް ލުމުން، ޑޭޓާ އަލުން އަޅާލެވޭނެއެވެ.</p>
+                        <input type="file" id="restoreFile" style="margin-bottom:10px;">
+                        <button class="btn btn-red" style="width:100%; justify-content:center;" onclick="restoreBackup()">📤 ޑޭޓާ އަޅާލާ</button>
+                    </div>
+
+                    <div style="margin-top:20px; text-align:center; border-top:1px solid #eee; padding-top:10px;">
+                        <button style="font-size:11px; color:red; border:none; background:none; cursor:pointer; text-decoration:underline;" onclick="hardReset()">⚠️ ހުރިހާ ޑޭޓާއެއް ރިސެޓްކުރޭ (All Reset)</button>
+                   </div>
+                </div>
             </div>
         </div>
     </div>
@@ -653,32 +626,6 @@
         </div>
     </div>
 
-    <!-- EXAM REPORT MODAL -->
-    <div id="examReportModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 style="margin:0; color:var(--primary-color);">📊 އިމްތިޙާން ރިޕޯޓް</h3>
-                <span class="close-modal" onclick="closeExamReport()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <h4 id="reportStudentName" style="text-align:center; color:#2c3e50; margin-top:0;"></h4>
-                <div id="reportSummary" style="text-align:center; margin-bottom:15px; font-weight:bold; color:#27ae60;"></div>
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>ތާރީޚް</th>
-                            <th>ބައި</th>
-                            <th>މިންވަރު</th>
-                            <th>މާކްސް</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
 <script>
     // --- FIREBASE CONFIGURATION ---
     // *** IMPORTANT: REPLACE THIS OBJECT WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE ***
@@ -700,426 +647,31 @@
         console.error("Firebase Init Error:", e);
         alert("Firebase Config Error! Please edit the HTML file and add your Firebase Config.");
     }
-
-    // --- Global Vars ---
     const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الخشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
-    const TEACHER_PASSWORD = "1234";
+    const STORAGE_CLASSES = 'hifz_v5_classes';
+    const STORAGE_RECORDS = 'hifz_v5_records';
+    const TEACHER_PASSWORD = "1234"; // PASSWORD
 
     let classes = {}; 
-    let records = []; // This will be an object in Firebase, but array locally for sorting
+    // Data Structure: 
+    // { "Grade 1": { teacher: "Mr. Ahmed", students: ["Ali (123)", "Hassan (124)"] } }
+    
+    let records = [];
     let currentClass = "";
     let currentStudent = null;
     let currentActiveSection = 'new';
     let currentPage = 1;
     let historyFilter = 'all'; 
 
-    // Stopwatch Variables
-    let timerInterval;
-    let startTime;
-    let elapsedTime = 0;
-
-    // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Init UI
+        loadData();
         populateSurahSelects();
+        refreshClassDropdowns();
         document.getElementById('entryDate').valueAsDate = new Date();
         loadMushaf(1);
-
-        // Firebase Listeners
-        if(db) {
-            // Listen for Classes
-            db.ref('classes').on('value', (snapshot) => {
-                const data = snapshot.val();
-                classes = data || { "Default Class": { teacher: "", students: [] } };
-                // Handle array/object conversion if needed from old data
-                Object.keys(classes).forEach(k => {
-                    if(Array.isArray(classes[k])) classes[k] = {teacher:"", students: classes[k]};
-                    if(!classes[k].students) classes[k].students = [];
-                });
-                
-                refreshClassDropdowns();
-                document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'flex'; // Show login after load
-            }, (error) => {
-                console.error(error);
-                alert("Error connecting to database. Check Console.");
-                document.getElementById('loading-overlay').style.display = 'none';
-            });
-
-            // Listen for Records
-            db.ref('records').on('value', (snapshot) => {
-                const data = snapshot.val();
-                // Convert Object to Array for easier local handling
-                records = [];
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        records.push({ ...data[key], firebaseKey: key });
-                    });
-                }
-                if(currentStudent) {
-                    renderHistory();
-                    autoFillNextLesson();
-                }
-            });
-        }
     });
 
-    // --- FIREBASE HELPER FUNCTIONS ---
-    function syncClassData() {
-        if(!db) return;
-        db.ref('classes').set(classes);
-    }
-
-    function pushRecord(record) {
-        if(!db) return;
-        db.ref('records').push(record);
-    }
-
-    function deleteRecordFromDB(key) {
-        if(!db) return;
-        db.ref(`records/${key}`).remove();
-    }
-
-    // --- UI LOGIC ---
-    function populateSurahSelects() {
-        const ids = ['newSurah', 'newEndSurah','shortSurah', 'shortEndSurah','longSurah', 'longEndSurah'];
-        ids.forEach(id => {
-            const sel = document.getElementById(id);
-            if(!sel) return;
-            sel.innerHTML = sel.innerHTML; 
-            surahNames.forEach((s, i) => {
-                let opt = document.createElement('option');
-                opt.value = i + 1;
-                opt.innerText = (i+1) + ". " + s;
-                sel.appendChild(opt);
-            });
-        });
-    }
-
-    function refreshClassDropdowns() {
-        const mainSel = document.getElementById('classSelect');
-        const modalSel = document.getElementById('modalClassSelect');
-        const deleteSel = document.getElementById('deleteClassSelect');
-        [mainSel, modalSel, deleteSel].forEach(sel => sel.innerHTML = '');
-
-        const keys = Object.keys(classes);
-        if(keys.length === 0) {
-            classes = {"Default Class": { teacher: "", students: [] }};
-            keys.push("Default Class");
-            syncClassData();
-        }
-
-        keys.forEach(k => {
-            [mainSel, modalSel, deleteSel].forEach(sel => {
-                let opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = k;
-                sel.appendChild(opt);
-            });
-        });
-
-        if(keys.includes(currentClass)) mainSel.value = currentClass;
-        else {
-            mainSel.value = keys[0];
-            currentClass = keys[0];
-        }
-        switchClass(mainSel.value);
-    }
-
-    function switchClass(className) {
-        currentClass = className;
-        document.getElementById('currentClassDisplay').innerText = "Class: " + className;
-        
-        const teacherDisplay = document.getElementById('classTeacherDisplay');
-        const teacherName = classes[className].teacher;
-        if(teacherName) {
-            teacherDisplay.style.display = 'inline-block';
-            teacherDisplay.innerText = "Tr. " + teacherName;
-            document.getElementById('teacherName').value = teacherName; 
-        } else {
-            teacherDisplay.style.display = 'none';
-        }
-
-        const list = document.getElementById('studentListContainer');
-        list.innerHTML = '';
-        currentStudent = null;
-        document.getElementById('studentHeader').innerText = "ދަރިވަރެއް ނެތް";
-        document.getElementById('historyContainer').innerHTML = ''; 
-        
-        clearForm();
-
-        const students = classes[className].students || [];
-        if(students.length === 0) {
-            list.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">މި ކްލާހުގައި ކުއްޖަކު ނެތް</div>';
-        } else {
-            students.forEach(s => {
-                const btn = document.createElement('button');
-                btn.className = 'student-btn';
-                btn.innerText = s;
-                btn.onclick = () => selectStudent(s, btn);
-                list.appendChild(btn);
-            });
-        }
-    }
-
-    function selectStudent(name, btnEl) {
-        currentStudent = name;
-        document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
-        if(btnEl) btnEl.classList.add('active');
-        document.getElementById('studentHeader').innerText = name;
-        
-        clearForm(); // Reset form and mistakes
-        autoFillNextLesson();
-        renderHistory();
-    }
-
-    function autoFillNextLesson() {
-        if(!currentStudent) return;
-        // Filter records for this student
-        const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
-        // Sort by date descending
-        studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
-
-        if(studentRecords.length === 0) return;
-        
-        // Find last DAILY lesson
-        const lastDaily = studentRecords.find(r => r.type === 'daily');
-        
-        if(lastDaily && lastDaily.new && lastDaily.new.s && lastDaily.new.en) {
-            const lastEndSurahName = lastDaily.new.es || lastDaily.new.s;
-            const lastEndVerse = parseInt(lastDaily.new.en);
-            if(!lastEndSurahName || !lastEndVerse) return;
-
-            const surahIndex = surahNames.indexOf(lastEndSurahName) + 1;
-            if(surahIndex === 0) return; 
-
-            const nextVerse = lastEndVerse + 1;
-            const loader = document.getElementById('loader-new');
-            if(loader) loader.style.display = 'inline-block';
-
-            // Try to fetch page for next verse
-            fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex}:${nextVerse}?fields=page_number`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.verse) {
-                        document.getElementById('newSurah').value = surahIndex;
-                        document.getElementById('newStart').value = nextVerse;
-                        if(data.verse.page_number) {
-                            loadMushaf(data.verse.page_number);
-                            document.getElementById('newPage').value = data.verse.page_number;
-                        }
-                    } else {
-                        // End of Surah, go to next Surah
-                        if(surahIndex < 114) {
-                            const nextSurahIndex = surahIndex + 1;
-                            document.getElementById('newSurah').value = nextSurahIndex;
-                            document.getElementById('newStart').value = 1;
-                            return fetch(`https://api.quran.com/api/v4/verses/by_key/${nextSurahIndex}:1?fields=page_number`);
-                        }
-                    }
-                })
-                .then(res => {
-                    if(res) return res.json();
-                })
-                .then(data2 => {
-                    if(data2 && data2.verse && data2.verse.page_number) {
-                        loadMushaf(data2.verse.page_number);
-                        document.getElementById('newPage').value = data2.verse.page_number;
-                    }
-                })
-                .catch(e => console.log(e))
-                .finally(() => {
-                    if(loader) loader.style.display = 'none';
-                    setActiveSection('new');
-                    const radio = document.querySelector(`input[name="activeSec"][value="new"]`);
-                    if(radio) radio.checked = true;
-                });
-        }
-    }
-
-    // --- Save & History ---
-    function saveRecord() {
-        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
-        
-        const type = document.getElementById('lessonType').value;
-        const getV = id => document.getElementById(id).value;
-        const getS = id => {
-            const el = document.getElementById(id);
-            if(!el.value) return "";
-            return el.options[el.selectedIndex].text.split('. ')[1] || "";
-        };
-
-        const base = {
-            id: Date.now(), // Still useful as a timestamp ID
-            class: currentClass,
-            student: currentStudent,
-            date: getV('entryDate'),
-            teacher: getV('teacherName')
-        };
-        
-        let rec = {};
-
-        if (type === 'exam') {
-            rec = {
-                ...base,
-                type: 'exam',
-                juzu: getV('examJuzu'),
-                portion: document.getElementById('examPortion').value,
-                examiner: getV('examExaminer'),
-                duration: document.getElementById('examDurationInput').value, // Use the input field value
-                mistakes: { teacher: getV('examTeacherMistakes'), self: getV('examSelfMistakes') },
-                scores: { 
-                    mutha1: getV('markMutha1'), 
-                    mutha2: getV('markMutha2'), 
-                    tajweed: getV('markTajweed'), 
-                    fluency: getV('markFluency'),
-                    total: document.getElementById('totalExamScore').innerText
-                }
-            };
-        } else {
-            rec = {
-                ...base,
-                type: 'daily',
-                new: { s: getS('newSurah'), es: getS('newEndSurah'), st: getV('newStart'), en: getV('newEnd'), m: getV('newMistakes'), p: getV('newPage') },
-                short: { s: getS('shortSurah'), es: getS('shortEndSurah'), st: getV('shortStart'), en: getV('shortEnd'), m: getV('shortMistakes') },
-                long: { s: getS('longSurah'), es: getS('longEndSurah'), st: getV('longStart'), en: getV('longEnd'), m: getV('longMistakes') }
-            };
-        }
-
-        pushRecord(rec);
-        clearForm(); // Clear after save so mistakes don't carry over
-        alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ");
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('historyContainer');
-        container.innerHTML = '';
-        const data = records.filter(r => r.class === currentClass && r.student === currentStudent);
-        data.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        // Filter Logic
-        let filteredData = data;
-        if(historyFilter !== 'all') {
-            filteredData = data.filter(r => {
-                if(r.type === 'exam') return historyFilter === 'exam';
-                // For daily, check if the specific section has data
-                if(historyFilter === 'new') return (r.new && (r.new.s || r.new.st));
-                if(historyFilter === 'short') return (r.short && (r.short.s || r.short.st));
-                if(historyFilter === 'long') return (r.long && (r.long.s || r.long.st));
-                return false;
-            });
-        }
-
-        if (filteredData.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:20px;">ރެކޯޑެއް ނެތް</div>';
-            return;
-        }
-
-        // Render Cards (Keeping it simple for cards vs table switch)
-        filteredData.forEach(r => {
-            const card = document.createElement('div');
-            
-            if (r.type === 'exam') {
-                const portionText = r.portion === 'whole' ? 'މުޅި ޖުޒުއު' : 
-                                    r.portion === 'half' ? '1/2' : 
-                                    r.portion === 'third' ? '1/3' : '1/4';
-                card.className = 'history-card exam-card';
-                card.innerHTML = `
-                    <button class="delete-card-btn teacher-only" onclick="delRec('${r.firebaseKey}')">&times;</button>
-                    <div class="card-header" style="border-color:#f1c40f;">
-                        <span class="card-date">🏆 އިމްތިޙާން (${r.juzu} - ${portionText}) - ${r.date}</span>
-                        <span class="card-teacher" style="background:#fff8e1; color:#d35400;">${r.scores.total}</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-section exam">
-                            <div style="font-size:12px;">
-                                <div>އިމްތިޙާން ކުރީ: ${r.examiner || '-'}</div>
-                                <div style="margin-top:5px; color:#e74c3c;">ކުށް: T(${r.mistakes.teacher}) S(${r.mistakes.self})</div>
-                                <div style="font-size:10px; color:#999;">ވަގުތު: ${r.duration || 0} މިނެޓް</div>
-                            </div>
-                        </div>
-                    </div>`;
-            } else {
-                card.className = 'history-card';
-                const buildSec = (label, obj, typeClass) => {
-                    if(!obj || (!obj.s && !obj.st && (!obj.m || obj.m == 0))) return '';
-                    const mistakeClass = obj.m > 0 ? 'red' : 'green';
-                    let surahDisplay = obj.s || '-';
-                    if(obj.es && obj.es !== obj.s) { surahDisplay += " - " + obj.es; }
-
-                    return `
-                        <div class="card-section ${typeClass}">
-                            <span class="section-label">${label}</span>
-                            <div class="section-content">
-                                <div class="surah-info">
-                                    <span class="surah-name">${surahDisplay}</span>
-                                    <span class="ayah-range">އާޔަތް: ${obj.st || '0'} - ${obj.en || '0'}</span>
-                                </div>
-                                <span class="mistake-badge ${mistakeClass}">${obj.m} ކުށް</span>
-                            </div>
-                        </div>`;
-                };
-
-                card.innerHTML = `
-                    <button class="delete-card-btn teacher-only" onclick="delRec('${r.firebaseKey}')">&times;</button>
-                    <div class="card-header">
-                        <span class="card-date">📅 ${r.date}</span>
-                        <span class="card-teacher">👨‍🏫 ${r.teacher || '-'}</span>
-                    </div>
-                    <div class="card-body">
-                        ${buildSec('އާ ފިލާވަޅު', r.new, 'new')}
-                        ${buildSec('ކުރު މުރާޖަޢާ', r.short, 'short')}
-                        ${buildSec('ދިގު މުރާޖަޢާ', r.long, 'long')}
-                    </div>`;
-            }
-            container.appendChild(card);
-        });
-        
-        // Re-apply parent/teacher mode visibility
-        if(document.body.classList.contains('parent-mode')) {
-            document.querySelectorAll('.teacher-only').forEach(e => e.style.display = 'none');
-        }
-    }
-
-    function delRec(key) {
-        if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
-            deleteRecordFromDB(key);
-        }
-    }
-
-    // --- OTHER UI ACTIONS ---
-    function startTimer() {
-        if (!timerInterval) {
-            startTime = Date.now() - elapsedTime;
-            timerInterval = setInterval(updateTimerDisplay, 1000);
-        }
-    }
-
-    function stopTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            const minutes = Math.ceil(elapsedTime / 60000);
-            document.getElementById('examDurationInput').value = minutes;
-        }
-    }
-
-    function updateTimerDisplay() {
-        elapsedTime = Date.now() - startTime;
-        const totalSeconds = Math.floor(elapsedTime / 1000);
-        const mins = Math.floor(totalSeconds / 60);
-        const secs = totalSeconds % 60;
-        document.getElementById('timerDisplay').innerText = 
-            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function resetTimer() {
-        stopTimer();
-        elapsedTime = 0;
-        document.getElementById('timerDisplay').innerText = "00:00";
-        document.getElementById('examDurationInput').value = "";
-    }
-
+    // --- LOGIN SYSTEM ---
     function loginAs(type) {
         if(type === 'teacher') {
             const pwd = prompt("ޕާސްވޯޑް ޖައްސަވާ:");
@@ -1145,6 +697,182 @@
         location.reload();
     }
 
+    // --- DATA HANDLING ---
+    function loadData() {
+        try {
+            const cls = localStorage.getItem(STORAGE_CLASSES);
+            classes = cls ? JSON.parse(cls) : { "Default Class": { teacher: "", students: [] } };
+            
+            // MIGRATION for old array format to new object format
+            if(classes && typeof classes === 'object') {
+                Object.keys(classes).forEach(k => {
+                    if (Array.isArray(classes[k])) {
+                        classes[k] = { teacher: "", students: classes[k] };
+                    }
+                });
+            } else {
+                classes = { "Default Class": { teacher: "", students: [] } };
+            }
+
+            const rec = localStorage.getItem(STORAGE_RECORDS);
+            records = rec ? JSON.parse(rec) : [];
+        } catch(e) {
+            console.error(e);
+            classes = { "Default Class": { teacher: "", students: [] } };
+            records = [];
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_CLASSES, JSON.stringify(classes));
+        localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+    }
+
+    function populateSurahSelects() {
+        const ids = ['newSurah', 'newEndSurah','shortSurah', 'shortEndSurah','longSurah', 'longEndSurah'];
+        ids.forEach(id => {
+            const sel = document.getElementById(id);
+            if(!sel) return;
+            sel.innerHTML = sel.innerHTML; 
+            surahNames.forEach((s, i) => {
+                let opt = document.createElement('option');
+                opt.value = i + 1;
+                opt.innerText = (i+1) + ". " + s;
+                sel.appendChild(opt);
+            });
+        });
+    }
+
+    // --- Class & Student Logic ---
+    function refreshClassDropdowns() {
+        const mainSel = document.getElementById('classSelect');
+        const modalSel = document.getElementById('modalClassSelect');
+        const deleteSel = document.getElementById('deleteClassSelect');
+        [mainSel, modalSel, deleteSel].forEach(sel => sel.innerHTML = '');
+
+        const keys = Object.keys(classes);
+        if(keys.length === 0) {
+            classes = {"Default Class": { teacher: "", students: [] }};
+            keys.push("Default Class");
+            saveData();
+        }
+
+        keys.forEach(k => {
+            [mainSel, modalSel, deleteSel].forEach(sel => {
+                let opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = k;
+                sel.appendChild(opt);
+            });
+        });
+
+        if(keys.includes(currentClass)) mainSel.value = currentClass;
+        else {
+            mainSel.value = keys[0];
+            currentClass = keys[0];
+        }
+        switchClass(mainSel.value);
+    }
+
+    function switchClass(className) {
+        currentClass = className;
+        document.getElementById('currentClassDisplay').innerText = "Class: " + currentClass;
+        
+        // Show Teacher Name
+        const teacherDisplay = document.getElementById('classTeacherDisplay');
+        const teacherName = classes[currentClass].teacher;
+        if(teacherName) {
+            teacherDisplay.style.display = 'inline-block';
+            teacherDisplay.innerText = "Tr. " + teacherName;
+            document.getElementById('teacherName').value = teacherName; // Auto-fill entry form
+        } else {
+            teacherDisplay.style.display = 'none';
+        }
+
+        const list = document.getElementById('studentListContainer');
+        list.innerHTML = '';
+        currentStudent = null;
+        document.getElementById('studentHeader').innerText = "ދަރިވަރެއް ނެތް";
+        document.getElementById('historyContainer').innerHTML = ''; 
+
+        const students = classes[currentClass].students || [];
+        if(students.length === 0) {
+            list.innerHTML = '<div style="padding:20px; text-align:center; color:#999; font-size:13px;">މި ކްލާހުގައި ކުއްޖަކު ނެތް</div>';
+        } else {
+            students.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = 'student-btn';
+                btn.innerText = s;
+                btn.onclick = () => selectStudent(s, btn);
+                list.appendChild(btn);
+            });
+        }
+    }
+
+    function selectStudent(name, btnEl) {
+        currentStudent = name;
+        document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
+        if(btnEl) btnEl.classList.add('active');
+        document.getElementById('studentHeader').innerText = name;
+        
+        // Auto fill next lesson
+        autoFillNextLesson();
+        renderHistory();
+    }
+
+    // --- AUTO FILL NEXT LESSON ---
+    async function autoFillNextLesson() {
+        if(!currentStudent) return;
+        const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
+        studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
+
+        if(studentRecords.length === 0) return;
+        const lastRecord = studentRecords[0];
+        
+        if(lastRecord.new && lastRecord.new.s && lastRecord.new.en) {
+            const lastEndSurahName = lastRecord.new.es || lastRecord.new.s;
+            const lastEndVerse = parseInt(lastRecord.new.en);
+            if(!lastEndSurahName || !lastEndVerse) return;
+
+            const surahIndex = surahNames.indexOf(lastEndSurahName) + 1;
+            if(surahIndex === 0) return; 
+
+            const nextVerse = lastEndVerse + 1;
+            const loader = document.getElementById('loader-new');
+            if(loader) loader.style.display = 'inline-block';
+
+            try {
+                const res = await fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex}:${nextVerse}?fields=page_number`);
+                if(res.ok) {
+                    const data = await res.json();
+                    if(data.verse) {
+                        document.getElementById('newSurah').value = surahIndex;
+                        document.getElementById('newStart').value = nextVerse;
+                        if(data.verse.page_number) {
+                            loadMushaf(data.verse.page_number);
+                            document.getElementById('newPage').value = data.verse.page_number;
+                        }
+                    }
+                } else {
+                    if(surahIndex < 114) {
+                        const nextSurahIndex = surahIndex + 1;
+                        document.getElementById('newSurah').value = nextSurahIndex;
+                        document.getElementById('newStart').value = 1;
+                        const res2 = await fetch(`https://api.quran.com/api/v4/verses/by_key/${nextSurahIndex}:1?fields=page_number`);
+                        const data2 = await res2.json();
+                        if(data2.verse && data2.verse.page_number) {
+                            loadMushaf(data2.verse.page_number);
+                            document.getElementById('newPage').value = data2.verse.page_number;
+                        }
+                    }
+                }
+                setActiveSection('new');
+                document.querySelector(`input[name="activeSec"][value="new"]`).checked = true;
+            } catch(e) { } finally { if(loader) loader.style.display = 'none'; }
+        }
+    }
+
+    // --- Modal Logic ---
     function openModal() { 
         document.getElementById('classModal').style.display = 'flex'; 
         document.getElementById('modalClassSelect').value = currentClass;
@@ -1164,11 +892,12 @@
     function createClass() {
         const name = document.getElementById('newClassName').value.trim();
         const teacher = document.getElementById('newClassTeacher').value.trim();
+        
         if(!name) return;
         if(classes[name]) return alert("މި ކްލާސް އެބައިން");
         
         classes[name] = { teacher: teacher, students: [] };
-        syncClassData();
+        saveData();
         
         document.getElementById('newClassName').value = '';
         document.getElementById('newClassTeacher').value = '';
@@ -1190,13 +919,24 @@
 
         lines.forEach(line => {
             if(!line.trim()) return;
-            let parts = line.split(/[\t,]+/);
-            if(parts.length < 2 && line.includes('-')) parts = line.split('-');
+            // Robust parsing: Handles comma, tab (excel), hyphen
+            // Matches: "Name, 123" or "Name 123" or "Name - 123"
+            
+            let parts = line.split(/[\t,]+/); // Split by tab or comma first
+            if(parts.length < 2 && line.includes('-')) {
+                parts = line.split('-');
+            }
 
             let name = parts[0].trim();
+            // Clean name from trailing/leading brackets if user pasted "Name (ID)"
             name = name.replace(/\(\d+\)$/, '').trim();
+
             let id = "";
-            if(parts.length > 1) id = parts[1].trim().replace(/[\(\)]/g, '');
+            if(parts.length > 1) {
+                id = parts[1].trim().replace(/[\(\)]/g, ''); // Remove brackets if present
+            }
+            
+            // Re-format consistently
             let fullName = id ? `${name} (${id})` : name;
 
             if(!classes[cls].students.includes(fullName)) {
@@ -1205,10 +945,11 @@
             }
         });
 
-        syncClassData();
+        saveData();
         document.getElementById('bulkStudents').value = '';
-        renderModalStudentList();
-        if(currentClass === cls) switchClass(cls);
+        
+        renderModalStudentList(); // Update the list inside modal
+        if(currentClass === cls) switchClass(cls); // Update main list
         alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
     }
 
@@ -1224,7 +965,10 @@
             students.forEach(s => {
                 const item = document.createElement('div');
                 item.className = 'modal-student-item';
-                item.innerHTML = `<span>${s}</span><button class="btn-del-mini" onclick="deleteStudent('${s}')">Delete</button>`;
+                item.innerHTML = `
+                    <span>${s}</span>
+                    <button class="btn-del-mini" onclick="deleteStudent('${s}')">Delete</button>
+                `;
                 listDiv.appendChild(item);
             });
         }
@@ -1234,7 +978,7 @@
         const cls = document.getElementById('modalClassSelect').value;
         if(confirm(`"${studentName}" ފޮހެލަން ބޭނުންތަ؟`)) {
             classes[cls].students = classes[cls].students.filter(s => s !== studentName);
-            syncClassData();
+            saveData();
             renderModalStudentList();
             if(currentClass === cls) switchClass(cls);
         }
@@ -1245,12 +989,62 @@
         if(Object.keys(classes).length <= 1) return alert("މިއީ ހަމައެކަނި އިން ކްލާސް. ފޮހެއެއް ނުލެވޭނެ.");
         if(confirm(cls + " ފޮހެލަން ބޭނުންތަ؟")) {
             delete classes[cls];
-            syncClassData();
+            saveData();
             refreshClassDropdowns();
             alert("ކްލާސް ފޮހެލެވިއްޖެ");
         }
     }
 
+    function hardReset() {
+        if(confirm("ހުރިހާ ޑޭޓާއެއް ފޮހެވޭނެ! ޔަގީންތަ؟")) {
+            localStorage.removeItem(STORAGE_CLASSES);
+            localStorage.removeItem(STORAGE_RECORDS);
+            location.reload();
+        }
+    }
+
+    // --- DATA BACKUP & RESTORE ---
+    function downloadBackup() {
+        const backup = { classes: classes, records: records, version: "v2.0", date: new Date().toISOString() };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "hifz_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function restoreBackup() {
+        const fileInput = document.getElementById('restoreFile');
+        const file = fileInput.files[0];
+        if (!file) { alert("ބެކަޕް ފައިލް (JSON) ނަގާ"); return; }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const content = JSON.parse(e.target.result);
+                // Simple validation
+                if (content.classes && content.records) {
+                    if(confirm("މިހާރު ހުރި ޑޭޓާ ފޮހެވި، ބެކަޕް ޑޭޓާ އެޅޭނެ. ކުރިއަށް ދާނަންތަ؟")) {
+                        classes = content.classes; records = content.records;
+                        // Fix migration if backup is from v1
+                         if(classes && typeof classes === 'object') {
+                            Object.keys(classes).forEach(k => {
+                                if (Array.isArray(classes[k])) {
+                                    classes[k] = { teacher: "", students: classes[k] };
+                                }
+                            });
+                        }
+                        saveData(); location.reload();
+                    }
+                } else { alert("މިއީ ރަނގަޅު ބެކަޕް ފައިލްއެއް ނޫން"); }
+            } catch (err) { alert("ފައިލް މައްސަލައެއް އުޅޭ: " + err); }
+        };
+        reader.readAsText(file);
+    }
+
+
+    // --- Mushaf & Auto-Fill ---
     function loadMushaf(p, sync = true) {
         if(p < 1 || p > 604) return;
         currentPage = parseInt(p);
@@ -1269,7 +1063,14 @@
         }
     }
 
-    function changePage(delta) { loadMushaf(currentPage + delta, false); }
+    function changePage(delta) {
+        loadMushaf(currentPage + delta, false);
+    }
+
+    function goToPage() { 
+        loadMushaf(document.getElementById('navPage').value, true); 
+    }
+    
     function toggleMushaf() {
         const w = getComputedStyle(document.documentElement).getPropertyValue('--mushaf-width').trim();
         document.documentElement.style.setProperty('--mushaf-width', w === '0px' ? '35%' : '0px');
@@ -1281,7 +1082,7 @@
         document.getElementById('box-'+sec).classList.add('active-section');
     }
 
-    function autoLoadPage(sec) {
+    async function autoLoadPage(sec) {
         const p = document.getElementById(sec+'Page').value;
         if(!p) return;
         loadMushaf(p, true);
@@ -1289,30 +1090,35 @@
         document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
     }
 
-    function fillSurahFromPage(page, section) {
+    async function fillSurahFromPage(page, section) {
         const loader = document.getElementById('loader-' + section);
         if(loader) loader.style.display = 'inline-block';
         
-        fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`)
-            .then(res => res.json())
-            .then(d => {
-                if(d.verses && d.verses.length > 0) {
-                    const first = d.verses[0].verse_key.split(':');
-                    document.getElementById(section+'Surah').value = first[0];
-                    document.getElementById(section+'Start').value = first[1];
-                    const last = d.verses[d.verses.length - 1].verse_key.split(':');
-                    document.getElementById(section+'EndSurah').value = last[0];
-                    document.getElementById(section+'End').value = last[1];
-                }
-            })
-            .catch(e => console.log("Error fetching data"))
-            .finally(() => { if(loader) loader.style.display = 'none'; });
+        try {
+            const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`);
+            const d = await res.json();
+            
+            if(d.verses && d.verses.length > 0) {
+                const first = d.verses[0].verse_key.split(':');
+                document.getElementById(section+'Surah').value = first[0];
+                document.getElementById(section+'Start').value = first[1];
+
+                const last = d.verses[d.verses.length - 1].verse_key.split(':');
+                document.getElementById(section+'EndSurah').value = last[0];
+                document.getElementById(section+'End').value = last[1];
+            }
+        } catch(e) {
+            console.log("Error fetching data");
+        } finally {
+            if(loader) loader.style.display = 'none';
+        }
     }
 
     function onImageClick(e) {
-        if(document.body.classList.contains('parent-mode')) return;
+        // Disable click in parent mode
+        if (document.body.classList.contains('parent-mode')) return;
+
         if(e.target.classList.contains('mistake-dot')) return;
-        
         const rect = document.getElementById('mushafWrapper').getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -1376,18 +1182,18 @@
 
     function clearForm() {
         ['new','short','long'].forEach(s => {
-            if(document.getElementById(s+'Mistakes')) document.getElementById(s+'Mistakes').value = 0;
-            if(document.getElementById(s+'Page')) document.getElementById(s+'Page').value = '';
-            if(document.getElementById(s+'Start')) document.getElementById(s+'Start').value = '';
-            if(document.getElementById(s+'End')) document.getElementById(s+'End').value = '';
-            if(document.getElementById(s+'Surah')) document.getElementById(s+'Surah').value = '';
-            if(document.getElementById(s+'EndSurah')) document.getElementById(s+'EndSurah').value = '';
+            document.getElementById(s+'Mistakes').value = 0;
+            document.getElementById(s+'Page').value = '';
+            document.getElementById(s+'Start').value = '';
+            document.getElementById(s+'End').value = '';
+            document.getElementById(s+'Surah').value = '';
+            document.getElementById(s+'EndSurah').value = '';
         });
         document.getElementById('examJuzu').value = '';
         document.getElementById('examExaminer').value = '';
-        document.getElementById('examDurationInput').value = '';
-        document.getElementById('timerDisplay').innerText = '00:00';
-        stopTimer();
+        document.getElementById('examStartTime').value = '';
+        document.getElementById('examEndTime').value = '';
+        document.getElementById('examDuration').innerText = '0';
         document.getElementById('examTeacherMistakes').value = 0;
         document.getElementById('examSelfMistakes').value = 0;
         document.getElementById('markMutha1').value = 2.5;
@@ -1398,6 +1204,7 @@
         clearDots();
     }
 
+    // --- VIEW LOGIC ---
     function toggleFormSection(val) {
         const dailyContainer = document.getElementById('container-daily');
         const examContainer = document.getElementById('container-exam');
@@ -1412,6 +1219,7 @@
         }
     }
     
+    // --- History Filtering ---
     function setHistoryFilter(type) {
         historyFilter = type;
         const buttons = document.querySelectorAll('.filter-btn');
@@ -1425,6 +1233,193 @@
         
         document.getElementById(activeBtnId).classList.add('active');
         renderHistory();
+    }
+
+    // --- Save & Display ---
+    function saveRecord() {
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
+        
+        const type = document.getElementById('lessonType').value;
+        const getV = id => document.getElementById(id).value;
+        const getS = id => {
+            const el = document.getElementById(id);
+            if(!el.value) return "";
+            return el.options[el.selectedIndex].text.split('. ')[1] || "";
+        };
+
+        const base = {
+            id: Date.now(),
+            class: currentClass,
+            student: currentStudent,
+            date: getV('entryDate'),
+            teacher: getV('teacherName')
+        };
+        
+        let rec = {};
+
+        if (type === 'exam') {
+            rec = {
+                ...base,
+                type: 'exam',
+                juzu: getV('examJuzu'),
+                examiner: getV('examExaminer'),
+                duration: document.getElementById('examDuration').innerText,
+                mistakes: { teacher: getV('examTeacherMistakes'), self: getV('examSelfMistakes') },
+                scores: { 
+                    mutha1: getV('markMutha1'), 
+                    mutha2: getV('markMutha2'), 
+                    tajweed: getV('markTajweed'), 
+                    fluency: getV('markFluency'),
+                    total: document.getElementById('totalExamScore').innerText
+                }
+            };
+        } else {
+            rec = {
+                ...base,
+                type: 'daily',
+                new: { s: getS('newSurah'), es: getS('newEndSurah'), st: getV('newStart'), en: getV('newEnd'), m: getV('newMistakes'), p: getV('newPage') },
+                short: { s: getS('shortSurah'), es: getS('shortEndSurah'), st: getV('shortStart'), en: getV('shortEnd'), m: getV('shortMistakes') },
+                long: { s: getS('longSurah'), es: getS('longEndSurah'), st: getV('longStart'), en: getV('longEnd'), m: getV('longMistakes') }
+            };
+        }
+
+        records.push(rec);
+        saveData();
+        renderHistory();
+        if(type === 'daily') autoFillNextLesson();
+        alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ");
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('historyContainer');
+        container.innerHTML = '';
+        const data = records.filter(r => r.class === currentClass && r.student === currentStudent);
+        data.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        // Filter Logic
+        let filteredData = data;
+        if(historyFilter !== 'all') {
+            filteredData = data.filter(r => {
+                if(r.type === 'exam') return historyFilter === 'exam';
+                // For daily, check if the specific section has data
+                if(historyFilter === 'new') return (r.new.s || r.new.st);
+                if(historyFilter === 'short') return (r.short.s || r.short.st);
+                if(historyFilter === 'long') return (r.long.s || r.long.st);
+                return false;
+            });
+        }
+
+        if (filteredData.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; padding:20px;">ރެކޯޑެއް ނެތް</div>';
+            return;
+        }
+
+        // Render Table or Cards based on Filter
+        if (['new', 'short', 'long'].includes(historyFilter)) {
+            const table = document.createElement('table');
+            table.className = 'hifz-table';
+            
+            let headerColor = '#27ae60';
+            if(historyFilter === 'short') headerColor = '#2980b9';
+            if(historyFilter === 'long') headerColor = '#d35400';
+            
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="background:${headerColor}; color:white;">ތާރީޚް</th>
+                        <th style="background:${headerColor}; color:white;">ސޫރަތް</th>
+                        <th style="background:${headerColor}; color:white;">އާޔަތް</th>
+                        <th style="background:${headerColor}; color:white;">ކުށް</th>
+                        <th style="background:${headerColor}; color:white;"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            
+            filteredData.forEach(r => {
+                const tr = document.createElement('tr');
+                const obj = r[historyFilter]; 
+                
+                let surahDisplay = obj.s || '-';
+                if(obj.es && obj.es !== obj.s) { surahDisplay += " - " + obj.es; }
+                
+                const mistakeClass = obj.m > 0 ? 'color:red;font-weight:bold' : 'color:green';
+                
+                tr.innerHTML = `
+                    <td>${r.date}</td>
+                    <td style="font-family:'Amiri'">${surahDisplay}</td>
+                    <td>${obj.st || '-'} - ${obj.en || '-'}</td>
+                    <td style="${mistakeClass}">${obj.m}</td>
+                    <td><button class="delete-card-btn" onclick="delRec(${r.id})" style="color:red;border:none;background:none;cursor:pointer;">&times;</button></td>
+                `;
+                table.querySelector('tbody').appendChild(tr);
+            });
+            container.appendChild(table);
+        } 
+        else {
+            filteredData.forEach(r => {
+                const card = document.createElement('div');
+                
+                if (r.type === 'exam') {
+                    card.className = 'history-card exam-card';
+                    card.innerHTML = `
+                        <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
+                        <div class="card-header" style="border-color:#f1c40f;">
+                            <span class="card-date">🏆 އިމްތިޙާން (${r.juzu}) - ${r.date}</span>
+                            <span class="card-teacher" style="background:#fff8e1; color:#d35400;">${r.scores.total}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-section exam">
+                                <div style="font-size:12px;">
+                                    <div>އިމްތިޙާން ކުރީ: ${r.examiner || '-'}</div>
+                                    <div style="margin-top:5px; color:#e74c3c;">ކުށް: T(${r.mistakes.teacher}) S(${r.mistakes.self})</div>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    card.className = 'history-card';
+                    const buildSec = (label, obj, typeClass) => {
+                        if(!obj || (!obj.s && !obj.st && obj.m == 0)) return '';
+                        const mistakeClass = obj.m > 0 ? 'red' : 'green';
+                        let surahDisplay = obj.s || '-';
+                        if(obj.es && obj.es !== obj.s) { surahDisplay += " - " + obj.es; }
+    
+                        return `
+                            <div class="card-section ${typeClass}">
+                                <span class="section-label">${label}</span>
+                                <div class="section-content">
+                                    <div class="surah-info">
+                                        <span class="surah-name">${surahDisplay}</span>
+                                        <span class="ayah-range">އާޔަތް: ${obj.st || '0'} - ${obj.en || '0'}</span>
+                                    </div>
+                                    <span class="mistake-badge ${mistakeClass}">${obj.m} ކުށް</span>
+                                </div>
+                            </div>`;
+                    };
+    
+                    card.innerHTML = `
+                        <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
+                        <div class="card-header">
+                            <span class="card-date">📅 ${r.date}</span>
+                            <span class="card-teacher">👨‍🏫 ${r.teacher || '-'}</span>
+                        </div>
+                        <div class="card-body">
+                            ${buildSec('އާ ފިލާވަޅު', r.new, 'new')}
+                            ${buildSec('ކުރު މުރާޖަޢާ', r.short, 'short')}
+                            ${buildSec('ދިގު މުރާޖަޢާ', r.long, 'long')}
+                        </div>`;
+                }
+                container.appendChild(card);
+            });
+        }
+    }
+
+    function delRec(id) {
+        if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
+            records = records.filter(r => r.id !== id);
+            saveData();
+            renderHistory();
+        }
     }
 
     function exportExcel() {
@@ -1456,7 +1451,7 @@
         XLSX.writeFile(wb, `Hifz_${currentClass}.xlsx`);
     }
 
-    // --- REPORT & PROGRESS ---
+    // --- Progress Logic ---
     function openProgressModal() { document.getElementById('progressModal').style.display = 'flex'; }
     function closeProgressModal() { document.getElementById('progressModal').style.display = 'none'; }
 
@@ -1470,54 +1465,21 @@
             r.class === currentClass && 
             r.student === currentStudent && 
             r.type === 'daily' &&
+            // Check if there is actual content in 'new' section
             (r.new.s || r.new.st)
         );
 
         let count = 0;
         studentRecords.forEach(r => {
             const d = new Date(r.date);
-            if (d >= start && d <= end) count++;
+            if (d >= start && d <= end) {
+                count++;
+            }
         });
 
         document.getElementById('progCount').innerText = count;
         document.getElementById('progressResult').style.display = 'block';
     }
-
-    function openExamReport() {
-        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
-        
-        const examRecords = records.filter(r => 
-            r.class === currentClass && 
-            r.student === currentStudent && 
-            r.type === 'exam'
-        );
-        examRecords.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        const tbody = document.getElementById('reportTableBody');
-        tbody.innerHTML = '';
-        
-        let totalScore = 0;
-        examRecords.forEach(r => {
-            const row = document.createElement('tr');
-            let score = parseFloat(r.scores.total) || 0;
-            totalScore += score;
-            
-            const portionText = r.portion === 'whole' ? 'މުޅި' : 
-                                r.portion === 'half' ? '1/2' : 
-                                r.portion === 'third' ? '1/3' : '1/4';
-
-            row.innerHTML = `<td>${r.date}</td><td>${r.juzu}</td><td>${portionText}</td><td>${score}%</td>`;
-            tbody.appendChild(row);
-        });
-
-        const avg = examRecords.length > 0 ? (totalScore / examRecords.length).toFixed(1) : 0;
-        document.getElementById('reportStudentName').innerText = currentStudent;
-        document.getElementById('reportSummary').innerText = `ޖުމްލަ އިމްތިޙާން: ${examRecords.length} | އެވްރެޖް: ${avg}%`;
-        document.getElementById('examReportModal').style.display = 'flex';
-    }
-    
-    function closeExamReport() { document.getElementById('examReportModal').style.display = 'none'; }
-
 </script>
 </body>
 </html>
