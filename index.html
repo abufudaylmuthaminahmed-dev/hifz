@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V6.0 (Complete System)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V6.1 (IUM ID Support)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- FIREBASE SDK (Compat Version) -->
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -30,6 +30,27 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+        }
+
+        /* --- ID BADGE STYLE --- */
+        .id-badge {
+            display: inline-block;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: sans-serif; /* ID usually looks better in English font */
+            margin-top: 4px;
+            border: 1px solid #bdc3c7;
+        }
+        
+        .student-header-banner .id-badge {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            font-size: 14px;
         }
 
         /* --- LOADING & LOGIN --- */
@@ -72,9 +93,11 @@
         .student-btn {
             background: none; border: none; padding: 10px; text-align: right; width: 100%;
             cursor: pointer; border-bottom: 1px solid #f9f9f9; font-family: inherit;
+            display: flex; flex-direction: column; /* To stack name and ID */
         }
         .student-btn:hover { background: #e8f6ef; color: var(--accent-color); padding-right: 15px; }
         .student-btn.active { background: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
+        .student-btn.active .id-badge { color: var(--accent-color); background: white; }
 
         /* --- MAIN CONTENT --- */
         .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
@@ -170,7 +193,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" style="display:none;">
         <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V6.0</h2>
+            <h2>ޙިފްޡް ޕްރޮގްރާމް V6.1</h2>
             <button class="login-btn btn-student" onclick="loginAs('student')">🎓 ދަރިވަރުން</button>
             <div style="margin:15px 0; border-bottom:1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
@@ -199,9 +222,9 @@
             <div style="background:white; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <small id="currentClassDisplay" style="color:#7f8c8d; font-weight:bold;">Class: -</small>
-                    <div style="display:flex; align-items:baseline; gap:10px;">
+                    <div style="display:flex; flex-direction:column;">
                         <h2 id="studentHeader" style="margin:0; color:var(--primary-color);">ދަރިވަރެއް ނެތް</h2>
-                        <span id="classTeacherDisplay" style="font-size:12px; background:#eee; padding:2px 8px; border-radius:10px;"></span>
+                        <div id="studentHeaderId"></div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
@@ -367,6 +390,7 @@
         <div class="main-content">
             <div class="student-header-banner">
                 <h2 id="stWelcomeName" style="margin:0;">މަރުޙަބާ!</h2>
+                <div id="stWelcomeID"></div>
                 <p>ތިރީގައިވާ ތާވަލުން ކުރީގެ ރެކޯޑްތަކާއި ފާހަގަކުރެވިފައިވާ ކުށްތައް ބައްލަވާ.</p>
             </div>
             <div id="stHistoryContainer"></div>
@@ -404,7 +428,7 @@
                 <div id="tab-students" class="tab-content active">
                     <label>ކްލާސް:</label>
                     <select id="modalClassSelect" class="class-select" onchange="renderModalStudentList()"></select>
-                    <textarea id="bulkStudents" placeholder="Name, ID (Each on new line)" style="width:100%; height:100px; margin-top:10px;"></textarea>
+                    <textarea id="bulkStudents" placeholder="Name IUM12345" style="width:100%; height:100px; margin-top:10px;"></textarea>
                     <button class="btn btn-green" style="width:100%; margin-top:5px;" onclick="importStudents()">Add Students</button>
                     <div id="modalStudentList" style="margin-top:15px; border:1px solid #eee; height:200px; overflow:auto;"></div>
                 </div>
@@ -453,10 +477,30 @@
     let currentStudent = null;
     let currentActiveSection = 'new';
     let currentPage = 1;
-    let sessionDots = []; // Stores dots for current active section only
+    let sessionDots = []; 
     
     // Stopwatch
     let timerInterval, startTime, elapsedTime = 0;
+
+    // --- HELPER: Parse Student Name & ID ---
+    function parseStudentInfo(fullString) {
+        let name = fullString;
+        let id = "";
+        
+        // Search for "IUM" pattern
+        if(fullString && fullString.toUpperCase().includes("IUM")) {
+            const parts = fullString.split(/IUM/i);
+            name = parts[0].trim().replace(/[-–,]/g, ''); // Clean separators
+            id = "IUM" + parts[1].trim();
+        } 
+        // Fallback for (12345) pattern
+        else if (fullString && fullString.includes('(')) {
+            const parts = fullString.split('(');
+            name = parts[0].trim();
+            id = parts[1].replace(')', '').trim();
+        }
+        return { name, id };
+    }
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -523,30 +567,32 @@
     function switchClass(cls) {
         currentClass = cls;
         document.getElementById('currentClassDisplay').innerText = "Class: " + cls;
-        const teacherName = classes[cls]?.teacher || "";
-        if(teacherName) document.getElementById('classTeacherDisplay').innerText = "Tr. " + teacherName;
-        
         const list = document.getElementById('studentListContainer');
         list.innerHTML = '';
         currentStudent = null;
         document.getElementById('studentHeader').innerText = "ދަރިވަރެއް ނެތް";
+        document.getElementById('studentHeaderId').innerHTML = "";
         
         (classes[cls]?.students || []).forEach(s => {
+            const info = parseStudentInfo(s);
             let btn = document.createElement('button');
             btn.className = 'student-btn';
-            btn.innerText = s;
+            btn.innerHTML = `<span>${info.name}</span>${info.id ? `<span class="id-badge">${info.id}</span>` : ''}`;
             btn.onclick = () => selectTeacherStudent(s, btn);
             list.appendChild(btn);
         });
     }
 
-    function selectTeacherStudent(name, btnEl) {
-        currentStudent = name;
+    function selectTeacherStudent(fullString, btnEl) {
+        currentStudent = fullString;
+        const info = parseStudentInfo(fullString);
+        
         document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
         if(btnEl) btnEl.classList.add('active');
-        document.getElementById('studentHeader').innerText = name;
         
-        // Reset everything
+        document.getElementById('studentHeader').innerText = info.name;
+        document.getElementById('studentHeaderId').innerHTML = info.id ? `<span class="id-badge" style="background:#eafaf1; border-color:#27ae60; color:#27ae60;">${info.id}</span>` : "";
+        
         clearForm();
         sessionDots = [];
         autoFillNextLesson();
@@ -559,7 +605,6 @@
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${p.toString().padStart(3,'0')}.png`;
         document.getElementById('pageIndicator').innerText = "Page " + p;
         clearDots();
-        // Redraw only current session dots
         sessionDots.forEach(d => {
             if(d.page == p) drawDot(d.x, d.y, true);
         });
@@ -578,13 +623,12 @@
             document.getElementById('box-'+sec).classList.add('active-section');
             document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
         }
-        // NOTE: In V6, we clear dots when switching sections to focus on saving ONE section at a time
         sessionDots = [];
         clearDots();
     }
 
     function onImageClick(e) {
-        if(document.body.classList.contains('parent-mode')) return; // No clicking for students here
+        if(document.body.classList.contains('parent-mode')) return; 
         
         const rect = document.getElementById('mushafWrapper').getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -592,7 +636,6 @@
         
         sessionDots.push({x, y, page: currentPage});
         
-        // Increase count
         adjM(currentActiveSection + 'Mistakes', 1);
         drawDot(x, y, true);
     }
@@ -625,12 +668,10 @@
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
         
         if(myRecs.length > 0) {
-            const last = myRecs[0].new; // Check last 'new' lesson
+            const last = myRecs[0].new; 
             if(last && last.s && last.en) {
-                // Logic to predict next (simplified)
                 const surahIdx = surahNames.indexOf(last.s) + 1;
                 const nextVerse = parseInt(last.en) + 1;
-                // Just fetch page
                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${nextVerse}?fields=page_number`)
                 .then(r=>r.json()).then(d=>{
                     if(d.verse && d.verse.page_number) {
@@ -644,7 +685,7 @@
         }
     }
 
-    // --- SAVE LOGIC (PARTIAL) ---
+    // --- SAVE LOGIC ---
     function saveRecord() {
         if(!currentStudent) return alert("Select a student");
         const type = document.getElementById('lessonType').value;
@@ -658,27 +699,23 @@
         };
 
         if(type === 'daily') {
-            // Only save the active section
             const sec = currentActiveSection; 
             const sVal = document.getElementById(sec+'Surah').value;
             
             if(sVal === "Surah...") return alert("Please select a Surah for " + sec);
 
             record[sec] = {
-                s: surahNames[parseInt(sVal)-1], // Store name
+                s: surahNames[parseInt(sVal)-1],
                 st: document.getElementById(sec+'Start').value,
                 en: document.getElementById(sec+'End').value,
                 m: document.getElementById(sec+'Mistakes').value,
-                dots: sessionDots // Save specific dots for this section
+                dots: sessionDots 
             };
         } else {
-            // Exam
             record.juzu = document.getElementById('examJuzu').value;
             record.portion = document.getElementById('examPortion').value;
             record.duration = document.getElementById('examDuration').value;
-            record.scores = {
-                total: document.getElementById('examTotal').innerText
-            };
+            record.scores = { total: document.getElementById('examTotal').innerText };
             record.mistakes = {
                 teacher: document.getElementById('examTMistakes').value,
                 self: document.getElementById('examSMistakes').value
@@ -686,12 +723,11 @@
         }
 
         db.ref('records').push(record);
-        alert("Saved successfully!");
+        alert("Saved!");
         
-        // Cleanup
         sessionDots = [];
         clearDots();
-        clearForm(); // Clear inputs
+        clearForm();
         autoFillNextLesson();
     }
 
@@ -732,22 +768,33 @@
         });
     }
 
-    // --- STUDENT VIEW ---
+    // --- STUDENT VIEW LOGIC ---
     function setupStudentView() {
         const sel = document.getElementById('stClassSelect');
         sel.innerHTML = '<option>Select Class</option>';
-        Object.keys(classes).forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+        Object.keys(classes).forEach(c => {
+            sel.innerHTML += `<option value="${c}">${c}</option>`;
+        });
     }
-    
+
     function stLoadStudents(cls) {
         const sel = document.getElementById('stNameSelect');
         sel.innerHTML = '<option>Select Name</option>';
-        (classes[cls]?.students || []).forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+        if(classes[cls]) {
+            classes[cls].students.forEach(s => {
+                const info = parseStudentInfo(s);
+                sel.innerHTML += `<option value="${s}">${info.name} ${info.id ? '('+info.id+')' : ''}</option>`;
+            });
+        }
     }
 
     function stSelectStudent(name) {
         const cls = document.getElementById('stClassSelect').value;
-        document.getElementById('stWelcomeName').innerText = "Welcome, " + name;
+        const info = parseStudentInfo(name);
+        
+        document.getElementById('stWelcomeName').innerText = "މަރުޙަބާ, " + info.name;
+        document.getElementById('stWelcomeID').innerHTML = info.id ? `<span class="id-badge">${info.id}</span>` : "";
+        
         const div = document.getElementById('stHistoryContainer');
         div.innerHTML = '';
         
@@ -755,58 +802,53 @@
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         myRecs.forEach(r => {
-            let content = '';
-            if(r.type === 'daily') {
-                ['new', 'short', 'long'].forEach(sec => {
-                    if(r[sec]) {
-                        const dotsData = encodeURIComponent(JSON.stringify(r[sec].dots || []));
-                        content += `
-                        <div style="background:#f9f9f9; padding:10px; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong>${sec.toUpperCase()}</strong>: ${r[sec].s} (${r[sec].st}-${r[sec].en})
-                                <br><span style="color:red; font-size:12px;">${r[sec].m} Mistakes</span>
-                            </div>
-                            ${r[sec].dots ? `<button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dotsData}')">📖 ބަލާލުމަށް</button>` : ''}
-                        </div>`;
-                    }
-                });
-            } else {
-                content = `<div style="padding:10px; background:#fff8e1;">🏆 Exam: ${r.juzu} - ${r.scores.total}</div>`;
-            }
+            let sectionsHtml = '';
+            ['new', 'short', 'long'].forEach(sec => {
+                if(r[sec]) {
+                    const dataStr = encodeURIComponent(JSON.stringify(r[sec]));
+                    
+                    sectionsHtml += `
+                    <div style="background:#f9f9f9; padding:10px; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${sec.toUpperCase()}</strong>: Surah ${r[sec].s} (${r[sec].st}-${r[sec].en})
+                            <br><span style="color:red; font-size:12px;">${r[sec].m || 0} Mistakes</span>
+                        </div>
+                        <button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dataStr}')">📖 ބަލާލުމަށް</button>
+                    </div>`;
+                }
+            });
 
-            if(content) {
-                div.innerHTML += `
-                <div class="history-card" style="border-right-color:${r.type=='exam'?'gold':'green'};">
-                    <div class="card-header"><b>${r.date}</b></div>
-                    ${content}
-                </div>`;
-            }
+            div.innerHTML += `
+            <div class="history-card" style="border-right-color:#e67e22;">
+                <div class="card-header"><b>${r.date}</b></div>
+                ${sectionsHtml}
+            </div>`;
         });
     }
 
-    window.stOpenMushaf = function(dataStr) {
-        const dots = JSON.parse(decodeURIComponent(dataStr));
-        if(!dots || dots.length === 0) return alert("No mistakes marked.");
+    window.stOpenMushaf = function(encodedData) {
+        const data = JSON.parse(decodeURIComponent(encodedData));
+        const dots = data.dots || [];
         
-        // Assume first dot page is the page to show
-        const page = dots[0].page;
+        let pageToShow = 1;
+        if(dots.length > 0) pageToShow = dots[0].page;
+
         const img = document.getElementById('stMushafImg');
-        img.src = `https://android.quran.com/data/width_1260/page${page.toString().padStart(3,'0')}.png`;
+        img.src = `https://android.quran.com/data/width_1260/page${pageToShow.toString().padStart(3,'0')}.png`;
         
-        // Draw dots (readonly)
         const wrapper = document.getElementById('stMushafWrapper');
-        // Clear old dots
-        while(wrapper.children.length > 1) wrapper.removeChild(wrapper.lastChild);
-        
+        while(wrapper.children.length > 1) { wrapper.removeChild(wrapper.lastChild); }
+
         dots.forEach(d => {
-            if(d.page == page) {
-                let dot = document.createElement('div');
+            if(d.page == pageToShow) {
+                const dot = document.createElement('div');
                 dot.className = 'mistake-dot readonly';
-                dot.style.left = d.x + 'px'; dot.style.top = d.y + 'px';
+                dot.style.left = d.x + 'px';
+                dot.style.top = d.y + 'px';
                 wrapper.appendChild(dot);
             }
         });
-        
+
         document.getElementById('stMushafModal').style.display = 'flex';
     }
 
@@ -830,7 +872,7 @@
         const s = parseInt(document.getElementById('examSMistakes').value)||0;
         let score = 80 - (t*2) - s;
         if(score < 0) score = 0;
-        score += (parseFloat(document.getElementById('markTajweed').value)||0) + (parseFloat(document.getElementById('markFluency').value)||0) + 5; // +5 dummy for muthashabih placeholders
+        score += (parseFloat(document.getElementById('markTajweed').value)||0) + (parseFloat(document.getElementById('markFluency').value)||0) + 5; 
         document.getElementById('examTotal').innerText = score + "%";
     }
 
@@ -843,22 +885,41 @@
         });
     }
 
-    // Modal & Settings functions (Simplified for brevity)
-    function openModal() { document.getElementById('classModal').style.display='flex'; document.getElementById('modalClassSelect').innerHTML = document.getElementById('classSelect').innerHTML; }
+    function openModal() { document.getElementById('classModal').style.display='flex'; document.getElementById('modalClassSelect').innerHTML = document.getElementById('classSelect').innerHTML; renderModalStudentList(); }
     function closeModal() { document.getElementById('classModal').style.display='none'; }
     function createClass() { 
         const n = document.getElementById('newClassName').value; 
-        const t = document.getElementById('newClassTeacher').value;
-        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); closeModal(); }
+        if(n) { db.ref('classes/'+n).set({students: []}); closeModal(); }
     }
     function importStudents() {
         const c = document.getElementById('modalClassSelect').value;
         const txt = document.getElementById('bulkStudents').value;
-        const list = txt.split('\n').filter(x=>x);
+        const list = txt.split('\n').filter(x=>x.trim());
         const old = classes[c]?.students || [];
+        // Just merge, regex handles display later
         db.ref('classes/'+c+'/students').set([...new Set([...old, ...list])]);
         alert('Students Added');
     }
+    
+    function renderModalStudentList() {
+        const c = document.getElementById('modalClassSelect').value;
+        const div = document.getElementById('modalStudentList');
+        div.innerHTML = '';
+        (classes[c]?.students || []).forEach(s => {
+            div.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                ${s} <button style="color:red; border:none;" onclick="deleteStudent('${c}','${s}')">X</button>
+            </div>`;
+        });
+    }
+    
+    function deleteStudent(c, s) {
+        if(confirm('Delete ' + s + '?')) {
+            const updated = classes[c].students.filter(st => st !== s);
+            db.ref('classes/'+c+'/students').set(updated);
+            renderModalStudentList();
+        }
+    }
+
     function downloadBackup() {
         const a = document.createElement('a');
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({classes, records}));
