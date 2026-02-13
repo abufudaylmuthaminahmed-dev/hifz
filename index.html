@@ -692,8 +692,8 @@
 
     let app, db;
     try {
-        app = initializeApp(firebaseConfig);
-        db = getDatabase(app);
+        // Initialize Firebase
+const app = initializeApp(firebaseConfig);
     } catch(e) {
         console.error("Firebase Init Error:", e);
         alert("Firebase Config Error! Please edit the HTML file and add your Firebase Config.");
