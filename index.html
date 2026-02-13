@@ -697,26 +697,24 @@
     </div>
 
 <script>
-    // --- FIREBASE CONFIGURATION ---
-    // *** IMPORTANT: REPLACE THIS OBJECT WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE ***
-    const firebaseConfig = {
-       apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
+   // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
   authDomain: "hifz-cde3b.firebaseapp.com",
   databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
   projectId: "hifz-cde3b",
   storageBucket: "hifz-cde3b.firebasestorage.app",
   messagingSenderId: "566754658580",
   appId: "1:566754658580:web:d63d0f167960f53bab9a01"
-    };
+};
 
-    let db;
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-    } catch(e) {
-        console.error("Firebase Init Error:", e);
-        alert("Firebase Config Error! Please edit the HTML file and add your Firebase Config.");
-    }
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
     // --- Global Vars ---
     const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات
