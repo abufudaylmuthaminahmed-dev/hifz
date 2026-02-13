@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V6.1 (IUM ID Support)</title>
-    <!-- SheetJS for Excel -->
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V7.0 (Dhivehi)</title>
+    <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <!-- FIREBASE SDK -->
+    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -32,28 +31,13 @@
             overflow: hidden;
         }
 
-        /* --- ID BADGE STYLE --- */
+        /* --- UI COMPONENTS --- */
         .id-badge {
-            display: inline-block;
-            background-color: #ecf0f1;
-            color: #7f8c8d;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            font-family: sans-serif; /* ID usually looks better in English font */
-            margin-top: 4px;
-            border: 1px solid #bdc3c7;
-        }
-        
-        .student-header-banner .id-badge {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.4);
-            font-size: 14px;
+            display: inline-block; background-color: #ecf0f1; color: #7f8c8d;
+            padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;
+            font-family: sans-serif; margin-top: 4px; border: 1px solid #bdc3c7;
         }
 
-        /* --- LOADING & LOGIN --- */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 10000; display: flex; flex-direction: column;
@@ -72,47 +56,41 @@
         }
         .login-btn {
             width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit;
         }
         .btn-student { background: var(--student-color); color: white; }
         .btn-teacher { background: var(--primary-color); color: white; }
 
-        /* --- DASHBOARD LAYOUTS --- */
         #teacher-dashboard, #student-dashboard { display: none; width: 100%; height: 100%; }
         .dashboard-active { display: flex !important; }
 
-        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sidebar-width); background: white; border-left: 1px solid #ddd;
             display: flex; flex-direction: column; padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05);
         }
-        .class-control-area { background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
-        .class-select { width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; }
         
         .student-list-container { flex: 1; overflow-y: auto; }
         .student-btn {
             background: none; border: none; padding: 10px; text-align: right; width: 100%;
             cursor: pointer; border-bottom: 1px solid #f9f9f9; font-family: inherit;
-            display: flex; flex-direction: column; /* To stack name and ID */
+            display: flex; flex-direction: column;
         }
         .student-btn:hover { background: #e8f6ef; color: var(--accent-color); padding-right: 15px; }
         .student-btn.active { background: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
         .student-btn.active .id-badge { color: var(--accent-color); background: white; }
 
-        /* --- MAIN CONTENT --- */
         .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        /* --- TEACHER FORM --- */
+        /* --- FORM --- */
         .entry-form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
         .form-group { flex: 1; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 12px; color: #555; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: inherit; font-size: 14px;}
         .arabic-input { font-family: 'Amiri', serif; direction: rtl; }
 
-        /* Sections */
-        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid transparent; transition: 0.2s; cursor: pointer; }
-        .section-box:hover { opacity: 0.9; }
+        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid transparent; transition: 0.2s; cursor: pointer; position: relative; }
+        .section-box:hover { opacity: 0.95; }
         .section-new { background: #eafaf1; }
         .section-short { background: #ebf5fb; }
         .section-long { background: #fef9e7; }
@@ -125,9 +103,12 @@
         #box-long.active-section { border-color: #d35400; }
         #box-exam.active-section { border-color: #f1c40f; }
 
-        .radio-label { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; }
+        .radio-label { 
+            position: absolute; top: 10px; left: 10px;
+            display: inline-flex; align-items: center; gap: 5px; 
+            background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; 
+        }
 
-        /* Mistake Counter */
         .mistake-wrapper { display: flex; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
         .mistake-btn { width: 30px; border: none; background: #eee; cursor: pointer; font-weight: bold; }
         .mistake-display { width: 40px; text-align: center; border: none; font-weight: bold; }
@@ -144,17 +125,11 @@
             border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
             cursor: pointer; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .mistake-dot:hover { transform: translate(-50%, -50%) scale(1.2); }
         .mistake-dot.readonly { cursor: default; background-color: rgba(231, 76, 60, 1); border-color: gold; }
 
-        /* --- EXAM & STOPWATCH --- */
-        .stopwatch-container { background: #34495e; color: white; padding: 10px; border-radius: 5px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .timer-display { font-family: monospace; font-size: 24px; font-weight: bold; color: #f1c40f; }
-        
-        /* --- HISTORY CARDS --- */
+        /* --- CARDS & TABLES --- */
         .history-card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-right: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card-new { border-color: #27ae60; } .card-short { border-color: #2980b9; } .card-long { border-color: #d35400; } .card-exam { border-color: #f1c40f; }
-        
         .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
 
         /* --- MODALS --- */
@@ -162,18 +137,17 @@
         .modal-content { background: white; padding: 0; border-radius: 10px; width: 500px; max-width: 95%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
         .modal-header { padding: 15px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; overflow-y: auto; }
-        
+        .close-modal { font-size: 24px; cursor: pointer; color: #7f8c8d; }
+
         .tab-header { display: flex; background: #eee; }
         .tab-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab-btn.active { background: white; border-color: var(--primary-color); color: var(--primary-color); font-weight: bold; }
         .tab-content { display: none; padding-top: 15px; }
         .tab-content.active { display: block; }
 
-        /* Student View Header */
         .student-header-banner { background: linear-gradient(to right, #e67e22, #f39c12); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
 
-        /* Utils */
-        .btn { padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-family: inherit;}
         .btn-green { background: var(--accent-color); }
         .btn-blue { background: #3498db; }
         .btn-red { background: #e74c3c; }
@@ -193,7 +167,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" style="display:none;">
         <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V6.1</h2>
+            <h2>ޙިފްޡް ޕްރޮގްރާމް V7.0</h2>
             <button class="login-btn btn-student" onclick="loginAs('student')">🎓 ދަރިވަރުން</button>
             <div style="margin:15px 0; border-bottom:1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
@@ -214,7 +188,7 @@
             
             <h4>ދަރިވަރުން</h4>
             <div id="studentListContainer" class="student-list-container"></div>
-            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; justify-content:center;">🚪 Logout</button>
+            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; justify-content:center;">🚪 ލޮގްއައުޓް</button>
         </div>
 
         <!-- MAIN CONTENT -->
@@ -249,19 +223,34 @@
                 <div id="container-daily">
                     <!-- New Lesson -->
                     <div id="box-new" class="section-box section-new active-section" onclick="setActiveSection('new')">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#27ae60; font-size:16px; font-weight:bold;">އާ ފިލާވަޅު (ސޭވްވާނީ މިބައި)</label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="new" checked> ކުށްޖެހުން</label>
-                        </div>
+                        <label style="color:#27ae60; font-size:16px; font-weight:bold;">އާ ފިލާވަޅު</label>
+                        <label class="radio-label"><input type="radio" name="activeSec" value="new" checked> ކުށްޖެހުން</label>
                         <div class="form-row">
-                            <input type="number" id="newPage" placeholder="Page" onchange="loadMushaf(this.value)" style="flex:0.5; text-align:center;">
-                            <select id="newSurah" class="arabic-input" style="flex:2"><option>Surah...</option></select>
-                            <input type="number" id="newStart" placeholder="Start" style="flex:0.8">
-                            <input type="number" id="newEnd" placeholder="End" style="flex:0.8">
-                            <div class="mistake-wrapper">
-                                <button class="mistake-btn" onclick="adjM('newMistakes',1)">+</button>
-                                <input id="newMistakes" class="mistake-display" value="0" readonly>
-                                <button class="mistake-btn" onclick="adjM('newMistakes',-1)">-</button>
+                            <div style="flex:0.5">
+                                <label>ޞަފްޙާ</label>
+                                <input type="number" id="newPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ފެށޭ ސޫރަތް/އާޔަތް</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="newSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="newStart" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ނިމޭ ސޫރަތް/އާޔަތް</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="newEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="newEnd" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:0.5">
+                                <label>ކުށްތައް</label>
+                                <div class="mistake-wrapper">
+                                    <button class="mistake-btn" onclick="adjM('newMistakes',1)">+</button>
+                                    <input id="newMistakes" class="mistake-display" value="0" readonly>
+                                    <button class="mistake-btn" onclick="adjM('newMistakes',-1)">-</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,14 +262,31 @@
                             <label class="radio-label"><input type="radio" name="activeSec" value="short"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
-                            <input type="number" id="shortPage" placeholder="Page" onchange="loadMushaf(this.value)" style="flex:0.5; text-align:center;">
-                            <select id="shortSurah" class="arabic-input" style="flex:2"><option>Surah...</option></select>
-                            <input type="number" id="shortStart" placeholder="Start" style="flex:0.8">
-                            <input type="number" id="shortEnd" placeholder="End" style="flex:0.8">
-                            <div class="mistake-wrapper">
-                                <button class="mistake-btn" onclick="adjM('shortMistakes',1)">+</button>
-                                <input id="shortMistakes" class="mistake-display" value="0" readonly>
-                                <button class="mistake-btn" onclick="adjM('shortMistakes',-1)">-</button>
+                            <div style="flex:0.5">
+                                <label>ޞަފްޙާ</label>
+                                <input type="number" id="shortPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ފެށޭ</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="shortSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="shortStart" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ނިމޭ</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="shortEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="shortEnd" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:0.5">
+                                <label>ކުށް</label>
+                                <div class="mistake-wrapper">
+                                    <button class="mistake-btn" onclick="adjM('shortMistakes',1)">+</button>
+                                    <input id="shortMistakes" class="mistake-display" value="0" readonly>
+                                    <button class="mistake-btn" onclick="adjM('shortMistakes',-1)">-</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -292,14 +298,31 @@
                             <label class="radio-label"><input type="radio" name="activeSec" value="long"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
-                            <input type="number" id="longPage" placeholder="Page" onchange="loadMushaf(this.value)" style="flex:0.5; text-align:center;">
-                            <select id="longSurah" class="arabic-input" style="flex:2"><option>Surah...</option></select>
-                            <input type="number" id="longStart" placeholder="Start" style="flex:0.8">
-                            <input type="number" id="longEnd" placeholder="End" style="flex:0.8">
-                            <div class="mistake-wrapper">
-                                <button class="mistake-btn" onclick="adjM('longMistakes',1)">+</button>
-                                <input id="longMistakes" class="mistake-display" value="0" readonly>
-                                <button class="mistake-btn" onclick="adjM('longMistakes',-1)">-</button>
+                            <div style="flex:0.5">
+                                <label>ޞަފްޙާ</label>
+                                <input type="number" id="longPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ފެށޭ</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="longSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="longStart" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:1.5">
+                                <label>ނިމޭ</label>
+                                <div style="display:flex; gap:5px;">
+                                    <select id="longEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
+                                    <input type="number" id="longEnd" placeholder="އާޔަތް" style="flex:0.5">
+                                </div>
+                            </div>
+                            <div style="flex:0.5">
+                                <label>ކުށް</label>
+                                <div class="mistake-wrapper">
+                                    <button class="mistake-btn" onclick="adjM('longMistakes',1)">+</button>
+                                    <input id="longMistakes" class="mistake-display" value="0" readonly>
+                                    <button class="mistake-btn" onclick="adjM('longMistakes',-1)">-</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -310,16 +333,15 @@
                     <div id="box-exam" class="section-box section-new active-section" style="border-color:#f1c40f;">
                         <h3 style="margin-top:0; color:#d35400;">🏆 އިމްތިޙާން</h3>
                         
-                        <!-- STOPWATCH -->
-                        <div class="stopwatch-container">
-                            <div class="timer-display" id="timerDisplay">00:00</div>
-                            <button class="btn btn-green" onclick="startTimer()">▶ Start</button>
-                            <button class="btn btn-red" onclick="stopTimer()">⏹ Stop</button>
-                            <input type="number" id="examDuration" placeholder="Min" style="width:60px; text-align:center; margin-right:auto;">
+                        <div class="stopwatch-container" style="background:#34495e; padding:10px; border-radius:5px; margin-bottom:10px; display:flex; align-items:center; gap:10px; color:white;">
+                            <div id="timerDisplay" style="font-family:monospace; font-size:24px; font-weight:bold; color:#f1c40f;">00:00</div>
+                            <button class="btn btn-green" onclick="startTimer()">▶ ފަށާ</button>
+                            <button class="btn btn-red" onclick="stopTimer()">⏹ ހުއްޓާ</button>
+                            <input type="number" id="examDuration" placeholder="މިނެޓް" style="width:60px; text-align:center; margin-right:auto;">
                         </div>
 
                         <div class="form-row">
-                            <div style="flex:2"><label>ބައި:</label><input type="text" id="examJuzu" placeholder="Juzu 30"></div>
+                            <div style="flex:2"><label>ބައި:</label><input type="text" id="examJuzu" placeholder="30 ވަނަ ޖުޒުއު"></div>
                             <div style="flex:1"><label>މިންވަރު:</label>
                                 <select id="examPortion">
                                     <option value="whole">މުޅި</option>
@@ -333,15 +355,15 @@
                         <div style="background:#fff3e0; padding:10px; border-radius:5px; margin:10px 0;">
                             <label>ކުށްތައް (ޖުމްލަ 80):</label>
                             <div style="display:flex; gap:10px;">
-                                <div style="flex:1">Teacher (-2): <input type="number" id="examTMistakes" value="0" onchange="calcExam()"></div>
-                                <div style="flex:1">Self (-1): <input type="number" id="examSMistakes" value="0" onchange="calcExam()"></div>
+                                <div style="flex:1">މުދައްރިސް (-2): <input type="number" id="examTMistakes" value="0" onchange="calcExam()"></div>
+                                <div style="flex:1">އަމިއްލަ (-1): <input type="number" id="examSMistakes" value="0" onchange="calcExam()"></div>
                             </div>
                         </div>
                         
                         <div class="form-row">
-                            <div style="flex:1"><label>Tajweed (10)</label><input type="number" id="markTajweed" value="10" onchange="calcExam()"></div>
-                            <div style="flex:1"><label>Fluency (5)</label><input type="number" id="markFluency" value="5" onchange="calcExam()"></div>
-                            <div style="flex:1"><label>Total:</label><h3 id="examTotal" style="margin:0; color:blue;">100%</h3></div>
+                            <div style="flex:1"><label>ތަޖްވީދު (10)</label><input type="number" id="markTajweed" value="10" onchange="calcExam()"></div>
+                            <div style="flex:1"><label>ފަރިތަކަން (5)</label><input type="number" id="markFluency" value="5" onchange="calcExam()"></div>
+                            <div style="flex:1"><label>ޖުމްލަ:</label><h3 id="examTotal" style="margin:0; color:blue;">100%</h3></div>
                         </div>
                     </div>
                 </div>
@@ -384,7 +406,7 @@
                 <label>ނަން:</label>
                 <select id="stNameSelect" onchange="stSelectStudent(this.value)" style="width:100%; padding:8px;"></select>
             </div>
-            <button class="btn btn-red" onclick="logout()" style="margin:auto 10px 10px 10px;">🚪 Logout</button>
+            <button class="btn btn-red" onclick="logout()" style="margin:auto 10px 10px 10px;">🚪 ލޮގްއައުޓް</button>
         </div>
 
         <div class="main-content">
@@ -416,7 +438,7 @@
     <div id="classModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>⚙️ ކްލާސް & ބެކަޕް</h3>
+                <h3>⚙️ ސެޓިންގްސް & ބެކަޕް</h3>
                 <span class="close-modal" onclick="closeModal()">&times;</span>
             </div>
             <div class="tab-header">
@@ -428,23 +450,23 @@
                 <div id="tab-students" class="tab-content active">
                     <label>ކްލާސް:</label>
                     <select id="modalClassSelect" class="class-select" onchange="renderModalStudentList()"></select>
-                    <textarea id="bulkStudents" placeholder="Name IUM12345" style="width:100%; height:100px; margin-top:10px;"></textarea>
-                    <button class="btn btn-green" style="width:100%; margin-top:5px;" onclick="importStudents()">Add Students</button>
+                    <textarea id="bulkStudents" placeholder="ނަން IUM12345 (ކޮންމެ ނަމެއް އައު ލައިނެއްގައި)" style="width:100%; height:100px; margin-top:10px;"></textarea>
+                    <button class="btn btn-green" style="width:100%; margin-top:5px;" onclick="importStudents()">ކުދިން އެޑްކުރޭ</button>
                     <div id="modalStudentList" style="margin-top:15px; border:1px solid #eee; height:200px; overflow:auto;"></div>
                 </div>
                 <div id="tab-class" class="tab-content">
-                    <label>New Class Name:</label> <input type="text" id="newClassName">
-                    <label>Teacher Name:</label> <input type="text" id="newClassTeacher">
-                    <button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="createClass()">Create Class</button>
+                    <label>އައު ކްލާހުގެ ނަން:</label> <input type="text" id="newClassName">
+                    <label>މުދައްރިސްގެ ނަން:</label> <input type="text" id="newClassTeacher">
+                    <button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="createClass()">ކްލާސް ހަދާ</button>
                     <hr>
-                    <label style="color:red;">Delete Class:</label>
+                    <label style="color:red;">ކްލާސް ފުހެލުން:</label>
                     <select id="deleteClassSelect" class="class-select"></select>
-                    <button class="btn btn-red" style="width:100%;" onclick="deleteSelectedClass()">Delete</button>
+                    <button class="btn btn-red" style="width:100%;" onclick="deleteSelectedClass()">ފުހެލާ</button>
                 </div>
                 <div id="tab-data" class="tab-content">
-                    <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="downloadBackup()">📥 Download Backup</button>
+                    <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="downloadBackup()">📥 ބެކަޕް ޑައުންލޯޑް</button>
                     <input type="file" id="restoreFile" style="margin-bottom:10px;">
-                    <button class="btn btn-red" style="width:100%;" onclick="restoreBackup()">📤 Restore Backup</button>
+                    <button class="btn btn-red" style="width:100%;" onclick="restoreBackup()">📤 ޑޭޓާ އަޅާލާ</button>
                 </div>
             </div>
         </div>
@@ -479,7 +501,6 @@
     let currentPage = 1;
     let sessionDots = []; 
     
-    // Stopwatch
     let timerInterval, startTime, elapsedTime = 0;
 
     // --- HELPER: Parse Student Name & ID ---
@@ -487,14 +508,11 @@
         let name = fullString;
         let id = "";
         
-        // Search for "IUM" pattern
         if(fullString && fullString.toUpperCase().includes("IUM")) {
             const parts = fullString.split(/IUM/i);
-            name = parts[0].trim().replace(/[-–,]/g, ''); // Clean separators
+            name = parts[0].trim().replace(/[-–,]/g, '');
             id = "IUM" + parts[1].trim();
-        } 
-        // Fallback for (12345) pattern
-        else if (fullString && fullString.includes('(')) {
+        } else if (fullString && fullString.includes('(')) {
             const parts = fullString.split('(');
             name = parts[0].trim();
             id = parts[1].replace(')', '').trim();
@@ -525,7 +543,7 @@
     });
 
     function populateSurahSelects() {
-        ['newSurah', 'shortSurah', 'longSurah'].forEach(id => {
+        ['newSurah', 'newEndSurah', 'shortSurah', 'shortEndSurah', 'longSurah', 'longEndSurah'].forEach(id => {
             const sel = document.getElementById(id);
             if(!sel) return;
             surahNames.forEach((s, i) => {
@@ -540,7 +558,7 @@
     function loginAs(role) {
         document.getElementById('login-screen').style.display = 'none';
         if(role === 'teacher') {
-            if(prompt("Password:") === "1234") {
+            if(prompt("ޕާސްވޯޑް:") === "1234") {
                 document.getElementById('teacher-dashboard').classList.add('dashboard-active');
             } else { location.reload(); }
         } else {
@@ -566,7 +584,10 @@
 
     function switchClass(cls) {
         currentClass = cls;
-        document.getElementById('currentClassDisplay').innerText = "Class: " + cls;
+        document.getElementById('currentClassDisplay').innerText = "ކްލާސް: " + cls;
+        const teacherName = classes[cls]?.teacher || "";
+        if(teacherName) document.getElementById('classTeacherDisplay').innerText = "Tr. " + teacherName;
+        
         const list = document.getElementById('studentListContainer');
         list.innerHTML = '';
         currentStudent = null;
@@ -603,7 +624,7 @@
     function loadMushaf(p) {
         currentPage = p;
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${p.toString().padStart(3,'0')}.png`;
-        document.getElementById('pageIndicator').innerText = "Page " + p;
+        document.getElementById('pageIndicator').innerText = "ޞަފްޙާ " + p;
         clearDots();
         sessionDots.forEach(d => {
             if(d.page == p) drawDot(d.x, d.y, true);
@@ -622,6 +643,9 @@
         if(sec !== 'exam') {
             document.getElementById('box-'+sec).classList.add('active-section');
             document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
+            
+            // SMART AUTO-FILL ON CLICK
+            if(currentStudent) autoFillSpecificSection(sec);
         }
         sessionDots = [];
         clearDots();
@@ -629,13 +653,10 @@
 
     function onImageClick(e) {
         if(document.body.classList.contains('parent-mode')) return; 
-        
         const rect = document.getElementById('mushafWrapper').getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        
         sessionDots.push({x, y, page: currentPage});
-        
         adjM(currentActiveSection + 'Mistakes', 1);
         drawDot(x, y, true);
     }
@@ -661,33 +682,78 @@
         if(el) el.value = Math.max(0, parseInt(el.value || 0) + val);
     }
 
-    // --- AUTO FILL ---
+    // --- AUTO FILL LOGIC (V7 Improved) ---
     function autoFillNextLesson() {
         if(!currentStudent) return;
-        const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily');
+        ['new', 'short', 'long'].forEach(sec => autoFillSpecificSection(sec));
+    }
+
+    function autoFillSpecificSection(sec) {
+        if(!currentStudent) return;
+        
+        // Find last record for this specific type
+        const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily' && r[sec]);
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
         
         if(myRecs.length > 0) {
-            const last = myRecs[0].new; 
-            if(last && last.s && last.en) {
-                const surahIdx = surahNames.indexOf(last.s) + 1;
-                const nextVerse = parseInt(last.en) + 1;
-                fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${nextVerse}?fields=page_number`)
-                .then(r=>r.json()).then(d=>{
-                    if(d.verse && d.verse.page_number) {
-                        loadMushaf(d.verse.page_number);
-                        document.getElementById('newPage').value = d.verse.page_number;
-                        document.getElementById('newSurah').value = surahIdx;
-                        document.getElementById('newStart').value = nextVerse;
-                    }
-                }).catch(()=>{});
+            const last = myRecs[0][sec]; // Get the specific section object
+            if(last && last.s && last.en) { // Check if valid
+                let nextPageToLoad = 1;
+                
+                // --- LOGIC PER SECTION ---
+                // New: Next page after last end page
+                if (sec === 'new') {
+                     // We need page number. In simplified V6, we saved 'en' (verse).
+                     // Ideally we saved page. If not, we approximate or fetch.
+                     // Assuming we have last known page in record or fetching via API.
+                     // For V7, let's fetch based on last verse.
+                     const surahIdx = surahNames.indexOf(last.s) + 1;
+                     const lastVerse = parseInt(last.en);
+                     
+                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
+                     .then(r=>r.json()).then(d=>{
+                         if(d.verse) {
+                             const lastPage = d.verse.page_number;
+                             // Start next page
+                             loadMushaf(lastPage + 1);
+                             document.getElementById('newPage').value = lastPage + 1;
+                         }
+                     });
+                }
+                
+                // Short: Same page as last start (Review)
+                if (sec === 'short') {
+                     // Need to find start page of last lesson
+                     const surahIdx = surahNames.indexOf(last.s) + 1;
+                     const startVerse = parseInt(last.st);
+                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${startVerse}?fields=page_number`)
+                     .then(r=>r.json()).then(d=>{
+                         if(d.verse) {
+                             loadMushaf(d.verse.page_number); // Load SAME page
+                             document.getElementById('shortPage').value = d.verse.page_number;
+                         }
+                     });
+                }
+
+                // Long: Next page after last end
+                if (sec === 'long') {
+                     const surahIdx = surahNames.indexOf(last.s) + 1;
+                     const lastVerse = parseInt(last.en);
+                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
+                     .then(r=>r.json()).then(d=>{
+                         if(d.verse) {
+                             loadMushaf(d.verse.page_number + 1); 
+                             document.getElementById('longPage').value = d.verse.page_number + 1;
+                         }
+                     });
+                }
             }
         }
     }
 
     // --- SAVE LOGIC ---
     function saveRecord() {
-        if(!currentStudent) return alert("Select a student");
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
         const type = document.getElementById('lessonType').value;
         
         let record = {
@@ -702,12 +768,13 @@
             const sec = currentActiveSection; 
             const sVal = document.getElementById(sec+'Surah').value;
             
-            if(sVal === "Surah...") return alert("Please select a Surah for " + sec);
+            if(sVal === "ސޫރަތް...") return alert("ސޫރަތް އިޚްތިޔާރުކުރައްވާ");
 
             record[sec] = {
                 s: surahNames[parseInt(sVal)-1],
                 st: document.getElementById(sec+'Start').value,
                 en: document.getElementById(sec+'End').value,
+                endSurah: surahNames[parseInt(document.getElementById(sec+'EndSurah').value)-1] || surahNames[parseInt(sVal)-1], // Fallback to start surah
                 m: document.getElementById(sec+'Mistakes').value,
                 dots: sessionDots 
             };
@@ -723,12 +790,12 @@
         }
 
         db.ref('records').push(record);
-        alert("Saved!");
+        alert("ސޭވް ކުރެވިއްޖެ!");
         
         sessionDots = [];
         clearDots();
-        clearForm();
-        autoFillNextLesson();
+        // Don't clear form immediately, maybe teacher wants to add another section.
+        // But requested to auto-move.
     }
 
     function toggleFormSection(val) {
@@ -746,46 +813,46 @@
         myRecs.forEach(r => {
             let html = `<div class="history-card ${r.type==='exam'?'card-exam':'card-new'}">
                 <div class="card-header">
-                    <span>📅 ${r.date} ${r.type==='exam'?'(Exam)':''}</span>
+                    <span>📅 ${r.date}</span>
                     <button onclick="if(confirm('Delete?')) db.ref('records/${r.key}').remove()" style="color:red;border:none;">&times;</button>
                 </div>`;
             
             if(r.type === 'daily') {
                 ['new', 'short', 'long'].forEach(sec => {
                     if(r[sec]) {
+                        // Translation map
+                        const secName = sec === 'new' ? 'އާ ފިލާވަޅު' : sec === 'short' ? 'ކުރު މުރާޖަޢާ' : 'ދިގު މުރާޖަޢާ';
+                        const color = sec === 'new' ? 'green' : sec === 'short' ? 'blue' : 'orange';
+                        
                         html += `<div style="font-size:13px; margin-top:5px;">
-                            <span style="font-weight:bold; color:${sec=='new'?'green':sec=='short'?'blue':'orange'}">${sec.toUpperCase()}:</span> 
-                            ${r[sec].s} (${r[sec].st}-${r[sec].en}) 
-                            <span style="color:red;">(${r[sec].m || 0} mistakes)</span>
+                            <span style="font-weight:bold; color:${color}">${secName}:</span> 
+                            ${r[sec].s} ${r[sec].st} - ${r[sec].endSurah || r[sec].s} ${r[sec].en}
+                            <span style="color:red;">(${r[sec].m || 0} ކުށް)</span>
                         </div>`;
                     }
                 });
             } else {
-                html += `<div>${r.juzu} (${r.portion}) - Result: ${r.scores.total}</div>`;
+                html += `<div>${r.juzu} (${r.portion}) - ނަތީޖާ: ${r.scores.total}</div>`;
             }
             html += `</div>`;
             div.innerHTML += html;
         });
     }
 
-    // --- STUDENT VIEW LOGIC ---
+    // --- STUDENT VIEW ---
     function setupStudentView() {
         const sel = document.getElementById('stClassSelect');
-        sel.innerHTML = '<option>Select Class</option>';
-        Object.keys(classes).forEach(c => {
-            sel.innerHTML += `<option value="${c}">${c}</option>`;
-        });
+        sel.innerHTML = '<option>ކްލާސް ނަގާ</option>';
+        Object.keys(classes).forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
-
+    
     function stLoadStudents(cls) {
         const sel = document.getElementById('stNameSelect');
-        sel.innerHTML = '<option>Select Name</option>';
-        if(classes[cls]) {
-            classes[cls].students.forEach(s => {
-                const info = parseStudentInfo(s);
-                sel.innerHTML += `<option value="${s}">${info.name} ${info.id ? '('+info.id+')' : ''}</option>`;
-            });
-        }
+        sel.innerHTML = '<option>ނަން ނަގާ</option>';
+        (classes[cls]?.students || []).forEach(s => {
+             const info = parseStudentInfo(s);
+             sel.innerHTML += `<option value="${s}">${info.name} ${info.id ? '('+info.id+')' : ''}</option>`;
+        });
     }
 
     function stSelectStudent(name) {
@@ -802,49 +869,53 @@
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         myRecs.forEach(r => {
-            let sectionsHtml = '';
-            ['new', 'short', 'long'].forEach(sec => {
-                if(r[sec]) {
-                    const dataStr = encodeURIComponent(JSON.stringify(r[sec]));
-                    
-                    sectionsHtml += `
-                    <div style="background:#f9f9f9; padding:10px; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <strong>${sec.toUpperCase()}</strong>: Surah ${r[sec].s} (${r[sec].st}-${r[sec].en})
-                            <br><span style="color:red; font-size:12px;">${r[sec].m || 0} Mistakes</span>
-                        </div>
-                        <button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dataStr}')">📖 ބަލާލުމަށް</button>
-                    </div>`;
-                }
-            });
+            let content = '';
+            if(r.type === 'daily') {
+                ['new', 'short', 'long'].forEach(sec => {
+                    if(r[sec]) {
+                        const dotsData = encodeURIComponent(JSON.stringify(r[sec].dots || []));
+                        const secName = sec === 'new' ? 'އާ ފިލާވަޅު' : sec === 'short' ? 'ކުރު' : 'ދިގު';
+                        
+                        content += `
+                        <div style="background:#f9f9f9; padding:10px; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${secName}</strong>: ${r[sec].s} ${r[sec].st} - ${r[sec].endSurah || r[sec].s} ${r[sec].en}
+                                <br><span style="color:red; font-size:12px;">${r[sec].m} ކުށް</span>
+                            </div>
+                            ${r[sec].dots ? `<button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dotsData}')">📖 ބަލާލުމަށް</button>` : ''}
+                        </div>`;
+                    }
+                });
+            } else {
+                content = `<div style="padding:10px; background:#fff8e1;">🏆 އިމްތިޙާން: ${r.juzu} - ${r.scores.total}</div>`;
+            }
 
-            div.innerHTML += `
-            <div class="history-card" style="border-right-color:#e67e22;">
-                <div class="card-header"><b>${r.date}</b></div>
-                ${sectionsHtml}
-            </div>`;
+            if(content) {
+                div.innerHTML += `
+                <div class="history-card" style="border-right-color:${r.type=='exam'?'gold':'green'};">
+                    <div class="card-header"><b>${r.date}</b></div>
+                    ${content}
+                </div>`;
+            }
         });
     }
 
-    window.stOpenMushaf = function(encodedData) {
-        const data = JSON.parse(decodeURIComponent(encodedData));
-        const dots = data.dots || [];
+    window.stOpenMushaf = function(dataStr) {
+        const dots = JSON.parse(decodeURIComponent(dataStr));
+        if(!dots || dots.length === 0) return alert("މިބައިގައި ކުށެއް ފާހަގަ ކުރެވިފައެއް ނެތް");
         
-        let pageToShow = 1;
-        if(dots.length > 0) pageToShow = dots[0].page;
-
+        const page = dots[0].page;
         const img = document.getElementById('stMushafImg');
-        img.src = `https://android.quran.com/data/width_1260/page${pageToShow.toString().padStart(3,'0')}.png`;
+        img.src = `https://android.quran.com/data/width_1260/page${page.toString().padStart(3,'0')}.png`;
         
         const wrapper = document.getElementById('stMushafWrapper');
         while(wrapper.children.length > 1) { wrapper.removeChild(wrapper.lastChild); }
 
         dots.forEach(d => {
-            if(d.page == pageToShow) {
-                const dot = document.createElement('div');
+            if(d.page == page) {
+                let dot = document.createElement('div');
                 dot.className = 'mistake-dot readonly';
-                dot.style.left = d.x + 'px';
-                dot.style.top = d.y + 'px';
+                dot.style.left = d.x + 'px'; dot.style.top = d.y + 'px';
                 wrapper.appendChild(dot);
             }
         });
@@ -889,14 +960,14 @@
     function closeModal() { document.getElementById('classModal').style.display='none'; }
     function createClass() { 
         const n = document.getElementById('newClassName').value; 
-        if(n) { db.ref('classes/'+n).set({students: []}); closeModal(); }
+        const t = document.getElementById('newClassTeacher').value;
+        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); closeModal(); }
     }
     function importStudents() {
         const c = document.getElementById('modalClassSelect').value;
         const txt = document.getElementById('bulkStudents').value;
         const list = txt.split('\n').filter(x=>x.trim());
         const old = classes[c]?.students || [];
-        // Just merge, regex handles display later
         db.ref('classes/'+c+'/students').set([...new Set([...old, ...list])]);
         alert('Students Added');
     }
@@ -921,9 +992,30 @@
     }
 
     function downloadBackup() {
+        // Create full object from arrays
+        let backupData = { classes: classes, records: {} };
+        records.forEach(r => {
+            backupData.records[r.key] = r;
+        });
+        
         const a = document.createElement('a');
-        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({classes, records}));
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
         a.download = "backup.json"; a.click();
+    }
+    
+    function restoreBackup() {
+        const file = document.getElementById('restoreFile').files[0];
+        if(!file) return alert("Select File");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = JSON.parse(e.target.result);
+            if(confirm("Restore data? This will overwrite existing data on cloud!")) {
+                db.ref('/').set(data);
+                alert("Restored!");
+                location.reload();
+            }
+        };
+        reader.readAsText(file);
     }
 </script>
 </body>
