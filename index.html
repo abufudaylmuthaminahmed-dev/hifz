@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online Database v4.0</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online Database v4.1</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
+    <!-- FIREBASE SDK (COMPAT VERSION - WORKS BETTER FOR LOCAL FILES) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         
@@ -267,6 +271,7 @@
     <div id="loading-overlay">
         <div class="loader-spin" style="width:40px; height:40px; border-width:4px;"></div>
         <p style="margin-top:10px; font-weight:bold; color:#555;">ޑޭޓާބޭސް އަށް ގުޅަނީ...</p>
+        <p style="font-size:11px; color:#999; margin-top:5px;">(ތިބޭފުޅާގެ ކޮންފިގްރޭޝަން ޗެކްކޮށްލައްވާ)</p>
     </div>
 
     <!-- LOGIN SCREEN -->
@@ -279,7 +284,7 @@
             <div style="margin: 15px 0; border-bottom: 1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v4.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v4.1</p>
     </div>
 
     <!-- APP CONTENT (Initially Hidden) -->
@@ -674,42 +679,38 @@
         </div>
     </div>
 
-<script type="module">
+<script>
     // --- FIREBASE CONFIGURATION ---
-    // PASTE YOUR FIREBASE CONFIG HERE
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
     // *** IMPORTANT: REPLACE THIS OBJECT WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE ***
     const firebaseConfig = {
-        apiKey: "AIzaSyDSEHqUQIegVjhWKpRgpJybdPaVDVroVos",
-  authDomain: "islam-portal-muthamin.firebaseapp.com",
-  projectId: "islam-portal-muthamin",
-  storageBucket: "islam-portal-muthamin.firebasestorage.app",
-  messagingSenderId: "842342714257",
-  appId: "1:842342714257:web:2f839d6bf92dda92936830"
+        apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
+  authDomain: "hifz-cde3b.firebaseapp.com",
+  projectId: "hifz-cde3b",
+  storageBucket: "hifz-cde3b.firebasestorage.app",
+  messagingSenderId: "566754658580",
+  appId: "1:566754658580:web:d63d0f167960f53bab9a01"
     };
 
-    let app, db;
+    let db;
     try {
-        app = initializeApp(firebaseConfig);
-        db = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
     } catch(e) {
         console.error("Firebase Init Error:", e);
         alert("Firebase Config Error! Please edit the HTML file and add your Firebase Config.");
     }
 
     // --- Global Vars ---
-    window.surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الخشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
-    window.TEACHER_PASSWORD = "1234";
+    const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الخشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+    const TEACHER_PASSWORD = "1234";
 
     let classes = {}; 
     let records = []; // This will be an object in Firebase, but array locally for sorting
-    window.currentClass = "";
-    window.currentStudent = null;
-    window.currentActiveSection = 'new';
-    window.currentPage = 1;
-    window.historyFilter = 'all'; 
+    let currentClass = "";
+    let currentStudent = null;
+    let currentActiveSection = 'new';
+    let currentPage = 1;
+    let historyFilter = 'all'; 
 
     // Stopwatch Variables
     let timerInterval;
@@ -719,14 +720,14 @@
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
         // Init UI
-        window.populateSurahSelects();
+        populateSurahSelects();
         document.getElementById('entryDate').valueAsDate = new Date();
-        window.loadMushaf(1);
+        loadMushaf(1);
 
         // Firebase Listeners
         if(db) {
             // Listen for Classes
-            onValue(ref(db, 'classes'), (snapshot) => {
+            db.ref('classes').on('value', (snapshot) => {
                 const data = snapshot.val();
                 classes = data || { "Default Class": { teacher: "", students: [] } };
                 // Handle array/object conversion if needed from old data
@@ -735,17 +736,17 @@
                     if(!classes[k].students) classes[k].students = [];
                 });
                 
-                window.refreshClassDropdowns();
+                refreshClassDropdowns();
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('login-screen').style.display = 'flex'; // Show login after load
             }, (error) => {
                 console.error(error);
-                alert("Error connecting to database");
+                alert("Error connecting to database. Check Console.");
                 document.getElementById('loading-overlay').style.display = 'none';
             });
 
             // Listen for Records
-            onValue(ref(db, 'records'), (snapshot) => {
+            db.ref('records').on('value', (snapshot) => {
                 const data = snapshot.val();
                 // Convert Object to Array for easier local handling
                 records = [];
@@ -754,32 +755,32 @@
                         records.push({ ...data[key], firebaseKey: key });
                     });
                 }
-                if(window.currentStudent) {
-                    window.renderHistory();
-                    window.autoFillNextLesson();
+                if(currentStudent) {
+                    renderHistory();
+                    autoFillNextLesson();
                 }
             });
         }
     });
 
     // --- FIREBASE HELPER FUNCTIONS ---
-    window.syncClassData = function() {
+    function syncClassData() {
         if(!db) return;
-        set(ref(db, 'classes'), classes);
+        db.ref('classes').set(classes);
     }
 
-    window.pushRecord = function(record) {
+    function pushRecord(record) {
         if(!db) return;
-        push(ref(db, 'records'), record);
+        db.ref('records').push(record);
     }
 
-    window.deleteRecordFromDB = function(key) {
+    function deleteRecordFromDB(key) {
         if(!db) return;
-        remove(ref(db, `records/${key}`));
+        db.ref(`records/${key}`).remove();
     }
 
-    // --- UI LOGIC (Exposed to Window) ---
-    window.populateSurahSelects = function() {
+    // --- UI LOGIC ---
+    function populateSurahSelects() {
         const ids = ['newSurah', 'newEndSurah','shortSurah', 'shortEndSurah','longSurah', 'longEndSurah'];
         ids.forEach(id => {
             const sel = document.getElementById(id);
@@ -794,7 +795,7 @@
         });
     }
 
-    window.refreshClassDropdowns = function() {
+    function refreshClassDropdowns() {
         const mainSel = document.getElementById('classSelect');
         const modalSel = document.getElementById('modalClassSelect');
         const deleteSel = document.getElementById('deleteClassSelect');
@@ -804,7 +805,7 @@
         if(keys.length === 0) {
             classes = {"Default Class": { teacher: "", students: [] }};
             keys.push("Default Class");
-            window.syncClassData();
+            syncClassData();
         }
 
         keys.forEach(k => {
@@ -816,16 +817,16 @@
             });
         });
 
-        if(keys.includes(window.currentClass)) mainSel.value = window.currentClass;
+        if(keys.includes(currentClass)) mainSel.value = currentClass;
         else {
             mainSel.value = keys[0];
-            window.currentClass = keys[0];
+            currentClass = keys[0];
         }
-        window.switchClass(mainSel.value);
+        switchClass(mainSel.value);
     }
 
-    window.switchClass = function(className) {
-        window.currentClass = className;
+    function switchClass(className) {
+        currentClass = className;
         document.getElementById('currentClassDisplay').innerText = "Class: " + className;
         
         const teacherDisplay = document.getElementById('classTeacherDisplay');
@@ -840,11 +841,11 @@
 
         const list = document.getElementById('studentListContainer');
         list.innerHTML = '';
-        window.currentStudent = null;
+        currentStudent = null;
         document.getElementById('studentHeader').innerText = "ދަރިވަރެއް ނެތް";
         document.getElementById('historyContainer').innerHTML = ''; 
         
-        window.clearForm();
+        clearForm();
 
         const students = classes[className].students || [];
         if(students.length === 0) {
@@ -854,27 +855,27 @@
                 const btn = document.createElement('button');
                 btn.className = 'student-btn';
                 btn.innerText = s;
-                btn.onclick = () => window.selectStudent(s, btn);
+                btn.onclick = () => selectStudent(s, btn);
                 list.appendChild(btn);
             });
         }
     }
 
-    window.selectStudent = function(name, btnEl) {
-        window.currentStudent = name;
+    function selectStudent(name, btnEl) {
+        currentStudent = name;
         document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
         if(btnEl) btnEl.classList.add('active');
         document.getElementById('studentHeader').innerText = name;
         
-        window.clearForm(); // Reset form and mistakes
-        window.autoFillNextLesson();
-        window.renderHistory();
+        clearForm(); // Reset form and mistakes
+        autoFillNextLesson();
+        renderHistory();
     }
 
-    window.autoFillNextLesson = function() {
-        if(!window.currentStudent) return;
+    function autoFillNextLesson() {
+        if(!currentStudent) return;
         // Filter records for this student
-        const studentRecords = records.filter(r => r.class === window.currentClass && r.student === window.currentStudent);
+        const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
         // Sort by date descending
         studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
 
@@ -888,7 +889,7 @@
             const lastEndVerse = parseInt(lastDaily.new.en);
             if(!lastEndSurahName || !lastEndVerse) return;
 
-            const surahIndex = window.surahNames.indexOf(lastEndSurahName) + 1;
+            const surahIndex = surahNames.indexOf(lastEndSurahName) + 1;
             if(surahIndex === 0) return; 
 
             const nextVerse = lastEndVerse + 1;
@@ -903,7 +904,7 @@
                         document.getElementById('newSurah').value = surahIndex;
                         document.getElementById('newStart').value = nextVerse;
                         if(data.verse.page_number) {
-                            window.loadMushaf(data.verse.page_number);
+                            loadMushaf(data.verse.page_number);
                             document.getElementById('newPage').value = data.verse.page_number;
                         }
                     } else {
@@ -921,14 +922,14 @@
                 })
                 .then(data2 => {
                     if(data2 && data2.verse && data2.verse.page_number) {
-                        window.loadMushaf(data2.verse.page_number);
+                        loadMushaf(data2.verse.page_number);
                         document.getElementById('newPage').value = data2.verse.page_number;
                     }
                 })
                 .catch(e => console.log(e))
                 .finally(() => {
                     if(loader) loader.style.display = 'none';
-                    window.setActiveSection('new');
+                    setActiveSection('new');
                     const radio = document.querySelector(`input[name="activeSec"][value="new"]`);
                     if(radio) radio.checked = true;
                 });
@@ -936,8 +937,8 @@
     }
 
     // --- Save & History ---
-    window.saveRecord = function() {
-        if(!window.currentStudent) return alert("ދަރިވަރަކު ނެތް");
+    function saveRecord() {
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
         
         const type = document.getElementById('lessonType').value;
         const getV = id => document.getElementById(id).value;
@@ -949,8 +950,8 @@
 
         const base = {
             id: Date.now(), // Still useful as a timestamp ID
-            class: window.currentClass,
-            student: window.currentStudent,
+            class: currentClass,
+            student: currentStudent,
             date: getV('entryDate'),
             teacher: getV('teacherName')
         };
@@ -964,7 +965,7 @@
                 juzu: getV('examJuzu'),
                 portion: document.getElementById('examPortion').value,
                 examiner: getV('examExaminer'),
-                duration: document.getElementById('examDuration').innerText,
+                duration: document.getElementById('examDurationInput').value, // Use the input field value
                 mistakes: { teacher: getV('examTeacherMistakes'), self: getV('examSelfMistakes') },
                 scores: { 
                     mutha1: getV('markMutha1'), 
@@ -984,26 +985,26 @@
             };
         }
 
-        window.pushRecord(rec);
-        window.clearForm(); // Clear after save so mistakes don't carry over
+        pushRecord(rec);
+        clearForm(); // Clear after save so mistakes don't carry over
         alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ");
     }
 
-    window.renderHistory = function() {
+    function renderHistory() {
         const container = document.getElementById('historyContainer');
         container.innerHTML = '';
-        const data = records.filter(r => r.class === window.currentClass && r.student === window.currentStudent);
+        const data = records.filter(r => r.class === currentClass && r.student === currentStudent);
         data.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         // Filter Logic
         let filteredData = data;
-        if(window.historyFilter !== 'all') {
+        if(historyFilter !== 'all') {
             filteredData = data.filter(r => {
-                if(r.type === 'exam') return window.historyFilter === 'exam';
+                if(r.type === 'exam') return historyFilter === 'exam';
                 // For daily, check if the specific section has data
-                if(window.historyFilter === 'new') return (r.new && (r.new.s || r.new.st));
-                if(window.historyFilter === 'short') return (r.short && (r.short.s || r.short.st));
-                if(window.historyFilter === 'long') return (r.long && (r.long.s || r.long.st));
+                if(historyFilter === 'new') return (r.new && (r.new.s || r.new.st));
+                if(historyFilter === 'short') return (r.short && (r.short.s || r.short.st));
+                if(historyFilter === 'long') return (r.long && (r.long.s || r.long.st));
                 return false;
             });
         }
@@ -1023,7 +1024,7 @@
                                     r.portion === 'third' ? '1/3' : '1/4';
                 card.className = 'history-card exam-card';
                 card.innerHTML = `
-                    <button class="delete-card-btn teacher-only" onclick="window.delRec('${r.firebaseKey}')">&times;</button>
+                    <button class="delete-card-btn teacher-only" onclick="delRec('${r.firebaseKey}')">&times;</button>
                     <div class="card-header" style="border-color:#f1c40f;">
                         <span class="card-date">🏆 އިމްތިޙާން (${r.juzu} - ${portionText}) - ${r.date}</span>
                         <span class="card-teacher" style="background:#fff8e1; color:#d35400;">${r.scores.total}</span>
@@ -1059,7 +1060,7 @@
                 };
 
                 card.innerHTML = `
-                    <button class="delete-card-btn teacher-only" onclick="window.delRec('${r.firebaseKey}')">&times;</button>
+                    <button class="delete-card-btn teacher-only" onclick="delRec('${r.firebaseKey}')">&times;</button>
                     <div class="card-header">
                         <span class="card-date">📅 ${r.date}</span>
                         <span class="card-teacher">👨‍🏫 ${r.teacher || '-'}</span>
@@ -1079,21 +1080,21 @@
         }
     }
 
-    window.delRec = function(key) {
+    function delRec(key) {
         if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
-            window.deleteRecordFromDB(key);
+            deleteRecordFromDB(key);
         }
     }
 
     // --- OTHER UI ACTIONS ---
-    window.startTimer = function() {
+    function startTimer() {
         if (!timerInterval) {
             startTime = Date.now() - elapsedTime;
-            timerInterval = setInterval(window.updateTimerDisplay, 1000);
+            timerInterval = setInterval(updateTimerDisplay, 1000);
         }
     }
 
-    window.stopTimer = function() {
+    function stopTimer() {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -1102,7 +1103,7 @@
         }
     }
 
-    window.updateTimerDisplay = function() {
+    function updateTimerDisplay() {
         elapsedTime = Date.now() - startTime;
         const totalSeconds = Math.floor(elapsedTime / 1000);
         const mins = Math.floor(totalSeconds / 60);
@@ -1111,46 +1112,46 @@
             `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    window.resetTimer = function() {
-        window.stopTimer();
+    function resetTimer() {
+        stopTimer();
         elapsedTime = 0;
         document.getElementById('timerDisplay').innerText = "00:00";
         document.getElementById('examDurationInput').value = "";
     }
 
-    window.loginAs = function(type) {
+    function loginAs(type) {
         if(type === 'teacher') {
             const pwd = prompt("ޕާސްވޯޑް ޖައްސަވާ:");
-            if(pwd === window.TEACHER_PASSWORD) {
+            if(pwd === TEACHER_PASSWORD) {
                 document.body.classList.remove('parent-mode');
-                window.showApp();
+                showApp();
             } else {
                 alert("ޕާސްވޯޑް ނުބައި");
             }
         } else {
             document.body.classList.add('parent-mode');
-            window.showApp();
+            showApp();
             alert("ބެލެނިވެރިންގެ ބަޔަށް މަރުޙަބާ.\nދަރިވަރުގެ ނަން ނެގުމަށްފަހު، އެކުއްޖާގެ ޙާޟިރީ އާއި ރެކޯޑްތައް ބެއްލެވޭނެއެވެ.");
         }
     }
 
-    window.showApp = function() {
+    function showApp() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
     }
 
-    window.logout = function() {
+    function logout() {
         location.reload();
     }
 
-    window.openModal = function() { 
+    function openModal() { 
         document.getElementById('classModal').style.display = 'flex'; 
-        document.getElementById('modalClassSelect').value = window.currentClass;
-        window.renderModalStudentList();
+        document.getElementById('modalClassSelect').value = currentClass;
+        renderModalStudentList();
     }
-    window.closeModal = function() { document.getElementById('classModal').style.display = 'none'; }
+    function closeModal() { document.getElementById('classModal').style.display = 'none'; }
     
-    window.switchTab = function(tabId) {
+    function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
@@ -1159,26 +1160,26 @@
         else document.querySelector('.tab-btn:last-child').classList.add('active');
     }
 
-    window.createClass = function() {
+    function createClass() {
         const name = document.getElementById('newClassName').value.trim();
         const teacher = document.getElementById('newClassTeacher').value.trim();
         if(!name) return;
         if(classes[name]) return alert("މި ކްލާސް އެބައިން");
         
         classes[name] = { teacher: teacher, students: [] };
-        window.syncClassData();
+        syncClassData();
         
         document.getElementById('newClassName').value = '';
         document.getElementById('newClassTeacher').value = '';
         
-        window.refreshClassDropdowns();
+        refreshClassDropdowns();
         document.getElementById('classSelect').value = name;
-        window.switchClass(name);
+        switchClass(name);
         alert("ކްލާސް ހެދިއްޖެ: " + name);
-        window.closeModal();
+        closeModal();
     }
 
-    window.importStudents = function() {
+    function importStudents() {
         const cls = document.getElementById('modalClassSelect').value;
         const txt = document.getElementById('bulkStudents').value;
         if(!txt.trim()) return;
@@ -1203,14 +1204,14 @@
             }
         });
 
-        window.syncClassData();
+        syncClassData();
         document.getElementById('bulkStudents').value = '';
-        window.renderModalStudentList();
-        if(window.currentClass === cls) window.switchClass(cls);
+        renderModalStudentList();
+        if(currentClass === cls) switchClass(cls);
         alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
     }
 
-    window.renderModalStudentList = function() {
+    function renderModalStudentList() {
         const cls = document.getElementById('modalClassSelect').value;
         const listDiv = document.getElementById('modalStudentList');
         listDiv.innerHTML = '';
@@ -1222,72 +1223,72 @@
             students.forEach(s => {
                 const item = document.createElement('div');
                 item.className = 'modal-student-item';
-                item.innerHTML = `<span>${s}</span><button class="btn-del-mini" onclick="window.deleteStudent('${s}')">Delete</button>`;
+                item.innerHTML = `<span>${s}</span><button class="btn-del-mini" onclick="deleteStudent('${s}')">Delete</button>`;
                 listDiv.appendChild(item);
             });
         }
     }
 
-    window.deleteStudent = function(studentName) {
+    function deleteStudent(studentName) {
         const cls = document.getElementById('modalClassSelect').value;
         if(confirm(`"${studentName}" ފޮހެލަން ބޭނުންތަ؟`)) {
             classes[cls].students = classes[cls].students.filter(s => s !== studentName);
-            window.syncClassData();
-            window.renderModalStudentList();
-            if(window.currentClass === cls) window.switchClass(cls);
+            syncClassData();
+            renderModalStudentList();
+            if(currentClass === cls) switchClass(cls);
         }
     }
 
-    window.deleteSelectedClass = function() {
+    function deleteSelectedClass() {
         const cls = document.getElementById('deleteClassSelect').value;
         if(Object.keys(classes).length <= 1) return alert("މިއީ ހަމައެކަނި އިން ކްލާސް. ފޮހެއެއް ނުލެވޭނެ.");
         if(confirm(cls + " ފޮހެލަން ބޭނުންތަ؟")) {
             delete classes[cls];
-            window.syncClassData();
-            window.refreshClassDropdowns();
+            syncClassData();
+            refreshClassDropdowns();
             alert("ކްލާސް ފޮހެލެވިއްޖެ");
         }
     }
 
-    window.loadMushaf = function(p, sync = true) {
+    function loadMushaf(p, sync = true) {
         if(p < 1 || p > 604) return;
-        window.currentPage = parseInt(p);
-        document.getElementById('navPage').value = window.currentPage;
-        document.getElementById('pageIndicator').innerText = "Page " + window.currentPage;
+        currentPage = parseInt(p);
+        document.getElementById('navPage').value = currentPage;
+        document.getElementById('pageIndicator').innerText = "Page " + currentPage;
         const img = document.getElementById('mushafImg');
-        img.src = `https://android.quran.com/data/width_1260/page${window.currentPage.toString().padStart(3,'0')}.png`;
-        window.clearDots();
+        img.src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
+        clearDots();
         
         if (sync && document.getElementById('lessonType').value !== 'exam') {
-            const pageInput = document.getElementById(window.currentActiveSection + 'Page');
+            const pageInput = document.getElementById(currentActiveSection + 'Page');
             if(pageInput) {
-                pageInput.value = window.currentPage;
-                window.fillSurahFromPage(window.currentPage, window.currentActiveSection);
+                pageInput.value = currentPage;
+                fillSurahFromPage(currentPage, currentActiveSection);
             }
         }
     }
 
-    window.changePage = function(delta) { window.loadMushaf(window.currentPage + delta, false); }
-    window.toggleMushaf = function() {
+    function changePage(delta) { loadMushaf(currentPage + delta, false); }
+    function toggleMushaf() {
         const w = getComputedStyle(document.documentElement).getPropertyValue('--mushaf-width').trim();
         document.documentElement.style.setProperty('--mushaf-width', w === '0px' ? '35%' : '0px');
     }
 
-    window.setActiveSection = function(sec) {
-        window.currentActiveSection = sec;
+    function setActiveSection(sec) {
+        currentActiveSection = sec;
         document.querySelectorAll('.section-box').forEach(b => b.classList.remove('active-section'));
         document.getElementById('box-'+sec).classList.add('active-section');
     }
 
-    window.autoLoadPage = function(sec) {
+    function autoLoadPage(sec) {
         const p = document.getElementById(sec+'Page').value;
         if(!p) return;
-        window.loadMushaf(p, true);
-        window.setActiveSection(sec);
+        loadMushaf(p, true);
+        setActiveSection(sec);
         document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
     }
 
-    window.fillSurahFromPage = function(page, section) {
+    function fillSurahFromPage(page, section) {
         const loader = document.getElementById('loader-' + section);
         if(loader) loader.style.display = 'inline-block';
         
@@ -1307,7 +1308,7 @@
             .finally(() => { if(loader) loader.style.display = 'none'; });
     }
 
-    window.onImageClick = function(e) {
+    function onImageClick(e) {
         if(document.body.classList.contains('parent-mode')) return;
         if(e.target.classList.contains('mistake-dot')) return;
         
@@ -1317,36 +1318,36 @@
         const dot = document.createElement('div');
         dot.className = 'mistake-dot';
         dot.style.left = x+'px'; dot.style.top = y+'px';
-        const target = window.currentActiveSection + 'Mistakes';
+        const target = currentActiveSection + 'Mistakes';
         const isExam = document.getElementById('lessonType').value === 'exam';
         
         dot.onclick = (ev) => { ev.stopPropagation(); dot.remove(); 
-            if(isExam) window.updateExamMistake('teacher', -1);
-            else window.adjustMistake(target, -1); 
+            if(isExam) updateExamMistake('teacher', -1);
+            else adjustMistake(target, -1); 
         };
         
         document.getElementById('mushafWrapper').appendChild(dot);
-        if(isExam) window.updateExamMistake('teacher', 1);
-        else window.adjustMistake(target, 1);
+        if(isExam) updateExamMistake('teacher', 1);
+        else adjustMistake(target, 1);
     }
 
-    window.adjustMistake = function(id, delta) {
+    function adjustMistake(id, delta) {
         const el = document.getElementById(id);
         let v = parseInt(el.value) || 0;
         v += delta; if(v < 0) v = 0;
         el.value = v;
     }
     
-    window.updateExamMistake = function(type, delta) {
+    function updateExamMistake(type, delta) {
         const id = type === 'teacher' ? 'examTeacherMistakes' : 'examSelfMistakes';
         const el = document.getElementById(id);
         let v = parseInt(el.value) || 0;
         v += delta; if(v < 0) v = 0;
         el.value = v;
-        window.calculateExamScore();
+        calculateExamScore();
     }
 
-    window.calculateDuration = function() {
+    function calculateDuration() {
         const start = document.getElementById('examStartTime').value;
         const end = document.getElementById('examEndTime').value;
         if(start && end) {
@@ -1357,7 +1358,7 @@
         }
     }
 
-    window.calculateExamScore = function() {
+    function calculateExamScore() {
         const teacherMistakes = parseInt(document.getElementById('examTeacherMistakes').value) || 0;
         const selfMistakes = parseInt(document.getElementById('examSelfMistakes').value) || 0;
         let hifzScore = 80 - (teacherMistakes * 2) - (selfMistakes * 1);
@@ -1370,9 +1371,9 @@
         document.getElementById('totalExamScore').innerText = total + "%";
     }
 
-    window.clearDots = function() { document.querySelectorAll('.mistake-dot').forEach(d => d.remove()); }
+    function clearDots() { document.querySelectorAll('.mistake-dot').forEach(d => d.remove()); }
 
-    window.clearForm = function() {
+    function clearForm() {
         ['new','short','long'].forEach(s => {
             if(document.getElementById(s+'Mistakes')) document.getElementById(s+'Mistakes').value = 0;
             if(document.getElementById(s+'Page')) document.getElementById(s+'Page').value = '';
@@ -1385,33 +1386,33 @@
         document.getElementById('examExaminer').value = '';
         document.getElementById('examDurationInput').value = '';
         document.getElementById('timerDisplay').innerText = '00:00';
-        window.stopTimer();
+        stopTimer();
         document.getElementById('examTeacherMistakes').value = 0;
         document.getElementById('examSelfMistakes').value = 0;
         document.getElementById('markMutha1').value = 2.5;
         document.getElementById('markMutha2').value = 2.5;
         document.getElementById('markTajweed').value = 10;
         document.getElementById('markFluency').value = 5;
-        window.calculateExamScore();
-        window.clearDots();
+        calculateExamScore();
+        clearDots();
     }
 
-    window.toggleFormSection = function(val) {
+    function toggleFormSection(val) {
         const dailyContainer = document.getElementById('container-daily');
         const examContainer = document.getElementById('container-exam');
         if (val === 'exam') {
             dailyContainer.style.display = 'none';
             examContainer.style.display = 'block';
-            window.setActiveSection('exam');
+            setActiveSection('exam');
         } else {
             dailyContainer.style.display = 'block';
             examContainer.style.display = 'none';
-            window.setActiveSection('new');
+            setActiveSection('new');
         }
     }
     
-    window.setHistoryFilter = function(type) {
-        window.historyFilter = type;
+    function setHistoryFilter(type) {
+        historyFilter = type;
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
         
@@ -1422,12 +1423,12 @@
         if(type === 'exam') activeBtnId = 'btnFilterExam';
         
         document.getElementById(activeBtnId).classList.add('active');
-        window.renderHistory();
+        renderHistory();
     }
 
-    window.exportExcel = function() {
+    function exportExcel() {
         if(records.length === 0) return alert("ނޯ ޑޭޓާ");
-        const data = records.filter(r => r.class === window.currentClass).map(r => {
+        const data = records.filter(r => r.class === currentClass).map(r => {
             if (r.type === 'exam') {
                  return {
                     "ތާރީޚް": r.date, "ދަރިވަރު": r.student, "ބާވަތް": "އިމްތިޙާން",
@@ -1450,23 +1451,23 @@
         if(data.length === 0) return alert("މި ކްލާހުގެ ރެކޯޑެއް ނެތް");
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, window.currentClass);
-        XLSX.writeFile(wb, `Hifz_${window.currentClass}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, currentClass);
+        XLSX.writeFile(wb, `Hifz_${currentClass}.xlsx`);
     }
 
     // --- REPORT & PROGRESS ---
-    window.openProgressModal = function() { document.getElementById('progressModal').style.display = 'flex'; }
-    window.closeProgressModal = function() { document.getElementById('progressModal').style.display = 'none'; }
+    function openProgressModal() { document.getElementById('progressModal').style.display = 'flex'; }
+    function closeProgressModal() { document.getElementById('progressModal').style.display = 'none'; }
 
-    window.calculateProgress = function() {
+    function calculateProgress() {
         const start = new Date(document.getElementById('progStartDate').value);
         const end = new Date(document.getElementById('progEndDate').value);
         
         if (isNaN(start) || isNaN(end)) return alert("ތާރީޚް އިޚްތިޔާރުކުރައްވާ");
 
         const studentRecords = records.filter(r => 
-            r.class === window.currentClass && 
-            r.student === window.currentStudent && 
+            r.class === currentClass && 
+            r.student === currentStudent && 
             r.type === 'daily' &&
             (r.new.s || r.new.st)
         );
@@ -1481,12 +1482,12 @@
         document.getElementById('progressResult').style.display = 'block';
     }
 
-    window.openExamReport = function() {
-        if(!window.currentStudent) return alert("ދަރިވަރަކު ނެތް");
+    function openExamReport() {
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
         
         const examRecords = records.filter(r => 
-            r.class === window.currentClass && 
-            r.student === window.currentStudent && 
+            r.class === currentClass && 
+            r.student === currentStudent && 
             r.type === 'exam'
         );
         examRecords.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1509,12 +1510,12 @@
         });
 
         const avg = examRecords.length > 0 ? (totalScore / examRecords.length).toFixed(1) : 0;
-        document.getElementById('reportStudentName').innerText = window.currentStudent;
+        document.getElementById('reportStudentName').innerText = currentStudent;
         document.getElementById('reportSummary').innerText = `ޖުމްލަ އިމްތިޙާން: ${examRecords.length} | އެވްރެޖް: ${avg}%`;
         document.getElementById('examReportModal').style.display = 'flex';
     }
     
-    window.closeExamReport = function() { document.getElementById('examReportModal').style.display = 'none'; }
+    function closeExamReport() { document.getElementById('examReportModal').style.display = 'none'; }
 
 </script>
 </body>
