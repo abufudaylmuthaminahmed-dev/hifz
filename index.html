@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online Database v4.2</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online Database v4.4</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- FIREBASE SDK -->
+    <!-- FIREBASE SDK (Compat Version - Best for single file apps) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -284,7 +284,7 @@
             <div style="margin: 15px 0; border-bottom: 1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v4.2</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v4.4</p>
     </div>
 
     <!-- APP CONTENT (Initially Hidden) -->
@@ -696,32 +696,30 @@
         </div>
     </div>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<script>
+    // --- FIREBASE CONFIGURATION ---
+    // Your specific config is inserted here
+    const firebaseConfig = {
+      apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
+      authDomain: "hifz-cde3b.firebaseapp.com",
+      databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
+      projectId: "hifz-cde3b",
+      storageBucket: "hifz-cde3b.firebasestorage.app",
+      messagingSenderId: "566754658580",
+      appId: "1:566754658580:web:d63d0f167960f53bab9a01"
+    };
 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
-    authDomain: "hifz-cde3b.firebaseapp.com",
-    databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
-    projectId: "hifz-cde3b",
-    storageBucket: "hifz-cde3b.firebasestorage.app",
-    messagingSenderId: "566754658580",
-    appId: "1:566754658580:web:d63d0f167960f53bab9a01"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
-  
+    let db;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+    } catch(e) {
+        console.error("Firebase Init Error:", e);
+        alert("Firebase Config Error! Please check console.");
+    }
 
     // --- Global Vars ---
-    const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات
-                        "ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
-    
+    const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
     const TEACHER_PASSWORD = "1234";
 
     let classes = {}; 
@@ -758,10 +756,10 @@
                 
                 refreshClassDropdowns();
                 document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'flex'; 
+                document.getElementById('login-screen').style.display = 'flex'; // Show login after load
             }, (error) => {
                 console.error(error);
-                alert("Error connecting to database. Check Console.");
+                alert("Error connecting to database.");
                 document.getElementById('loading-overlay').style.display = 'none';
             });
 
@@ -893,11 +891,14 @@
 
     function autoFillNextLesson() {
         if(!currentStudent) return;
+        // Filter records for this student
         const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
+        // Sort by date descending
         studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
 
         if(studentRecords.length === 0) return;
         
+        // Find last DAILY lesson
         const lastDaily = studentRecords.find(r => r.type === 'daily');
         
         if(lastDaily && lastDaily.new && lastDaily.new.s && lastDaily.new.en) {
@@ -912,6 +913,7 @@
             const loader = document.getElementById('loader-new');
             if(loader) loader.style.display = 'inline-block';
 
+            // Try to fetch page for next verse
             fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex}:${nextVerse}?fields=page_number`)
                 .then(res => res.json())
                 .then(data => {
@@ -923,6 +925,7 @@
                             document.getElementById('newPage').value = data.verse.page_number;
                         }
                     } else {
+                        // End of Surah, go to next Surah
                         if(surahIndex < 114) {
                             const nextSurahIndex = surahIndex + 1;
                             document.getElementById('newSurah').value = nextSurahIndex;
@@ -1000,7 +1003,7 @@
         }
 
         pushRecord(rec);
-        clearForm();
+        clearForm(); // Clear after save so mistakes don't carry over
         alert("ރެކޯޑް ސޭވް ކުރެވިއްޖެ");
     }
 
@@ -1010,10 +1013,12 @@
         const data = records.filter(r => r.class === currentClass && r.student === currentStudent);
         data.sort((a,b) => new Date(b.date) - new Date(a.date));
 
+        // Filter Logic
         let filteredData = data;
         if(historyFilter !== 'all') {
             filteredData = data.filter(r => {
                 if(r.type === 'exam') return historyFilter === 'exam';
+                // For daily, check if the specific section has data
                 if(historyFilter === 'new') return (r.new && (r.new.s || r.new.st));
                 if(historyFilter === 'short') return (r.short && (r.short.s || r.short.st));
                 if(historyFilter === 'long') return (r.long && (r.long.s || r.long.st));
@@ -1026,6 +1031,7 @@
             return;
         }
 
+        // Render Cards (Keeping it simple for cards vs table switch)
         filteredData.forEach(r => {
             const card = document.createElement('div');
             
@@ -1085,6 +1091,7 @@
             container.appendChild(card);
         });
         
+        // Re-apply parent/teacher mode visibility
         if(document.body.classList.contains('parent-mode')) {
             document.querySelectorAll('.teacher-only').forEach(e => e.style.display = 'none');
         }
