@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V7.0 (Dhivehi)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V7.1</title>
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Firebase SDK (Compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -19,7 +19,7 @@
             --student-color: #e67e22;
             --bg-color: #f4f7f6;
             --sidebar-width: 280px;
-            --mushaf-width: 35%;
+            --mushaf-width: 40%; /* Widened for better view */
         }
 
         body {
@@ -34,8 +34,8 @@
         /* --- UI COMPONENTS --- */
         .id-badge {
             display: inline-block; background-color: #ecf0f1; color: #7f8c8d;
-            padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;
-            font-family: sans-serif; margin-top: 4px; border: 1px solid #bdc3c7;
+            padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;
+            font-family: sans-serif; margin-top: 2px; border: 1px solid #bdc3c7;
         }
 
         #loading-overlay {
@@ -71,9 +71,9 @@
         
         .student-list-container { flex: 1; overflow-y: auto; }
         .student-btn {
-            background: none; border: none; padding: 10px; text-align: right; width: 100%;
+            background: none; border: none; padding: 12px 10px; text-align: right; width: 100%;
             cursor: pointer; border-bottom: 1px solid #f9f9f9; font-family: inherit;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; font-size: 15px; /* Larger font */
         }
         .student-btn:hover { background: #e8f6ef; color: var(--accent-color); padding-right: 15px; }
         .student-btn.active { background: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
@@ -81,22 +81,28 @@
 
         .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        /* --- FORM --- */
-        .entry-form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
+        /* --- FORM STYLING IMPROVED --- */
+        .entry-form { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
         .form-group { flex: 1; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: inherit; font-size: 14px;}
-        .arabic-input { font-family: 'Amiri', serif; direction: rtl; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: #444; }
+        input, select { 
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; 
+            box-sizing: border-box; font-family: inherit; font-size: 16px; /* Larger Input Text */
+        }
+        .arabic-input { font-family: 'Amiri', serif; direction: rtl; font-size: 18px; }
 
-        .section-box { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid transparent; transition: 0.2s; cursor: pointer; position: relative; }
-        .section-box:hover { opacity: 0.95; }
+        .section-box { 
+            padding: 20px; border-radius: 10px; margin-bottom: 20px; 
+            border: 2px solid transparent; transition: 0.2s; cursor: pointer; position: relative; 
+        }
+        .section-box:hover { transform: translateY(-2px); }
         .section-new { background: #eafaf1; }
         .section-short { background: #ebf5fb; }
         .section-long { background: #fef9e7; }
         
         .section-box.active-section {
-            background: white; border-left: 5px solid; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white; border-left: 6px solid; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
         #box-new.active-section { border-color: #27ae60; }
         #box-short.active-section { border-color: #2980b9; }
@@ -104,26 +110,32 @@
         #box-exam.active-section { border-color: #f1c40f; }
 
         .radio-label { 
-            position: absolute; top: 10px; left: 10px;
-            display: inline-flex; align-items: center; gap: 5px; 
-            background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; 
+            position: absolute; top: 15px; left: 15px;
+            display: inline-flex; align-items: center; gap: 8px; 
+            background: rgba(255,255,255,0.9); padding: 6px 12px; border-radius: 20px; 
+            font-weight: bold; font-size: 13px; border: 1px solid #ddd;
         }
 
-        .mistake-wrapper { display: flex; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
-        .mistake-btn { width: 30px; border: none; background: #eee; cursor: pointer; font-weight: bold; }
-        .mistake-display { width: 40px; text-align: center; border: none; font-weight: bold; }
+        .mistake-wrapper { display: flex; border: 1px solid #aaa; border-radius: 6px; overflow: hidden; height: 38px; }
+        .mistake-btn { width: 35px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-size: 18px; }
+        .mistake-display { width: 50px; text-align: center; border: none; font-weight: bold; font-size: 18px; }
 
         /* --- MUSHAF --- */
         .mushaf-panel { width: var(--mushaf-width); background: #2c3e50; display: flex; flex-direction: column; transition: width 0.3s; border-right: 1px solid #ccc; }
-        .mushaf-header { background: #34495e; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .mushaf-header { 
+            background: #34495e; color: white; padding: 12px; 
+            display: flex; flex-direction: column; gap: 5px; align-items: center; 
+            border-bottom: 1px solid #444;
+        }
+        .mushaf-info { font-size: 16px; font-weight: bold; color: #f1c40f; font-family: 'Amiri', serif;}
         .mushaf-container { flex: 1; overflow: auto; background: #fdfdfd; display: flex; justify-content: center; position: relative; }
         .mushaf-wrapper { position: relative; display: inline-block; margin: 10px; }
         .mushaf-page-img { max-width: 100%; display: block; border: 1px solid #ddd; cursor: crosshair; }
         
         .mistake-dot {
-            position: absolute; width: 20px; height: 20px; background-color: rgba(231, 76, 60, 0.8);
+            position: absolute; width: 24px; height: 24px; background-color: rgba(231, 76, 60, 0.85);
             border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
-            cursor: pointer; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
         .mistake-dot.readonly { cursor: default; background-color: rgba(231, 76, 60, 1); border-color: gold; }
 
@@ -147,7 +159,7 @@
 
         .student-header-banner { background: linear-gradient(to right, #e67e22, #f39c12); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
 
-        .btn { padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-family: inherit;}
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; font-size: 14px;}
         .btn-green { background: var(--accent-color); }
         .btn-blue { background: #3498db; }
         .btn-red { background: #e74c3c; }
@@ -167,7 +179,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" style="display:none;">
         <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V7.0</h2>
+            <h2>ޙިފްޡް ޕްރޮގްރާމް V7.1</h2>
             <button class="login-btn btn-student" onclick="loginAs('student')">🎓 ދަރިވަރުން</button>
             <div style="margin:15px 0; border-bottom:1px solid #eee;"></div>
             <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
@@ -223,12 +235,12 @@
                 <div id="container-daily">
                     <!-- New Lesson -->
                     <div id="box-new" class="section-box section-new active-section" onclick="setActiveSection('new')">
-                        <label style="color:#27ae60; font-size:16px; font-weight:bold;">އާ ފިލާވަޅު</label>
+                        <label style="color:#27ae60; font-size:18px; font-weight:bold;">އާ ފިލާވަޅު</label>
                         <label class="radio-label"><input type="radio" name="activeSec" value="new" checked> ކުށްޖެހުން</label>
                         <div class="form-row">
                             <div style="flex:0.5">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="newPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                                <input type="number" id="newPage" placeholder="Page" onchange="handlePageChange(this.value, 'new')" style="text-align:center; font-weight:bold;">
                             </div>
                             <div style="flex:1.5">
                                 <label>ފެށޭ ސޫރަތް/އާޔަތް</label>
@@ -258,13 +270,13 @@
                     <!-- Short Revision -->
                     <div id="box-short" class="section-box section-short" onclick="setActiveSection('short')">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#2980b9; font-size:16px; font-weight:bold;">ކުރު މުރާޖަޢާ</label>
+                            <label style="color:#2980b9; font-size:18px; font-weight:bold;">ކުރު މުރާޖަޢާ</label>
                             <label class="radio-label"><input type="radio" name="activeSec" value="short"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
                             <div style="flex:0.5">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="shortPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                                <input type="number" id="shortPage" placeholder="Page" onchange="handlePageChange(this.value, 'short')" style="text-align:center; font-weight:bold;">
                             </div>
                             <div style="flex:1.5">
                                 <label>ފެށޭ</label>
@@ -294,13 +306,13 @@
                     <!-- Long Revision -->
                     <div id="box-long" class="section-box section-long" onclick="setActiveSection('long')">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <label style="color:#d35400; font-size:16px; font-weight:bold;">ދިގު މުރާޖަޢާ</label>
+                            <label style="color:#d35400; font-size:18px; font-weight:bold;">ދިގު މުރާޖަޢާ</label>
                             <label class="radio-label"><input type="radio" name="activeSec" value="long"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
                             <div style="flex:0.5">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="longPage" placeholder="Page" onchange="loadMushaf(this.value)" style="text-align:center;">
+                                <input type="number" id="longPage" placeholder="Page" onchange="handlePageChange(this.value, 'long')" style="text-align:center; font-weight:bold;">
                             </div>
                             <div style="flex:1.5">
                                 <label>ފެށޭ</label>
@@ -333,11 +345,11 @@
                     <div id="box-exam" class="section-box section-new active-section" style="border-color:#f1c40f;">
                         <h3 style="margin-top:0; color:#d35400;">🏆 އިމްތިޙާން</h3>
                         
-                        <div class="stopwatch-container" style="background:#34495e; padding:10px; border-radius:5px; margin-bottom:10px; display:flex; align-items:center; gap:10px; color:white;">
-                            <div id="timerDisplay" style="font-family:monospace; font-size:24px; font-weight:bold; color:#f1c40f;">00:00</div>
+                        <div class="stopwatch-container" style="background:#34495e; padding:15px; border-radius:5px; margin-bottom:15px; display:flex; align-items:center; gap:10px; color:white;">
+                            <div id="timerDisplay" style="font-family:monospace; font-size:28px; font-weight:bold; color:#f1c40f;">00:00</div>
                             <button class="btn btn-green" onclick="startTimer()">▶ ފަށާ</button>
                             <button class="btn btn-red" onclick="stopTimer()">⏹ ހުއްޓާ</button>
-                            <input type="number" id="examDuration" placeholder="މިނެޓް" style="width:60px; text-align:center; margin-right:auto;">
+                            <input type="number" id="examDuration" placeholder="މިނެޓް" style="width:70px; text-align:center; margin-right:auto; font-size:16px;">
                         </div>
 
                         <div class="form-row">
@@ -352,9 +364,9 @@
                             </div>
                         </div>
                         
-                        <div style="background:#fff3e0; padding:10px; border-radius:5px; margin:10px 0;">
+                        <div style="background:#fff3e0; padding:15px; border-radius:8px; margin:15px 0;">
                             <label>ކުށްތައް (ޖުމްލަ 80):</label>
-                            <div style="display:flex; gap:10px;">
+                            <div style="display:flex; gap:15px;">
                                 <div style="flex:1">މުދައްރިސް (-2): <input type="number" id="examTMistakes" value="0" onchange="calcExam()"></div>
                                 <div style="flex:1">އަމިއްލަ (-1): <input type="number" id="examSMistakes" value="0" onchange="calcExam()"></div>
                             </div>
@@ -363,12 +375,12 @@
                         <div class="form-row">
                             <div style="flex:1"><label>ތަޖްވީދު (10)</label><input type="number" id="markTajweed" value="10" onchange="calcExam()"></div>
                             <div style="flex:1"><label>ފަރިތަކަން (5)</label><input type="number" id="markFluency" value="5" onchange="calcExam()"></div>
-                            <div style="flex:1"><label>ޖުމްލަ:</label><h3 id="examTotal" style="margin:0; color:blue;">100%</h3></div>
+                            <div style="flex:1"><label>ޖުމްލަ:</label><h3 id="examTotal" style="margin:0; color:blue; font-size:24px;">100%</h3></div>
                         </div>
                     </div>
                 </div>
 
-                <button class="btn btn-green" style="width:100%; justify-content:center; margin-top:10px;" onclick="saveRecord()">💾 ސޭވް (ޚިޔާރުކުރެވިފައިވާ ބައި)</button>
+                <button class="btn btn-green" style="width:100%; justify-content:center; margin-top:10px; font-size:16px; padding:12px;" onclick="saveRecord()">💾 ސޭވް (ޚިޔާރުކުރެވިފައިވާ ބައި)</button>
             </div>
 
             <!-- HISTORY -->
@@ -381,10 +393,10 @@
         <!-- MUSHAF -->
         <div class="mushaf-panel" id="mushafPanel">
             <div class="mushaf-header">
-                <span id="pageIndicator">Page 1</span>
-                <div>
+                <div id="mushafInfoDisplay" class="mushaf-info">---</div>
+                <div style="display:flex; gap:10px; align-items:center;">
                     <button class="btn btn-grey" onclick="changePage(1)">></button>
-                    <input type="number" id="navPage" style="width:50px; text-align:center;" onchange="loadMushaf(this.value)">
+                    <input type="number" id="navPage" style="width:60px; text-align:center; font-weight:bold;" onchange="loadMushaf(this.value)">
                     <button class="btn btn-grey" onclick="changePage(-1)"><</button>
                 </div>
             </div>
@@ -500,7 +512,6 @@
     let currentActiveSection = 'new';
     let currentPage = 1;
     let sessionDots = []; 
-    
     let timerInterval, startTime, elapsedTime = 0;
 
     // --- HELPER: Parse Student Name & ID ---
@@ -616,15 +627,30 @@
         
         clearForm();
         sessionDots = [];
-        autoFillNextLesson();
+        autoFillAllSections(); // Auto-fill on selection
         renderTeacherHistory();
     }
 
     // --- MUSHAF & DOTS ---
     function loadMushaf(p) {
-        currentPage = p;
-        document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${p.toString().padStart(3,'0')}.png`;
-        document.getElementById('pageIndicator').innerText = "ޞަފްޙާ " + p;
+        if(!p || p < 1 || p > 604) return;
+        currentPage = parseInt(p);
+        document.getElementById('navPage').value = currentPage;
+        document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
+        
+        // Fetch Metadata for Header (Juzu & Surah)
+        fetch(`https://api.quran.com/api/v4/verses/by_page/${currentPage}?per_page=1`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.verses && d.verses.length > 0) {
+                const juzu = d.verses[0].juz_number;
+                // Rough estimate for Surah name from first verse on page
+                const surahId = d.verses[0].verse_key.split(':')[0];
+                const surahName = surahNames[surahId-1];
+                document.getElementById('mushafInfoDisplay').innerText = `ޖުޒުއު ${juzu} - ${surahName}`;
+            }
+        });
+
         clearDots();
         sessionDots.forEach(d => {
             if(d.page == p) drawDot(d.x, d.y, true);
@@ -634,7 +660,7 @@
     function changePage(d) { loadMushaf(parseInt(currentPage) + d); }
     function toggleMushaf() { 
         const p = document.getElementById('mushafPanel');
-        p.style.width = p.style.width === '0px' ? '35%' : '0px';
+        p.style.width = p.style.width === '0px' ? '40%' : '0px';
     }
 
     function setActiveSection(sec) {
@@ -643,9 +669,9 @@
         if(sec !== 'exam') {
             document.getElementById('box-'+sec).classList.add('active-section');
             document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
-            
-            // SMART AUTO-FILL ON CLICK
-            if(currentStudent) autoFillSpecificSection(sec);
+            // Load the page specific to this section
+            const pageVal = document.getElementById(sec+'Page').value;
+            if(pageVal) loadMushaf(pageVal);
         }
         sessionDots = [];
         clearDots();
@@ -682,78 +708,95 @@
         if(el) el.value = Math.max(0, parseInt(el.value || 0) + val);
     }
 
-    // --- AUTO FILL LOGIC (V7 Improved) ---
-    function autoFillNextLesson() {
-        if(!currentStudent) return;
-        ['new', 'short', 'long'].forEach(sec => autoFillSpecificSection(sec));
+    // --- AUTO FILL LOGIC (V7.1 Smart) ---
+    // Handle Page Input Change: Auto-fill Verses
+    function handlePageChange(page, section) {
+        if(!page) return;
+        loadMushaf(page);
+        
+        // Fetch Start and End verses of this page
+        fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.verses && d.verses.length > 0) {
+                const first = d.verses[0].verse_key.split(':');
+                const last = d.verses[d.verses.length - 1].verse_key.split(':');
+                
+                document.getElementById(section+'Surah').value = first[0];
+                document.getElementById(section+'Start').value = first[1];
+                document.getElementById(section+'EndSurah').value = last[0];
+                document.getElementById(section+'End').value = last[1];
+            }
+        });
     }
 
-    function autoFillSpecificSection(sec) {
+    function autoFillAllSections() {
         if(!currentStudent) return;
-        
-        // Find last record for this specific type
-        const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily' && r[sec]);
+        // Check last records
+        const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily');
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
         
         if(myRecs.length > 0) {
-            const last = myRecs[0][sec]; // Get the specific section object
-            if(last && last.s && last.en) { // Check if valid
-                let nextPageToLoad = 1;
-                
-                // --- LOGIC PER SECTION ---
-                // New: Next page after last end page
-                if (sec === 'new') {
-                     // We need page number. In simplified V6, we saved 'en' (verse).
-                     // Ideally we saved page. If not, we approximate or fetch.
-                     // Assuming we have last known page in record or fetching via API.
-                     // For V7, let's fetch based on last verse.
-                     const surahIdx = surahNames.indexOf(last.s) + 1;
-                     const lastVerse = parseInt(last.en);
-                     
-                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
-                     .then(r=>r.json()).then(d=>{
-                         if(d.verse) {
-                             const lastPage = d.verse.page_number;
-                             // Start next page
-                             loadMushaf(lastPage + 1);
-                             document.getElementById('newPage').value = lastPage + 1;
-                         }
-                     });
-                }
-                
-                // Short: Same page as last start (Review)
-                if (sec === 'short') {
-                     // Need to find start page of last lesson
-                     const surahIdx = surahNames.indexOf(last.s) + 1;
-                     const startVerse = parseInt(last.st);
-                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${startVerse}?fields=page_number`)
-                     .then(r=>r.json()).then(d=>{
-                         if(d.verse) {
-                             loadMushaf(d.verse.page_number); // Load SAME page
-                             document.getElementById('shortPage').value = d.verse.page_number;
-                         }
-                     });
-                }
+            const lastRec = myRecs[0];
 
-                // Long: Next page after last end
-                if (sec === 'long') {
-                     const surahIdx = surahNames.indexOf(last.s) + 1;
-                     const lastVerse = parseInt(last.en);
-                     fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
-                     .then(r=>r.json()).then(d=>{
-                         if(d.verse) {
-                             loadMushaf(d.verse.page_number + 1); 
-                             document.getElementById('longPage').value = d.verse.page_number + 1;
+            // 1. New Lesson: Next page after last 'New'
+            if (lastRec.new && lastRec.new.en) {
+                 const surahIdx = surahNames.indexOf(lastRec.new.s) + 1;
+                 const lastVerse = parseInt(lastRec.new.en);
+                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_
+                 number`)
+                .then(r => r.json()).then(d => {
+                    if(d.verse) {
+                        const nextPage = d.verse.page_number + 1;
+                        if(nextPage <= 604) {
+                            document.getElementById('newPage').value = nextPage;
+                            // Auto fill verses for this page
+                            handlePageChange(nextPage, 'new');
+                            // If this is the active section, load the mushaf
+                            if(currentActiveSection === 'new') loadMushaf(nextPage);
+                        }
+                    }
+                });
+            }
+
+            // 2. Short Revision: Page where last lesson STARTED
+            if (lastRec.short && lastRec.short.st) {
+                 const surahIdx = surahNames.indexOf(lastRec.short.s) + 1;
+                 const startVerse = parseInt(lastRec.short.st);
+                 
+                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${startVerse}?fields=page_number`)
+                 .then(r => r.json()).then(d => {
+                     if(d.verse) {
+                         document.getElementById('shortPage').value = d.verse.page_number;
+                         handlePageChange(d.verse.page_number, 'short');
+                         if(currentActiveSection === 'short') loadMushaf(d.verse.page_number);
+                     }
+                 });
+            }
+
+            // 3. Long Revision: Next page after last END
+            if (lastRec.long && lastRec.long.en) {
+                 const surahIdx = surahNames.indexOf(lastRec.long.s) + 1;
+                 const lastVerse = parseInt(lastRec.long.en);
+                 
+                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
+                 .then(r => r.json()).then(d => {
+                     if(d.verse) {
+                         const nextPage = d.verse.page_number + 1;
+                         if(nextPage <= 604) {
+                             document.getElementById('longPage').value = nextPage;
+                             handlePageChange(nextPage, 'long');
+                             if(currentActiveSection === 'long') loadMushaf(nextPage);
                          }
-                     });
-                }
+                     }
+                 });
             }
         }
     }
 
     // --- SAVE LOGIC ---
     function saveRecord() {
-        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
+        if(!currentStudent) return alert("ދަރިވަރަކު އިޚްތިޔާރުކުރައްވާ");
         const type = document.getElementById('lessonType').value;
         
         let record = {
@@ -768,15 +811,15 @@
             const sec = currentActiveSection; 
             const sVal = document.getElementById(sec+'Surah').value;
             
-            if(sVal === "ސޫރަތް...") return alert("ސޫރަތް އިޚްތިޔާރުކުރައްވާ");
+            if(sVal === "ސޫރަތް..." || sVal === "") return alert("ސޫރަތް އިޚްތިޔާރުކުރައްވާ");
 
             record[sec] = {
                 s: surahNames[parseInt(sVal)-1],
                 st: document.getElementById(sec+'Start').value,
                 en: document.getElementById(sec+'End').value,
-                endSurah: surahNames[parseInt(document.getElementById(sec+'EndSurah').value)-1] || surahNames[parseInt(sVal)-1], // Fallback to start surah
+                endSurah: surahNames[parseInt(document.getElementById(sec+'EndSurah').value)-1] || surahNames[parseInt(sVal)-1],
                 m: document.getElementById(sec+'Mistakes').value,
-                dots: sessionDots 
+                dots: sessionDots // Save mistakes location
             };
         } else {
             record.juzu = document.getElementById('examJuzu').value;
@@ -794,8 +837,11 @@
         
         sessionDots = [];
         clearDots();
-        // Don't clear form immediately, maybe teacher wants to add another section.
-        // But requested to auto-move.
+        // Clear specific section fields
+        if(type === 'daily') {
+            document.getElementById(currentActiveSection+'Mistakes').value = 0;
+        }
+        autoFillAllSections(); // Refresh suggestions
     }
 
     function toggleFormSection(val) {
@@ -814,13 +860,12 @@
             let html = `<div class="history-card ${r.type==='exam'?'card-exam':'card-new'}">
                 <div class="card-header">
                     <span>📅 ${r.date}</span>
-                    <button onclick="if(confirm('Delete?')) db.ref('records/${r.key}').remove()" style="color:red;border:none;">&times;</button>
+                    <button onclick="if(confirm('ފުހެލަން ބޭނުންތަ؟')) db.ref('records/${r.key}').remove()" style="color:red;border:none;background:none;cursor:pointer;">&times;</button>
                 </div>`;
             
             if(r.type === 'daily') {
                 ['new', 'short', 'long'].forEach(sec => {
                     if(r[sec]) {
-                        // Translation map
                         const secName = sec === 'new' ? 'އާ ފިލާވަޅު' : sec === 'short' ? 'ކުރު މުރާޖަޢާ' : 'ދިގު މުރާޖަޢާ';
                         const color = sec === 'new' ? 'green' : sec === 'short' ? 'blue' : 'orange';
                         
@@ -839,7 +884,7 @@
         });
     }
 
-    // --- STUDENT VIEW ---
+    // --- STUDENT VIEW LOGIC ---
     function setupStudentView() {
         const sel = document.getElementById('stClassSelect');
         sel.innerHTML = '<option>ކްލާސް ނަގާ</option>';
@@ -882,7 +927,7 @@
                                 <strong>${secName}</strong>: ${r[sec].s} ${r[sec].st} - ${r[sec].endSurah || r[sec].s} ${r[sec].en}
                                 <br><span style="color:red; font-size:12px;">${r[sec].m} ކުށް</span>
                             </div>
-                            ${r[sec].dots ? `<button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dotsData}')">📖 ބަލާލުމަށް</button>` : ''}
+                            ${r[sec].dots && r[sec].dots.length > 0 ? `<button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dotsData}')">📖 ބަލާލުމަށް</button>` : ''}
                         </div>`;
                     }
                 });
@@ -912,6 +957,7 @@
         while(wrapper.children.length > 1) { wrapper.removeChild(wrapper.lastChild); }
 
         dots.forEach(d => {
+            // Check if page matches (simple logic for now)
             if(d.page == page) {
                 let dot = document.createElement('div');
                 dot.className = 'mistake-dot readonly';
@@ -948,28 +994,55 @@
     }
 
     function clearForm() {
+        // Reset all sections
         ['new','short','long'].forEach(s => {
             document.getElementById(s+'Page').value='';
             document.getElementById(s+'Start').value='';
             document.getElementById(s+'End').value='';
-            document.getElementById(s+'Mistakes').value='';
+            document.getElementById(s+'Mistakes').value='0';
+            document.getElementById(s+'Surah').value='Surah...';
+            document.getElementById(s+'EndSurah').value='Surah...';
         });
+        
+        document.getElementById('examJuzu').value = '';
+        document.getElementById('examDuration').value = '';
+        document.getElementById('timerDisplay').innerText = '00:00';
+        stopTimer();
+        elapsedTime = 0;
+        document.getElementById('examTMistakes').value = 0;
+        document.getElementById('examSMistakes').value = 0;
+        document.getElementById('examTotal').innerText = "100%";
+        
+        clearDots();
     }
 
+    // --- MODAL & SETTINGS ---
     function openModal() { document.getElementById('classModal').style.display='flex'; document.getElementById('modalClassSelect').innerHTML = document.getElementById('classSelect').innerHTML; renderModalStudentList(); }
     function closeModal() { document.getElementById('classModal').style.display='none'; }
+    
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        if(tabId === 'tab-students') document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        else if (tabId === 'tab-class') document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        else document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    }
+
     function createClass() { 
         const n = document.getElementById('newClassName').value; 
         const t = document.getElementById('newClassTeacher').value;
-        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); closeModal(); }
+        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); alert('ކްލާސް ހެދިއްޖެ'); closeModal(); }
     }
+    
     function importStudents() {
         const c = document.getElementById('modalClassSelect').value;
         const txt = document.getElementById('bulkStudents').value;
         const list = txt.split('\n').filter(x=>x.trim());
         const old = classes[c]?.students || [];
         db.ref('classes/'+c+'/students').set([...new Set([...old, ...list])]);
-        alert('Students Added');
+        alert('ކުދިން އިތުރުކުރެވިއްޖެ');
+        document.getElementById('bulkStudents').value = '';
     }
     
     function renderModalStudentList() {
@@ -978,40 +1051,45 @@
         div.innerHTML = '';
         (classes[c]?.students || []).forEach(s => {
             div.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                ${s} <button style="color:red; border:none;" onclick="deleteStudent('${c}','${s}')">X</button>
+                ${s} <button style="color:red; border:none; cursor:pointer;" onclick="deleteStudent('${c}','${s}')">X</button>
             </div>`;
         });
     }
     
     function deleteStudent(c, s) {
-        if(confirm('Delete ' + s + '?')) {
+        if(confirm(s + ' ފުހެލަން ބޭނުންތަ؟')) {
             const updated = classes[c].students.filter(st => st !== s);
             db.ref('classes/'+c+'/students').set(updated);
             renderModalStudentList();
         }
     }
+    
+    function deleteSelectedClass() {
+        const cls = document.getElementById('deleteClassSelect').value;
+        if(confirm(cls + " ފުހެލަން ބޭނުންތަ؟")) {
+            db.ref('classes/'+cls).remove();
+            refreshDropdowns();
+            alert("ކްލާސް ފުހެލެވިއްޖެ");
+        }
+    }
 
     function downloadBackup() {
-        // Create full object from arrays
         let backupData = { classes: classes, records: {} };
-        records.forEach(r => {
-            backupData.records[r.key] = r;
-        });
-        
+        records.forEach(r => { backupData.records[r.key] = r; });
         const a = document.createElement('a');
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
-        a.download = "backup.json"; a.click();
+        a.download = "hifz_backup.json"; a.click();
     }
     
     function restoreBackup() {
         const file = document.getElementById('restoreFile').files[0];
-        if(!file) return alert("Select File");
+        if(!file) return alert("ފައިލް ނަގާ");
         const reader = new FileReader();
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
-            if(confirm("Restore data? This will overwrite existing data on cloud!")) {
+            if(confirm("ޑޭޓާ ރީސްޓޯ ކުރަންވީތަ؟ (މިހާރު ހުރި ޑޭޓާ ގެއްލޭނެ)")) {
                 db.ref('/').set(data);
-                alert("Restored!");
+                alert("ރީސްޓޯ ކުރެވިއްޖެ");
                 location.reload();
             }
         };
