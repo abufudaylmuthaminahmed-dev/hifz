@@ -3,195 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V11.0</title>
-    <!-- SheetJS -->
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V12.0</title>
+    
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        /* FONTS */
+        /* FONTS & ROOT */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
         @font-face { font-family: 'Mv Waheed'; src: local('Mv Waheed'), local('Mv Waheed-Regular'); }
         
         :root {
             --primary: #2c3e50;
+            --secondary: #34495e;
             --accent: #27ae60;
-            --student: #e67e22;
-            --bg: #f4f7f6;
+            --accent-hover: #219150;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #333;
             --sidebar-w: 280px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+        * { box-sizing: border-box; outline: none; }
         body {
             font-family: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            background-color: var(--bg);
-            margin: 0; padding: 0;
-            height: 100vh; overflow: hidden;
-            font-size: 16px; color: #2c3e50;
+            background-color: var(--bg-color);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            font-size: 16px; color: var(--text-main);
         }
-
-        h1, h2, h3, h4 { font-family: 'Mv Waheed', 'Faruma', sans-serif; margin: 0; }
 
         /* --- LAYOUT UTILS --- */
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .center { align-items: center; justify-content: center; }
         .between { justify-content: space-between; }
-        .gap-10 { gap: 10px; }
         .hidden { display: none !important; }
         .w-full { width: 100%; }
+        .mt-10 { margin-top: 10px; }
 
         /* --- LOGIN SCREEN --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--primary), #34495e);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             z-index: 10000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
+            align-items: center; justify-content: center;
         }
-        .login-box {
-            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; color: #333;
+        .login-card {
+            background: rgba(255,255,255,0.95); padding: 40px; border-radius: 20px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px);
         }
         .login-input {
-            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc;
-            border-radius: 8px; text-align: center; font-size: 16px; font-family: inherit;
+            width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #e0e0e0;
+            border-radius: 10px; font-size: 16px; text-align: center; transition: 0.3s;
         }
-        .btn-big {
-            width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: bold; cursor: pointer; color: white; font-family: inherit;
-        }
+        .login-input:focus { border-color: var(--primary); }
+        .login-title { font-family: 'Mv Waheed'; color: var(--primary); margin-bottom: 20px; }
 
-        /* --- APP STRUCTURE --- */
+        /* --- APP CONTAINER --- */
         .app-container { display: flex; height: 100vh; width: 100%; }
 
         /* SIDEBAR */
         .sidebar {
-            width: var(--sidebar-w); background: white; border-left: 1px solid #ddd;
+            width: var(--sidebar-w); background: white; border-left: 1px solid #e0e0e0;
             display: flex; flex-direction: column; z-index: 100;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05); transition: transform 0.3s ease;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.03); transition: transform 0.3s ease;
         }
-        .sidebar-header { padding: 20px; background: var(--primary); color: white; text-align: center; }
+        .sidebar-header {
+            padding: 20px; background: var(--primary); color: white;
+            text-align: center; font-family: 'Mv Waheed';
+        }
+        
         .student-list { flex: 1; overflow-y: auto; padding: 10px; }
         
+        /* STUDENT CARD DESIGN */
         .student-card {
-            background: white; border: 1px solid #eee; padding: 10px; margin-bottom: 5px;
-            border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            background: white; border: 1px solid #eee; padding: 12px; margin-bottom: 8px;
+            border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s; position: relative; overflow: hidden;
         }
-        .student-card.active { background: #eafaf1; border-right: 4px solid var(--accent); }
+        .student-card:hover { transform: translateX(-3px); border-color: var(--accent); }
+        .student-card.active { background: #e8f5e9; border-color: var(--accent); border-right: 5px solid var(--accent); }
+        
         .st-avatar { 
-            width: 35px; height: 35px; background: #eee; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;
+            width: 40px; height: 40px; background: #ecf0f1; border-radius: 50%; color: var(--primary);
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;
         }
-        .id-badge {
-            font-size: 11px; background: #f0f0f0; padding: 2px 6px; border-radius: 4px;
-            color: #555; font-family: sans-serif;
-        }
+        .st-info div { font-weight: bold; font-size: 15px; color: #333; }
+        .st-id { font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 4px; color: #666; font-family: sans-serif; }
 
-        /* MAIN CONTENT */
+        /* MAIN CONTENT AREA */
         .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
         .top-bar {
-            background: white; padding: 15px; border-bottom: 1px solid #ddd;
+            background: white; padding: 15px 20px; border-bottom: 1px solid #e0e0e0;
             display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .menu-btn { font-size: 24px; cursor: pointer; margin-left: 15px; display: none; }
-        .scroll-content { flex: 1; overflow-y: auto; padding: 20px; }
+        
+        .scroll-content { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg-color); }
 
+        /* --- DASHBOARD STATS --- */
+        .dashboard-welcome {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;
+        }
+        .stats-grid { display: flex; gap: 15px; margin-top: 15px; }
+        .stat-card { 
+            background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 10px; text-align: center; 
+            backdrop-filter: blur(5px); min-width: 100px;
+        }
+
+        /* --- FORM STYLES --- */
+        .entry-form {
+            background: white; padding: 25px; border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #f0f0f0;
+        }
+        
         /* TABS */
-        .tabs-container { display: flex; gap: 5px; margin-bottom: 0; }
+        .tabs-container { display: flex; gap: 8px; margin-bottom: 0; padding: 0 10px; }
         .tab-btn {
-            flex: 1; padding: 10px; text-align: center; background: #e0e0e0;
-            border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #555;
+            flex: 1; padding: 12px; text-align: center; background: #e9ecef;
+            border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #7f8c8d;
+            transition: 0.2s; border: 1px solid transparent; border-bottom: none;
         }
-        .tab-btn.active { background: white; color: var(--primary); border-top: 3px solid var(--primary); }
-        
-        /* FORMS */
-        .form-container { background: white; padding: 20px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
-        .form-group { flex: 1; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 15px; height: 40px;}
-        .arabic-input { font-family: 'Amiri', serif; direction: rtl; font-size: 18px; }
+        .tab-btn:hover { background: #dee2e6; }
+        .tab-btn.active { background: white; color: var(--primary); border-top: 4px solid var(--accent); box-shadow: 0 -2px 5px rgba(0,0,0,0.03); }
 
-        /* MISTAKE COUNTER */
-        .mistake-box { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; height: 40px; }
-        .m-btn { width: 35px; border: none; background: #eee; font-size: 18px; font-weight: bold; cursor: pointer; height: 100%; }
-        .m-val { flex: 1; text-align: center; border: none; font-weight: bold; font-size: 16px; background:white;}
-
-        /* MUSHAF */
-        .mushaf-panel {
-            width: 35%; background: #34495e; display: flex; flex-direction: column;
-            border-right: 1px solid #ccc; transition: all 0.3s;
+        /* INPUTS */
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 13px; color: #555; }
+        input, select {
+            width: 100%; padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px;
+            font-family: inherit; font-size: 16px; height: 45px; background: #fff;
         }
-        .mushaf-header { background: #2c3e50; color: white; padding: 10px; text-align: center; display:flex; justify-content:space-between; align-items:center;}
-        .mushaf-container { flex: 1; overflow: auto; background: #fdfdfd; display: flex; justify-content: center; position: relative; }
-        .mushaf-img { max-width: 100%; display: block; }
-        
-        .mistake-dot {
-            position: absolute; width: 22px; height: 22px; background: rgba(231,76,60,0.9);
-            border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
-            cursor: pointer; z-index: 10;
-        }
-        .mistake-dot.readonly { cursor: default; background: gold; border-color: orange; }
+        input:focus, select:focus { border-color: var(--accent); }
 
-        /* HISTORY */
-        .history-item {
-            background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px;
-            border-right: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        /* HISTORY CARDS */
+        .history-card {
+            background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px;
+            border-right: 5px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex; flex-direction: column; gap: 5px;
         }
         .h-new { border-color: #27ae60; } .h-short { border-color: #2980b9; } 
         .h-long { border-color: #e67e22; } .h-exam { border-color: #f1c40f; }
 
+        /* MUSHAF */
+        .mushaf-panel {
+            width: 35%; background: #2d3436; display: flex; flex-direction: column;
+            border-right: 1px solid #ccc; transition: all 0.3s;
+        }
+        .mushaf-header { background: #2c3e50; color: white; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .mushaf-container { flex: 1; overflow: auto; background: #fdfdfd; display: flex; justify-content: center; }
+        .mushaf-img { max-width: 100%; display: block; }
+        .mistake-dot {
+            position: absolute; width: 22px; height: 22px; background: rgba(231,76,60,0.85);
+            border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
+            cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* BUTTONS */
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-family: inherit; font-size: 14px; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .bg-green { background: var(--accent); } .bg-blue { background: #3498db; }
+        .bg-red { background: #e74c3c; } .bg-grey { background: #95a5a6; } .bg-orange { background: #e67e22; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-box { background: white; width: 95%; max-width: 600px; padding: 0; border-radius: 15px; display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .modal-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 25px; overflow-y: auto; }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .sidebar { position: fixed; top: 0; right: 0; height: 100%; transform: translateX(100%); width: 280px; }
+            .sidebar { position: fixed; top: 0; right: 0; height: 100%; transform: translateX(100%); width: 280px; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
             .sidebar.open { transform: translateX(0); }
             .mushaf-panel { position: fixed; top: 0; left: 0; width: 100% !important; height: 100%; z-index: 3000; transform: translateY(100%); }
             .mushaf-panel.open { transform: translateY(0); }
-            .menu-btn { display: block; }
-            .form-row { flex-direction: column; gap: 5px; }
+            .menu-btn { display: block !important; }
+            .form-row { flex-direction: column; gap: 10px; }
             .form-row > div { width: 100%; }
         }
+        .menu-btn { display: none; font-size: 24px; cursor: pointer; color: var(--primary); }
 
-        /* UTILS */
-        .btn { padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; font-family: inherit; }
-        .bg-green { background: var(--accent); } .bg-blue { background: #3498db; } .bg-red { background: #e74c3c; } .bg-grey { background: #95a5a6; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
-        .modal-box { background: white; width: 95%; max-width: 500px; padding: 20px; border-radius: 10px; display:flex; flex-direction:column; max-height:90vh; }
+        /* ADMIN TABLE */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        .admin-table th { background: #f1f3f5; padding: 10px; text-align: right; color: #555; }
+        .admin-table td { border-bottom: 1px solid #eee; padding: 10px; }
     </style>
 </head>
 <body>
 
     <!-- LOADING -->
     <div id="loading-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:30000; display:flex; justify-content:center; align-items:center;">
-        <h3>...ސިސްޓަމް ލޯޑުވަނީ</h3>
+        <div style="text-align:center;">
+            <div style="width:50px; height:50px; border:5px solid #eee; border-top:5px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto;"></div>
+            <p style="margin-top:15px; font-weight:bold; color:#555;">...ސިސްޓަމް ލޯޑުވަނީ</p>
+            <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+        </div>
     </div>
 
-    <!-- LOGIN -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen">
-        <div class="login-box" id="role-view">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V11.0</h2>
-            <br>
-            <button class="btn-big" style="background:var(--student-color);" onclick="showLogin('student')">🎓 ދަރިވަރުން</button>
-            <button class="btn-big" style="background:var(--primary);" onclick="showLogin('teacher')">👨‍🏫 މުދައްރިސް</button>
+        <div class="login-card" id="role-view">
+            <h2 class="login-title">ޙިފްޡް ޕްރޮގްރާމް V12.0</h2>
+            <button class="btn bg-orange w-full" style="padding:15px; margin-bottom:10px; font-size:18px;" onclick="showLogin('student')">🎓 ދަރިވަރުން</button>
+            <button class="btn bg-blue w-full" style="padding:15px; font-size:18px;" onclick="showLogin('teacher')">👨‍🏫 މުދައްރިސް</button>
         </div>
 
-        <div class="login-box hidden" id="login-form-view">
+        <div class="login-card hidden" id="login-form-view">
             <h3 id="login-title">ލޮގިން</h3>
-            <input type="text" id="login-id" class="login-input" placeholder="އައިޑީ / ޔޫސަރ">
+            <input type="text" id="login-id" class="login-input" placeholder="އައިޑީ ނަންބަރު (ID)">
             <input type="password" id="login-pass" class="login-input" placeholder="ޕާސްވޯޑް">
-            <button class="btn-big bg-green" onclick="processLogin()">ވަންނަވާ</button>
-            <button class="btn-big bg-grey" onclick="backToRole()">ފަހަތަށް</button>
+            <button class="btn bg-green w-full" style="padding:12px; font-size:16px;" onclick="processLogin()">ވަންނަވާ</button>
+            <button class="btn bg-grey w-full mt-10" onclick="backToRole()">ފަހަތަށް</button>
         </div>
     </div>
 
-    <!-- APP -->
+    <!-- FORCE PASSWORD MODAL (First Time) -->
+    <div id="forcePassModal" class="modal">
+        <div class="modal-box" style="max-width:400px;">
+            <div class="modal-header"><h3>ޕާސްވޯޑް ސެޓްކުރައްވާ</h3></div>
+            <div class="modal-body">
+                <p style="color:#666; margin-bottom:15px;">ފުރަތަމަ ފަހަރު ވަންނަ ކަމަށްވާނަމަ، އައު ޕާސްވޯޑެއް ހަދަން ޖެހޭނެއެވެ.</p>
+                <input type="password" id="newPass1" class="login-input" placeholder="އައު ޕާސްވޯޑް">
+                <input type="password" id="newPass2" class="login-input" placeholder="ޕާސްވޯޑް ކަށަވަރުކުރޭ">
+                <button class="btn bg-green w-full mt-10" onclick="setNewPassword()">ސޭވް & ލޮގިން</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
     <div id="app-container" class="app-container hidden">
         
         <!-- SIDEBAR -->
@@ -203,62 +249,77 @@
                 </div>
             </div>
             
-            <div id="teacher-controls" style="padding:15px; border-bottom:1px solid #eee;">
-                <select id="classSelect" onchange="loadStudents(this.value)" style="width:100%; padding:8px; margin-bottom:10px;"></select>
+            <div id="teacher-controls" style="padding:15px; border-bottom:1px solid #eee; background:#fcfcfc;">
+                <select id="classSelect" onchange="loadStudents(this.value)" style="width:100%; margin-bottom:10px;"></select>
                 <input type="text" placeholder="🔍 ހޯދުމަށް..." onkeyup="filterStudents(this.value)" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px;">
                 <div class="flex gap-10">
-                    <button class="btn bg-blue" style="flex:1; font-size:12px;" onclick="openSettings()">⚙️ ސެޓިންގްސް</button>
-                    <button class="btn bg-red" style="font-size:12px;" onclick="logout()">🚪</button>
+                    <button class="btn bg-blue w-full btn-sm" onclick="openSettings()">⚙️ ސެޓިންގްސް</button>
+                    <button class="btn bg-red w-full btn-sm" onclick="logout()">🚪</button>
                 </div>
             </div>
 
-            <div id="student-controls" class="hidden" style="padding:15px; text-align:center; background:#f0f2f5;">
-                <h4 id="stNameDisplay" style="color:var(--primary);">Student Name</h4>
-                <span id="stIdDisplay" class="id-badge">ID</span>
-                <button class="btn bg-red w-full" style="margin-top:10px;" onclick="logout()">ލޮގްއައުޓް</button>
+            <div id="student-controls" class="hidden" style="padding:20px; text-align:center; background:#f0f2f5;">
+                <div style="font-size:40px;">🎓</div>
+                <h4 id="stNameDisplay" style="color:var(--primary); margin:10px 0;">Name</h4>
+                <button class="btn bg-red w-full" onclick="logout()">ލޮގްއައުޓް</button>
             </div>
 
             <div id="studentList" class="student-list"></div>
         </aside>
 
-        <!-- MAIN -->
+        <!-- MAIN CONTENT -->
         <main class="content-area">
             <div class="top-bar">
                 <div class="flex center">
                     <span class="menu-btn" onclick="toggleSidebar()">☰</span>
                     <div style="margin-right:15px;">
                         <h2 id="pageTitle" style="color:var(--primary);">ޑޭޝްބޯޑް</h2>
-                        <small id="pageSub" style="color:#777;">މަރުޙަބާ</small>
                     </div>
                 </div>
                 <div class="flex gap-10">
                     <button class="btn bg-green" onclick="exportExcel()">Excel</button>
-                    <button class="btn bg-blue" onclick="toggleMushaf(true)">📖</button>
+                    <button class="btn bg-blue" onclick="toggleMushaf(true)">📖 މުޞްޙަފް</button>
                 </div>
             </div>
 
             <div class="scroll-content">
                 
-                <!-- TEACHER FORM -->
-                <div id="teacherEntry" class="hidden">
-                    <div class="form-row">
-                        <div style="flex:1"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
+                <!-- DASHBOARD / WELCOME -->
+                <div id="dashboardStats" class="dashboard-welcome">
+                    <div>
+                        <h2 id="welcomeText" style="margin:0;">މަރުޙަބާ!</h2>
+                        <p id="welcomeSub" style="margin:5px 0 0 0; opacity:0.9;">ދަރިވަރެއް ޚިޔާރުކުރައްވާ</p>
                     </div>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats injected via JS -->
+                    </div>
+                </div>
 
+                <!-- TEACHER ENTRY FORM -->
+                <div id="teacherEntry" class="hidden">
                     <div class="tabs-container">
                         <div class="tab-btn active" id="btn-new" onclick="setTab('new')">އާ ފިލާވަޅު</div>
-                        <div class="tab-btn" id="btn-short" onclick="setTab('short')">ކުރު މުރާޖަޢާ</div>
-                        <div class="tab-btn" id="btn-long" onclick="setTab('long')">ދިގު މުރާޖަޢާ</div>
+                        <div class="tab-btn" id="btn-short" onclick="setTab('short')">ކުރު</div>
+                        <div class="tab-btn" id="btn-long" onclick="setTab('long')">ދިގު</div>
                         <div class="tab-btn" id="btn-exam" onclick="setTab('exam')">އިމްތިޙާން</div>
                     </div>
 
                     <div class="form-container">
+                        <!-- HEADER -->
+                        <div class="flex between center" style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <label style="margin:0;">ތާރީޚް:</label>
+                                <input type="date" id="entryDate" style="width:auto; padding:5px;">
+                            </div>
+                            <div id="editBadge" class="hidden" style="background:#fff3cd; color:#856404; padding:5px 10px; border-radius:5px; font-weight:bold;">✏️ Editing Mode</div>
+                        </div>
+
                         <!-- Daily Inputs -->
                         <div id="daily-inputs">
                             <div class="form-row">
                                 <div style="flex:1"><label>ޞަފްޙާ</label><input type="number" id="inpPage" placeholder="#" onchange="handlePage(this.value)"></div>
-                                <div style="flex:2"><label>ފެށޭ</label><div class="flex gap-10"><select id="inpSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpStart" placeholder="އާޔަތް"></div></div>
-                                <div style="flex:2"><label>ނިމޭ</label><div class="flex gap-10"><select id="inpEndSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpEnd" placeholder="އާޔަތް"></div></div>
+                                <div style="flex:2"><label>ފެށޭ</label><div class="flex gap-10"><select id="inpSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpStart" placeholder="Verse"></div></div>
+                                <div style="flex:2"><label>ނިމޭ</label><div class="flex gap-10"><select id="inpEndSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpEnd" placeholder="Verse"></div></div>
                                 <div style="flex:1"><label>ކުށް</label>
                                     <div class="mistake-box">
                                         <button class="m-btn" onclick="adjM(1)">+</button>
@@ -271,15 +332,16 @@
 
                         <!-- Exam Inputs -->
                         <div id="exam-inputs" class="hidden">
-                            <div style="background:#34495e; color:white; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; align-items:center; gap:15px;">
-                                <div id="timerDisplay" style="font-family:monospace; font-size:24px; font-weight:bold; color:#f1c40f;">00:00</div>
-                                <button class="btn bg-green" onclick="startTimer()">▶ ފަށާ</button>
-                                <button class="btn bg-red" onclick="stopTimer()">⏹ ހުއްޓާ</button>
-                                <input type="number" id="examDuration" placeholder="މިނެޓް" style="width:60px; text-align:center; color:black;">
+                            <div class="stopwatch-container" style="background:#34495e; padding:15px; border-radius:10px; margin-bottom:15px; display:flex; align-items:center; gap:15px; color:white;">
+                                <div id="timerDisplay" style="font-family:monospace; font-size:28px; font-weight:bold; color:#f1c40f;">00:00</div>
+                                <button class="btn bg-green" onclick="startTimer()">Start</button>
+                                <button class="btn bg-red" onclick="stopTimer()">Stop</button>
+                                <input type="number" id="examDuration" placeholder="Min" style="width:70px; text-align:center; color:black;">
                             </div>
+
                             <div class="form-row">
                                 <div style="flex:1"><label>ޖުޒުއު</label><input type="text" id="exJuzu" placeholder="30"></div>
-                                <div style="flex:1"><label>ޞަފްޙާ</label><input type="number" id="exPage" onchange="loadMushafImage(this.value)"></div>
+                                <div style="flex:1"><label>ޞަފްޙާ (ފޮތް)</label><input type="number" id="exPage" onchange="loadMushafImage(this.value)"></div>
                                 <div style="flex:1"><label>މިންވަރު</label>
                                     <select id="exPortion" onchange="calcExam()">
                                         <option value="whole">މުޅި</option>
@@ -288,7 +350,7 @@
                                         <option value="quarter">1/4</option>
                                     </select>
                                 </div>
-                                <div style="flex:1"><label>ނަތީޖާ</label><h3 id="exTotal" style="color:blue; margin:0;">100%</h3></div>
+                                <div style="flex:1"><label>ނަތީޖާ</label><h3 id="exTotal" style="color:blue; margin:0; font-size:24px;">100%</h3></div>
                             </div>
                             <div class="form-row">
                                 <div style="flex:1"><label>މުދައްރިސް (-2)</label><input type="number" id="exTMistakes" value="0" onchange="calcExam()"></div>
@@ -298,12 +360,12 @@
                             </div>
                         </div>
 
-                        <button class="btn bg-green w-full" style="margin-top:10px; font-size:16px;" onclick="saveData()">💾 ރައްކާކުރޭ</button>
+                        <button class="btn bg-green w-full" style="margin-top:10px; font-size:16px; padding:12px;" onclick="saveData()">💾 ސޭވް</button>
                     </div>
                 </div>
 
                 <!-- HISTORY -->
-                <div style="margin-top:20px;">
+                <div id="historySection" class="hidden" style="margin-top:20px; padding-bottom:50px;">
                     <h3>ރެކޯޑްތައް</h3>
                     <div id="historyList"></div>
                 </div>
@@ -314,14 +376,14 @@
         <!-- MUSHAF PANEL -->
         <aside class="mushaf-panel" id="mushafPanel">
             <div class="mushaf-header">
-                <button class="btn bg-red" onclick="toggleMushaf(false)">ބަންދު</button>
+                <button class="btn bg-red btn-sm" onclick="toggleMushaf(false)">ބަންދު</button>
                 <div style="text-align:center;">
                     <span id="mushafTitle" style="color:white; font-weight:bold;">Page 1</span><br>
                     <small id="mushafSurahInfo" style="color:#f1c40f;"></small>
                 </div>
                 <div>
-                    <button class="btn bg-grey" onclick="changePage(1)">></button>
-                    <button class="btn bg-grey" onclick="changePage(-1)"><</button>
+                    <button class="btn bg-grey btn-sm" onclick="changePage(1)">></button>
+                    <button class="btn bg-grey btn-sm" onclick="changePage(-1)"><</button>
                 </div>
             </div>
             <div class="mushaf-container">
@@ -337,29 +399,49 @@
     <div id="settingsModal" class="modal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>ސެޓިންގްސް</h3>
+                <h3>ސެޓިންގްސް & އެޑްމިން</h3>
                 <span onclick="document.getElementById('settingsModal').style.display='none'" style="cursor:pointer; font-size:24px;">&times;</span>
             </div>
+            <div class="tab-header">
+                <div class="tab-btn active" onclick="switchModalTab('m-students')">ކުދިން</div>
+                <div class="tab-btn" onclick="switchModalTab('m-class')">ކްލާސް</div>
+                <div class="tab-btn" onclick="switchModalTab('m-admin')">އެޑްމިން (PW)</div>
+            </div>
             <div class="modal-body">
-                <label>އައު ކްލާސް:</label>
-                <div class="flex gap-10" style="margin-bottom:15px;">
-                    <input id="newClassName" placeholder="Name">
-                    <button class="btn bg-blue" onclick="createClass()">Add</button>
+                <!-- Add Students -->
+                <div id="m-students" class="modal-tab-content">
+                    <label>ކުދިން އެޑްކުރުން (Name IUM123):</label>
+                    <textarea id="bulkData" style="width:100%; height:100px; padding:10px; border:1px solid #ccc;"></textarea>
+                    <button class="btn bg-green w-full mt-10" onclick="importStudents()">Import</button>
                 </div>
-                <label>ކުދިން އެޑްކުރުން (Name IUM123):</label>
-                <textarea id="bulkData" style="width:100%; height:100px; border:1px solid #ccc; padding:10px;"></textarea>
-                <button class="btn bg-green w-full" style="margin-top:5px;" onclick="importStudents()">Import</button>
-                <hr>
-                <button class="btn bg-blue w-full" onclick="downloadBackup()">Download Backup</button>
-                <input type="file" id="restoreFile" style="margin-top:5px;">
-                <button class="btn bg-red w-full" onclick="restoreBackup()">Restore Backup</button>
+                
+                <!-- Class Management -->
+                <div id="m-class" class="modal-tab-content hidden">
+                    <label>އައު ކްލާސް:</label>
+                    <div class="flex gap-10">
+                        <input id="newClassName" placeholder="Name">
+                        <button class="btn bg-blue" onclick="createClass()">Add</button>
+                    </div>
+                </div>
+
+                <!-- Admin / Passwords -->
+                <div id="m-admin" class="modal-tab-content hidden">
+                    <h4 style="margin-bottom:10px;">ދަރިވަރުންގެ މަޢުލޫމާތު</h4>
+                    <select id="adminClassSelect" onchange="renderAdminTable()" style="width:100%; margin-bottom:10px;"></select>
+                    <div style="max-height:300px; overflow:auto;">
+                        <table class="admin-table">
+                            <thead><tr><th>ނަން</th><th>ID</th><th>ޕާސްވޯޑް</th></tr></thead>
+                            <tbody id="adminTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
-    // *** PASTE YOUR CONFIG HERE ***
+    // --- FIREBASE CONFIGURATION ---
+    // *** IMPORTANT: PASTE YOUR CONFIG HERE ***
     const firebaseConfig = {
       apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
       authDomain: "hifz-cde3b.firebaseapp.com",
@@ -374,21 +456,22 @@
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("Firebase Error:", e); }
 
-    // --- STATE ---
+    // --- APP STATE ---
     let appState = {
         role: null,
         classes: {},
         records: [],
-        users: {},
+        users: {}, // Passwords
         currClass: null,
         currStudent: null,
         activeTab: 'new',
         currPage: 1,
         dots: [],
         timer: null,
-        startT: 0
+        startT: 0,
+        editingKey: null // Key of record being edited
     };
 
     const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
@@ -410,14 +493,15 @@
                     Object.keys(val.records).forEach(k => appState.records.push({...val.records[k], key: k}));
                 }
                 
+                // Update UI based on current state
                 if(appState.role === 'teacher') {
                     renderClassSelect();
+                    updateStats();
                     if(appState.currStudent) renderHistory();
+                    if(document.getElementById('settingsModal').style.display === 'flex') renderAdminTable(); // Refresh admin if open
                 } else if (appState.role === 'student') {
                     renderHistory();
                 }
-                document.getElementById('loading-overlay').classList.add('hidden');
-                if(!appState.role) document.getElementById('login-screen').classList.remove('hidden');
             });
         }
     };
@@ -434,16 +518,35 @@
         });
     }
 
+    // --- HELPER: PARSE ID ---
+    function parseStudentInfo(fullString) {
+        let name = fullString;
+        let id = "";
+        
+        if(fullString && fullString.toUpperCase().includes("IUM")) {
+            const parts = fullString.split(/IUM/i);
+            name = parts[0].trim().replace(/[-–,]/g, '');
+            id = "IUM" + parts[1].trim();
+        } else if (fullString && fullString.includes('(')) {
+            const parts = fullString.split('(');
+            name = parts[0].trim();
+            id = parts[1].replace(')', '').trim();
+        }
+        return { name, id };
+    }
+
     // --- AUTH ---
     function showLogin(role) {
         appState.tempRole = role;
         document.getElementById('role-view').classList.add('hidden');
         document.getElementById('login-form-view').classList.remove('hidden');
+        document.getElementById('login-title').innerText = role === 'teacher' ? 'މުދައްރިސް ލޮގިން' : 'ދަރިވަރު ލޮގިން';
     }
     function backToRole() {
         document.getElementById('role-view').classList.remove('hidden');
         document.getElementById('login-form-view').classList.add('hidden');
     }
+
     function processLogin() {
         const id = document.getElementById('login-id').value.trim();
         const pass = document.getElementById('login-pass').value.trim();
@@ -452,22 +555,50 @@
             if(pass === '1234') initApp('teacher');
             else alert('Wrong Password');
         } else {
+            // Student
+            if(!id) return alert('ID Required');
+            
+            // Check if ID exists in any class
             let foundName = null, foundClass = null;
             Object.keys(appState.classes).forEach(c => {
                 (appState.classes[c].students || []).forEach(s => {
-                    if(s.includes(id)) { foundName = s; foundClass = c; }
+                    const info = parseStudentInfo(s);
+                    // Match ID or fallback to Name match
+                    if((info.id && info.id === id) || s === id) { foundName = s; foundClass = c; }
                 });
             });
 
             if(foundName) {
-                if(!appState.users[id]) db.ref('users/'+id).set('1234');
-                if(appState.users[id] && appState.users[id] !== pass && pass !== '1234') return alert('Wrong Password');
                 appState.currClass = foundClass;
                 appState.currStudent = foundName;
-                initApp('student');
+                appState.tempId = id; // Store ID to set password
+
+                // Check Password Logic
+                if(!appState.users[id]) {
+                    // FIRST TIME LOGIN -> Force Password Setup
+                    document.getElementById('forcePassModal').style.display = 'flex';
+                } else {
+                    if(appState.users[id] === pass) {
+                        initApp('student');
+                    } else {
+                        alert('ޕާސްވޯޑް ނުބައި');
+                    }
+                }
             } else {
-                alert('ID not found');
+                alert('މި އައިޑީ ނުފެނުނު');
             }
+        }
+    }
+
+    function setNewPassword() {
+        const p1 = document.getElementById('newPass1').value;
+        const p2 = document.getElementById('newPass2').value;
+        if(p1 && p1 === p2) {
+            db.ref('users/'+appState.tempId).set(p1);
+            document.getElementById('forcePassModal').style.display = 'none';
+            initApp('student');
+        } else {
+            alert("ޕާސްވޯޑް ދިމައެއް ނުވޭ");
         }
     }
 
@@ -478,13 +609,19 @@
         
         if(role === 'teacher') {
             document.getElementById('teacher-controls').classList.remove('hidden');
+            document.getElementById('student-controls').classList.add('hidden');
             renderClassSelect();
+            updateStats();
         } else {
             document.getElementById('teacher-controls').classList.add('hidden');
             document.getElementById('student-controls').classList.remove('hidden');
-            document.getElementById('stNameDisplay').innerText = appState.currStudent.split('IUM')[0];
-            document.getElementById('stIdDisplay').innerText = appState.currStudent.includes('IUM') ? 'IUM'+appState.currStudent.split('IUM')[1] : 'ID';
+            const info = parseStudentInfo(appState.currStudent);
+            document.getElementById('stNameDisplay').innerText = info.name;
+            document.getElementById('stIdDisplay').innerText = info.id;
+            
             document.getElementById('pageTitle').innerText = "Student Portal";
+            document.getElementById('dashboardStats').classList.add('hidden');
+            document.getElementById('historySection').classList.remove('hidden');
             renderHistory();
         }
     }
@@ -503,10 +640,10 @@
         const list = document.getElementById('studentList');
         list.innerHTML = '';
         (appState.classes[cls].students || []).forEach(s => {
+            const info = parseStudentInfo(s);
             const div = document.createElement('div');
             div.className = 'student-card';
-            let name = s.split('IUM')[0].trim();
-            div.innerHTML = `<div class="st-avatar">${name.charAt(0)}</div><div><div style="font-weight:bold;">${name}</div><span class="id-badge">${s.includes('IUM')?s.split('IUM')[1]:'ID'}</span></div>`;
+            div.innerHTML = `<div class="st-avatar">${info.name.charAt(0)}</div><div><div style="font-weight:bold;">${info.name}</div><span class="id-badge">${info.id || '-'}</span></div>`;
             div.onclick = () => selectStudent(s, div);
             list.appendChild(div);
         });
@@ -517,11 +654,19 @@
         document.querySelectorAll('.student-card').forEach(e => e.classList.remove('active'));
         el.classList.add('active');
         
-        document.getElementById('pageTitle').innerText = name.split('IUM')[0];
+        const info = parseStudentInfo(name);
+        document.getElementById('pageTitle').innerText = info.name;
         document.getElementById('pageSub').innerText = appState.currClass;
+        
+        document.getElementById('dashboardStats').classList.add('hidden');
         document.getElementById('teacherEntry').classList.remove('hidden');
+        document.getElementById('historySection').classList.remove('hidden');
         
         if(window.innerWidth <= 768) toggleSidebar();
+        
+        // Reset Edit Mode
+        appState.editingKey = null;
+        document.getElementById('editBadge').classList.add('hidden');
         
         clearInputs();
         appState.dots = [];
@@ -529,13 +674,33 @@
         renderHistory();
     }
 
-    function filterStudents(q) {
-        document.querySelectorAll('.student-card').forEach(c => {
-            c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? 'flex' : 'none';
-        });
+    // --- AUTO FILL (When NOT Editing) ---
+    function autoFill() {
+        if(appState.editingKey) return; // Don't autofill if editing
+        if(!appState.currStudent) return;
+        
+        const recs = appState.records.filter(r => r.student === appState.currStudent && r.type === 'daily');
+        recs.sort((a,b) => new Date(b.date) - new Date(a.date));
+        
+        if(recs.length > 0) {
+            const last = recs[0][appState.activeTab];
+            if(last && last.en) {
+                const sIdx = surahNames.indexOf(last.s)+1;
+                const v = parseInt(last.en);
+                fetch(`https://api.quran.com/api/v4/verses/by_key/${sIdx}:${v}?fields=page_number`)
+                .then(r=>r.json()).then(d=>{
+                    if(d.verse) {
+                        let nextPage = d.verse.page_number;
+                        if(appState.activeTab !== 'short') nextPage++;
+                        document.getElementById('inpPage').value = nextPage;
+                        handlePage(nextPage);
+                    }
+                });
+            }
+        }
     }
 
-    // --- TABS & FORM ---
+    // --- FORM LOGIC ---
     function setTab(tab) {
         appState.activeTab = tab;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -547,55 +712,17 @@
         } else {
             document.getElementById('daily-inputs').classList.remove('hidden');
             document.getElementById('exam-inputs').classList.add('hidden');
-            autoFill();
+            if(!appState.editingKey) autoFill();
         }
         appState.dots = [];
         loadMushafImage(appState.currPage);
     }
 
-    function autoFill() {
-        if(!appState.currStudent || appState.activeTab === 'exam') return;
-        const recs = appState.records.filter(r => r.student === appState.currStudent && r.type === 'daily');
-        recs.sort((a,b) => new Date(b.date) - new Date(a.date));
-        
-        if(recs.length > 0) {
-            const last = recs[0][appState.activeTab];
-            if(last && last.en) {
-                // Fetch next logic
-                const sIdx = surahNames.indexOf(last.s)+1;
-                const v = parseInt(last.en);
-                fetch(`https://api.quran.com/api/v4/verses/by_key/${sIdx}:${v}?fields=page_number`).then(r=>r.json()).then(d=>{
-                    if(d.verse) {
-                        let nextPage = d.verse.page_number;
-                        // For 'new' and 'long', we usually move to next page
-                        if(appState.activeTab === 'new' || appState.activeTab === 'long') nextPage++;
-                        
-                        document.getElementById('inpPage').value = nextPage;
-                        handlePage(nextPage);
-                    }
-                });
-            }
-        }
-    }
-
-    function handlePage(p) {
-        loadMushafImage(p);
-        fetch(`https://api.quran.com/api/v4/verses/by_page/${p}?per_page=300`).then(r=>r.json()).then(d=>{
-            if(d.verses && d.verses.length > 0) {
-                const f = d.verses[0].verse_key.split(':');
-                const l = d.verses[d.verses.length-1].verse_key.split(':');
-                document.getElementById('inpSurah').value = f[0];
-                document.getElementById('inpStart').value = f[1];
-                document.getElementById('inpEndSurah').value = l[0];
-                document.getElementById('inpEnd').value = l[1];
-            }
-        });
-    }
-
     function saveData() {
         if(!appState.currStudent) return alert('Select Student');
         const tab = appState.activeTab;
-        const rec = {
+        
+        let rec = {
             id: Date.now(),
             date: document.getElementById('entryDate').value,
             class: appState.currClass,
@@ -614,14 +741,59 @@
         } else {
             rec.juzu = document.getElementById('exJuzu').value;
             rec.score = document.getElementById('exTotal').innerText;
-            rec.duration = document.getElementById('examDuration').value;
+            rec.portion = document.getElementById('exPortion').value;
+            // Add full exam details here if needed
         }
 
-        db.ref('records').push(rec);
-        alert('Saved');
+        // EDIT or NEW?
+        if(appState.editingKey) {
+            db.ref('records/' + appState.editingKey).update(rec);
+            alert('Updated!');
+            appState.editingKey = null;
+            document.getElementById('editBadge').classList.add('hidden');
+        } else {
+            db.ref('records').push(rec);
+            alert('Saved');
+        }
+
         appState.dots = [];
         clearInputs();
         loadMushafImage(appState.currPage);
+    }
+
+    // --- EDIT LOGIC ---
+    function editRecord(key) {
+        const rec = appState.records.find(r => r.key === key);
+        if(!rec) return;
+
+        appState.editingKey = key;
+        document.getElementById('editBadge').classList.remove('hidden');
+        document.getElementById('entryDate').value = rec.date;
+
+        if(rec.type === 'exam') {
+            setTab('exam');
+            document.getElementById('exJuzu').value = rec.juzu;
+            // Ideally load other fields too
+        } else {
+            // Find which section (new/short/long) exists
+            const sec = Object.keys(rec).find(k => ['new','short','long'].includes(k));
+            if(sec) {
+                setTab(sec);
+                const data = rec[sec];
+                // Reverse lookup surah
+                const sIdx = surahNames.indexOf(data.s) + 1;
+                document.getElementById('inpSurah').value = sIdx;
+                document.getElementById('inpStart').value = data.st;
+                document.getElementById('inpEnd').value = data.en;
+                document.getElementById('inpMistakes').value = data.m;
+                appState.dots = data.dots || [];
+                // Need to find page to load mushaf visual
+                // For simplicity, just load current page
+                loadMushafImage(appState.currPage);
+            }
+        }
+        // Scroll to form
+        document.getElementById('teacherEntry').scrollIntoView({behavior: 'smooth'});
     }
 
     function renderHistory() {
@@ -631,10 +803,14 @@
         recs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         recs.forEach(r => {
-            let html = `<div class="history-item ${r.type==='exam'?'h-exam':'h-'+Object.keys(r).find(k=>['new','short','long'].includes(k))}">
+            let html = `<div class="history-card ${r.type==='exam'?'h-exam':'h-'+Object.keys(r).find(k=>['new','short','long'].includes(k))}">
                 <div class="flex between" style="margin-bottom:5px;">
                     <strong>${r.date}</strong>
-                    ${appState.role === 'teacher' ? `<span style="color:red; cursor:pointer;" onclick="delRec('${r.key}')">×</span>` : ''}
+                    ${appState.role === 'teacher' ? `
+                        <div class="flex gap-10">
+                            <span style="color:blue; cursor:pointer;" onclick="editRecord('${r.key}')">✎</span>
+                            <span style="color:red; cursor:pointer;" onclick="delRec('${r.key}')">×</span>
+                        </div>` : ''}
                 </div>`;
             
             if(r.type === 'daily') {
@@ -645,35 +821,64 @@
                         html += `<div>
                             <span style="font-weight:bold; color:var(--primary);">${label}:</span> 
                             ${r[s].s || ''} (${r[s].st}-${r[s].en}) - <span style="color:red">${r[s].m} ކުށް</span>
-                            ${r[s].dots && r[s].dots.length > 0 ? `<button class="btn-sm bg-blue" onclick="viewDots('${dotsData}')">ބަލާލުމަށް</button>` : ''}
+                            ${r[s].dots && r[s].dots.length>0 ? `<button class="btn btn-sm bg-blue" onclick="viewDots('${dotsData}')">ބަލާލުމަށް</button>` : ''}
                         </div>`;
                     }
                 });
             } else {
-                html += `<div>އިމްތިޙާން: ޖުޒުއު ${r.juzu} - ${r.score}</div>`;
+                html += `<div style="font-weight:bold; font-size:16px;">🏆 އިމްތިޙާން: ޖުޒުއު ${r.juzu} - <span style="color:blue">${r.score}</span></div>`;
             }
             div.innerHTML += html + `</div>`;
         });
     }
 
-    function delRec(k) { if(confirm('Delete?')) db.ref('records/'+k).remove(); }
+    // --- ADMIN & SETTINGS ---
+    function openSettings() { document.getElementById('settingsModal').style.display='flex'; }
+    function closeModal() { document.getElementById('settingsModal').style.display='none'; }
+    
+    function switchModalTab(tabId) {
+        document.querySelectorAll('.modal-tab-content').forEach(e => e.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        
+        if(tabId === 'm-admin') {
+             const sel = document.getElementById('adminClassSelect');
+             sel.innerHTML = document.getElementById('classSelect').innerHTML;
+             renderAdminTable();
+        }
+    }
+    
+    function renderAdminTable() {
+        const cls = document.getElementById('adminClassSelect').value;
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = '';
+        
+        (appState.classes[cls]?.students || []).forEach(s => {
+            const info = parseStudentInfo(s);
+            // Get Password
+            const pass = appState.users[info.id] || "Not Set";
+            
+            tbody.innerHTML += `<tr>
+                <td>${info.name}</td>
+                <td>${info.id}</td>
+                <td style="font-family:monospace; color:var(--accent); font-weight:bold;">${pass}</td>
+            </tr>`;
+        });
+    }
 
-    // --- MUSHAF ---
+    // --- MUSHAF & UTILS (Standard) ---
     function loadMushafImage(p) {
         if(!p) return;
         appState.currPage = parseInt(p);
-        document.getElementById('mushafTitle').innerText = "ޞަފްޙާ " + p;
+        document.getElementById('mushafTitle').innerText = "Page " + p;
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${p.toString().padStart(3,'0')}.png`;
-        
         fetch(`https://api.quran.com/api/v4/verses/by_page/${p}?per_page=1`).then(r=>r.json()).then(d=>{
-            if(d.verses && d.verses.length>0) {
+            if(d.verses.length>0) {
                 const j = d.verses[0].juz_number;
                 const s = surahNames[d.verses[0].verse_key.split(':')[0]-1];
-                document.getElementById('mushafSurahInfo').innerText = `ޖުޒުއު ${j} - ${s}`;
+                document.getElementById('mushafSurahInfo').innerText = `Juzu ${j} - ${s}`;
             }
         });
-
-        document.querySelectorAll('.mistake-dot').forEach(e => e.remove());
+        document.querySelectorAll('.mistake-dot').forEach(e=>e.remove());
         appState.dots.forEach(d => { if(d.p == p) drawDot(d.x, d.y); });
     }
 
@@ -693,7 +898,6 @@
         d.style.left = x + 'px'; d.style.top = y + 'px';
         document.getElementById('mushafWrapper').appendChild(d);
     }
-
     function viewDots(data) {
         const dots = JSON.parse(decodeURIComponent(data));
         loadMushafImage(dots[0].p);
@@ -701,28 +905,36 @@
         setTimeout(() => {
             dots.forEach(d => {
                 const dot = document.createElement('div');
-                dot.className = 'mistake-dot dot.ro';
+                dot.className = 'mistake-dot readonly';
                 dot.style.background = 'gold';
                 dot.style.left = d.x + 'px'; dot.style.top = d.y + 'px';
                 document.getElementById('mushafWrapper').appendChild(dot);
             });
         }, 500);
     }
-
-    function toggleMushaf(show) { 
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function toggleMushaf(s) { 
         const p = document.getElementById('mushafPanel');
-        if(show === undefined) p.classList.toggle('open');
-        else if(show) p.classList.add('open');
-        else p.classList.remove('open');
+        if(s) p.classList.add('open'); else p.classList.remove('open');
     }
-
     function changePage(d) { loadMushafImage(appState.currPage + d); }
+    function handlePage(v) { loadMushafImage(v); }
     function adjM(v) { document.getElementById('inpMistakes').value = Math.max(0, parseInt(document.getElementById('inpMistakes').value) + v); }
-    
     function clearInputs() {
         ['Start','End','Mistakes'].forEach(i => document.getElementById('inp'+i).value = i==='Mistakes'?0:'');
-        document.getElementById('examDuration').value='';
     }
+    function updateStats() {
+        let total = 0; Object.values(appState.classes).forEach(c => total += (c.students||[]).length);
+        document.getElementById('statTotal').innerText = total;
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('statToday').innerText = appState.records.filter(r => r.date === today).length;
+    }
+    function filterStudents(q) {
+        document.querySelectorAll('.student-card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
+    function delRec(k) { if(confirm('Delete?')) db.ref('records/'+k).remove(); }
 
     // --- EXAM CALC ---
     function startTimer() {
@@ -744,19 +956,16 @@
         const taj = parseInt(document.getElementById('exTaj').value)||0;
         const flu = parseInt(document.getElementById('exFlu').value)||0;
         const base = document.getElementById('exPortion').value === 'whole' ? 80 : 40;
-        
         let score = base - (t*2) - s;
         if(score < 0) score = 0;
         score += taj + flu;
-
         document.getElementById('exTotal').innerText = score + "%";
     }
 
-    // --- SETTINGS ---
-    function openSettings() { document.getElementById('settingsModal').style.display='flex'; }
+    // --- IMPORTS/EXPORTS ---
     function createClass() { 
         const n = document.getElementById('newClassName').value;
-        if(n) { db.ref('classes/'+n).set({students:[]}); document.getElementById('settingsModal').style.display='none'; }
+        if(n) { db.ref('classes/'+n).set({students:[]}); closeModal(); }
     }
     function importStudents() {
         const c = appState.currClass;
@@ -781,7 +990,6 @@
         };
         r.readAsText(f);
     }
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 </script>
 </body>
 </html>
