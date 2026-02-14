@@ -2,8 +2,8 @@
 <html lang="dv" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V7.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V9.0 (Mobile Ready)</title>
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase SDK -->
@@ -11,98 +11,95 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
+        /* FONTS */
+        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
+        @font-face { font-family: 'Mv Waheed'; src: local('Mv Waheed'), local('Mv Waheed-Regular'); }
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         
         :root {
             --primary-color: #2c3e50;
             --accent-color: #27ae60;
-            --student-color: #e67e22;
-            --bg-color: #f4f7f6;
-            --sidebar-width: 280px;
-            --mushaf-width: 40%; /* Widened for better view */
+            --student-color: #d35400;
+            --bg-color: #f0f2f5;
+            --sidebar-width: 260px;
+            --mushaf-width: 30%;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Faruma', 'MV Faseyha', 'Noto Sans Thaana', sans-serif;
+            font-family: 'Faruma', 'Noto Sans Thaana', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 16px; /* Base font size increased */
         }
 
-        /* --- UI COMPONENTS --- */
-        .id-badge {
-            display: inline-block; background-color: #ecf0f1; color: #7f8c8d;
-            padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;
-            font-family: sans-serif; margin-top: 2px; border: 1px solid #bdc3c7;
-        }
+        h1, h2, h3, h4 { font-family: 'Mv Waheed', 'Faruma', sans-serif; margin: 10px 0; }
 
+        /* --- LOADING & LOGIN --- */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 10000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.98); z-index: 20000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            z-index: 9999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            z-index: 10000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white; padding: 20px;
         }
         .login-box {
-            background: white; padding: 40px; border-radius: 15px; width: 320px; text-align: center; color: #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 350px; 
+            text-align: center; color: #333; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
-        .login-btn {
-            width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit;
+        .login-input {
+            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 16px; font-family: inherit;
         }
-        .btn-student { background: var(--student-color); color: white; }
-        .btn-teacher { background: var(--primary-color); color: white; }
 
-        #teacher-dashboard, #student-dashboard { display: none; width: 100%; height: 100%; }
+        /* --- LAYOUT --- */
+        #teacher-dashboard, #student-dashboard { display: none; width: 100%; height: 100%; overflow: hidden; }
         .dashboard-active { display: flex !important; }
 
         .sidebar {
             width: var(--sidebar-width); background: white; border-left: 1px solid #ddd;
-            display: flex; flex-direction: column; padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; padding: 15px; box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease; z-index: 100;
         }
         
-        .student-list-container { flex: 1; overflow-y: auto; }
-        .student-btn {
-            background: none; border: none; padding: 12px 10px; text-align: right; width: 100%;
-            cursor: pointer; border-bottom: 1px solid #f9f9f9; font-family: inherit;
-            display: flex; flex-direction: column; font-size: 15px; /* Larger font */
-        }
-        .student-btn:hover { background: #e8f6ef; color: var(--accent-color); padding-right: 15px; }
-        .student-btn.active { background: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
-        .student-btn.active .id-badge { color: var(--accent-color); background: white; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        /* Mobile Menu Toggle */
+        .menu-toggle { display: none; font-size: 24px; cursor: pointer; color: var(--primary-color); }
 
-        /* --- FORM STYLING IMPROVED --- */
-        .entry-form { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
-        .form-group { flex: 1; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: #444; }
+        /* --- FORMS & INPUTS --- */
+        .entry-form { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 120px; }
+        
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #444; }
         input, select { 
             width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; 
-            box-sizing: border-box; font-family: inherit; font-size: 16px; /* Larger Input Text */
+            font-family: inherit; font-size: 16px; height: 40px; /* Bigger touch targets */
         }
         .arabic-input { font-family: 'Amiri', serif; direction: rtl; font-size: 18px; }
 
+        /* SECTIONS */
         .section-box { 
-            padding: 20px; border-radius: 10px; margin-bottom: 20px; 
+            padding: 15px; border-radius: 10px; margin-bottom: 15px; 
             border: 2px solid transparent; transition: 0.2s; cursor: pointer; position: relative; 
         }
-        .section-box:hover { transform: translateY(-2px); }
-        .section-new { background: #eafaf1; }
-        .section-short { background: #ebf5fb; }
-        .section-long { background: #fef9e7; }
+        .section-new { background: #e8f5e9; }
+        .section-short { background: #e3f2fd; }
+        .section-long { background: #fff3e0; }
         
         .section-box.active-section {
             background: white; border-left: 6px solid; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: scale(1.01);
         }
         #box-new.active-section { border-color: #27ae60; }
         #box-short.active-section { border-color: #2980b9; }
@@ -110,27 +107,25 @@
         #box-exam.active-section { border-color: #f1c40f; }
 
         .radio-label { 
-            position: absolute; top: 15px; left: 15px;
-            display: inline-flex; align-items: center; gap: 8px; 
-            background: rgba(255,255,255,0.9); padding: 6px 12px; border-radius: 20px; 
-            font-weight: bold; font-size: 13px; border: 1px solid #ddd;
+            position: absolute; top: 10px; left: 10px;
+            display: inline-flex; align-items: center; gap: 5px; 
+            background: white; padding: 4px 10px; border-radius: 15px; 
+            font-weight: bold; font-size: 12px; border: 1px solid #ddd;
         }
 
-        .mistake-wrapper { display: flex; border: 1px solid #aaa; border-radius: 6px; overflow: hidden; height: 38px; }
-        .mistake-btn { width: 35px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-size: 18px; }
+        /* --- MISTAKE COUNTER --- */
+        .mistake-wrapper { display: flex; border: 1px solid #aaa; border-radius: 6px; overflow: hidden; height: 40px; }
+        .mistake-btn { width: 40px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-size: 20px; }
         .mistake-display { width: 50px; text-align: center; border: none; font-weight: bold; font-size: 18px; }
 
         /* --- MUSHAF --- */
-        .mushaf-panel { width: var(--mushaf-width); background: #2c3e50; display: flex; flex-direction: column; transition: width 0.3s; border-right: 1px solid #ccc; }
-        .mushaf-header { 
-            background: #34495e; color: white; padding: 12px; 
-            display: flex; flex-direction: column; gap: 5px; align-items: center; 
-            border-bottom: 1px solid #444;
+        .mushaf-panel { 
+            width: var(--mushaf-width); background: #34495e; display: flex; flex-direction: column; 
+            border-right: 1px solid #ccc; transition: all 0.3s;
         }
-        .mushaf-info { font-size: 16px; font-weight: bold; color: #f1c40f; font-family: 'Amiri', serif;}
+        .mushaf-header { background: #2c3e50; color: white; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .mushaf-container { flex: 1; overflow: auto; background: #fdfdfd; display: flex; justify-content: center; position: relative; }
-        .mushaf-wrapper { position: relative; display: inline-block; margin: 10px; }
-        .mushaf-page-img { max-width: 100%; display: block; border: 1px solid #ddd; cursor: crosshair; }
+        .mushaf-page-img { max-width: 100%; display: block; border: 1px solid #ddd; }
         
         .mistake-dot {
             position: absolute; width: 24px; height: 24px; background-color: rgba(231, 76, 60, 0.85);
@@ -139,38 +134,62 @@
         }
         .mistake-dot.readonly { cursor: default; background-color: rgba(231, 76, 60, 1); border-color: gold; }
 
-        /* --- CARDS & TABLES --- */
+        /* --- HISTORY & FILTERS --- */
+        .filter-bar { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; white-space: nowrap; }
+        .filter-btn {
+            background: #e0e0e0; border: none; padding: 8px 16px; border-radius: 20px;
+            font-size: 14px; cursor: pointer; color: #333; font-weight: bold; flex-shrink: 0;
+        }
+        .filter-btn.active { background: var(--primary-color); color: white; }
+
         .history-card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-right: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card-new { border-color: #27ae60; } .card-short { border-color: #2980b9; } .card-long { border-color: #d35400; } .card-exam { border-color: #f1c40f; }
-        .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
 
-        /* --- MODALS --- */
+        /* --- BUTTONS --- */
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-family: inherit; font-size: 14px; }
+        .btn-green { background: var(--accent-color); }
+        .btn-blue { background: #3498db; }
+        .btn-red { background: #e74c3c; }
+        .btn-grey { background: #7f8c8d; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { 
+                position: fixed; top: 0; right: 0; height: 100%; width: 280px; 
+                transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            }
+            .sidebar.open { transform: translateX(0); }
+            
+            .mushaf-panel { 
+                position: fixed; top: 0; left: 0; height: 100%; width: 100% !important; z-index: 1500;
+                transform: translateY(100%); transition: transform 0.3s;
+            }
+            .mushaf-panel.open { transform: translateY(0); }
+
+            .menu-toggle { display: block; }
+            .main-content { padding: 15px; }
+            
+            /* Adjust form for mobile */
+            .form-row { flex-direction: row; } 
+            .form-row > div { flex: 1 1 45%; } /* 2 columns on mobile */
+            
+            .student-header-banner { text-align: center; }
+        }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 0; border-radius: 10px; width: 500px; max-width: 95%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
         .modal-header { padding: 15px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; overflow-y: auto; }
         .close-modal { font-size: 24px; cursor: pointer; color: #7f8c8d; }
 
-        .tab-header { display: flex; background: #eee; }
-        .tab-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-btn.active { background: white; border-color: var(--primary-color); color: var(--primary-color); font-weight: bold; }
-        .tab-content { display: none; padding-top: 15px; }
-        .tab-content.active { display: block; }
-
-        .student-header-banner { background: linear-gradient(to right, #e67e22, #f39c12); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; font-size: 14px;}
-        .btn-green { background: var(--accent-color); }
-        .btn-blue { background: #3498db; }
-        .btn-red { background: #e74c3c; }
-        .btn-grey { background: #7f8c8d; }
         .loader-spin { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- LOADING OVERLAY -->
+    <!-- LOADING -->
     <div id="loading-overlay">
         <div class="loader-spin"></div>
         <p style="margin-top:10px;">ޑޭޓާބޭސް އަށް ގުޅަނީ...</p>
@@ -178,51 +197,63 @@
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" style="display:none;">
-        <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V7.1</h2>
-            <button class="login-btn btn-student" onclick="loginAs('student')">🎓 ދަރިވަރުން</button>
-            <div style="margin:15px 0; border-bottom:1px solid #eee;"></div>
-            <button class="login-btn btn-teacher" onclick="loginAs('teacher')">👨‍🏫 މުދައްރިސް</button>
+        <div class="login-box" id="roleSelection">
+            <h2>ޙިފްޡް ޕްރޮގްރާމް V9.0</h2>
+            <button class="btn btn-student" style="width:100%; margin-bottom:10px; padding:15px;" onclick="showStudentLogin()">🎓 ދަރިވަރުން</button>
+            <button class="btn btn-teacher" style="width:100%; padding:15px;" onclick="loginTeacher()">👨‍🏫 މުދައްރިސް</button>
+        </div>
+
+        <div class="login-box" id="studentLoginForm" style="display:none;">
+            <h3>ދަރިވަރު ލޮގިން</h3>
+            <input type="text" id="stLoginId" class="login-input" placeholder="އައިޑީ ކާޑު ނަންބަރު (ID)">
+            <input type="password" id="stLoginPass" class="login-input" placeholder="ޕާސްވޯޑް (Default: 1234)">
+            <button class="btn btn-green" style="width:100%; margin-top:10px;" onclick="processStudentLogin()">ވަންނަވާ</button>
+            <button class="btn btn-grey" style="width:100%; margin-top:5px;" onclick="document.getElementById('studentLoginForm').style.display='none'; document.getElementById('roleSelection').style.display='block';">ފަހަތަށް</button>
         </div>
     </div>
 
     <!-- TEACHER DASHBOARD -->
     <div id="teacher-dashboard">
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <h3 style="text-align:center; color:var(--primary-color);">މުދައްރިސް ޕެނަލް</h3>
-            
-            <div class="class-control-area">
-                <label>ކްލާސް:</label>
-                <select id="classSelect" class="class-select" onchange="switchClass(this.value)"></select>
-                <button class="manage-btn" style="width:100%; border:none; background:#3498db; color:white; padding:8px; border-radius:5px; cursor:pointer;" onclick="openModal()">⚙️ ސެޓިންގްސް / ބެކަޕް</button>
+        <div class="sidebar" id="teacherSidebar">
+            <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                <h3 style="margin:0; color:var(--primary-color);">މުދައްރިސް</h3>
+                <span style="cursor:pointer; font-size:24px;" onclick="toggleSidebar()">×</span>
             </div>
             
-            <h4>ދަރިވަރުން</h4>
+            <div class="class-control-area" style="margin:10px;">
+                <label>ކްލާސް:</label>
+                <select id="classSelect" class="class-select" onchange="switchClass(this.value)"></select>
+                <button class="manage-btn" style="width:100%; border:none; background:#3498db; color:white; padding:8px; border-radius:5px; cursor:pointer;" onclick="openModal()">⚙️ ސެޓިންގްސް</button>
+            </div>
+            
+            <h4 style="padding:0 10px;">ދަރިވަރުން</h4>
             <div id="studentListContainer" class="student-list-container"></div>
-            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; justify-content:center;">🚪 ލޮގްއައުޓް</button>
+            <button class="btn btn-grey" onclick="logout()" style="margin:10px;">🚪 ލޮގްއައުޓް</button>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="main-content">
-            <div style="background:white; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <small id="currentClassDisplay" style="color:#7f8c8d; font-weight:bold;">Class: -</small>
-                    <div style="display:flex; flex-direction:column;">
-                        <h2 id="studentHeader" style="margin:0; color:var(--primary-color);">ދަރިވަރެއް ނެތް</h2>
-                        <div id="studentHeaderId"></div>
+            <!-- Header Bar -->
+            <div style="background:white; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
+                    <div>
+                        <small id="currentClassDisplay" style="color:#7f8c8d; font-weight:bold;">Class: -</small>
+                        <div style="display:flex; flex-direction:column;">
+                            <h2 id="studentHeader" style="margin:0; color:var(--primary-color);">ދަރިވަރެއް ނެތް</h2>
+                            <div id="studentHeaderId"></div>
+                        </div>
                     </div>
                 </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-green" onclick="exportExcel()">Excel</button>
-                    <button class="btn btn-blue" onclick="toggleMushaf()">📖 މުޞްޙަފް</button>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn btn-green" onclick="exportExcel()" style="padding:8px;"><span style="display:none; @media(min-width:600px){display:inline;}">Excel</span>📥</button>
+                    <button class="btn btn-blue" onclick="toggleMushaf(true)">📖</button>
                 </div>
             </div>
 
             <!-- TEACHER FORM -->
             <div class="entry-form">
                 <div class="form-row">
-                    <div style="flex:0.5"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
+                    <div style="flex:1"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
                     <div style="flex:1"><label>ވައްތަރު</label>
                         <select id="lessonType" onchange="toggleFormSection(this.value)">
                             <option value="daily">ފިލާވަޅުތައް</option>
@@ -238,26 +269,26 @@
                         <label style="color:#27ae60; font-size:18px; font-weight:bold;">އާ ފިލާވަޅު</label>
                         <label class="radio-label"><input type="radio" name="activeSec" value="new" checked> ކުށްޖެހުން</label>
                         <div class="form-row">
-                            <div style="flex:0.5">
+                            <div style="flex:1; min-width:80px;">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="newPage" placeholder="Page" onchange="handlePageChange(this.value, 'new')" style="text-align:center; font-weight:bold;">
+                                <input type="number" id="newPage" placeholder="#" onchange="handlePageChange(this.value, 'new')" style="text-align:center; font-weight:bold;">
                             </div>
-                            <div style="flex:1.5">
-                                <label>ފެށޭ ސޫރަތް/އާޔަތް</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="newSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="newStart" placeholder="އާޔަތް" style="flex:0.5">
+                            <div style="flex:2">
+                                <label>ފެށޭ</label>
+                                <div style="display:flex; gap:2px;">
+                                    <select id="newSurah" class="arabic-input" style="flex:1"><option>...</option></select>
+                                    <input type="number" id="newStart" placeholder="އާޔަތް" style="flex:0.6">
                                 </div>
                             </div>
-                            <div style="flex:1.5">
-                                <label>ނިމޭ ސޫރަތް/އާޔަތް</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="newEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="newEnd" placeholder="އާޔަތް" style="flex:0.5">
+                            <div style="flex:2">
+                                <label>ނިމޭ</label>
+                                <div style="display:flex; gap:2px;">
+                                    <select id="newEndSurah" class="arabic-input" style="flex:1"><option>...</option></select>
+                                    <input type="number" id="newEnd" placeholder="އާޔަތް" style="flex:0.6">
                                 </div>
                             </div>
-                            <div style="flex:0.5">
-                                <label>ކުށްތައް</label>
+                            <div style="flex:1; min-width:100px;">
+                                <label>ކުށް</label>
                                 <div class="mistake-wrapper">
                                     <button class="mistake-btn" onclick="adjM('newMistakes',1)">+</button>
                                     <input id="newMistakes" class="mistake-display" value="0" readonly>
@@ -274,32 +305,13 @@
                             <label class="radio-label"><input type="radio" name="activeSec" value="short"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
-                            <div style="flex:0.5">
+                            <div style="flex:1; min-width:80px;">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="shortPage" placeholder="Page" onchange="handlePageChange(this.value, 'short')" style="text-align:center; font-weight:bold;">
+                                <input type="number" id="shortPage" placeholder="#" onchange="handlePageChange(this.value, 'short')" style="text-align:center; font-weight:bold;">
                             </div>
-                            <div style="flex:1.5">
-                                <label>ފެށޭ</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="shortSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="shortStart" placeholder="އާޔަތް" style="flex:0.5">
-                                </div>
-                            </div>
-                            <div style="flex:1.5">
-                                <label>ނިމޭ</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="shortEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="shortEnd" placeholder="އާޔަތް" style="flex:0.5">
-                                </div>
-                            </div>
-                            <div style="flex:0.5">
-                                <label>ކުށް</label>
-                                <div class="mistake-wrapper">
-                                    <button class="mistake-btn" onclick="adjM('shortMistakes',1)">+</button>
-                                    <input id="shortMistakes" class="mistake-display" value="0" readonly>
-                                    <button class="mistake-btn" onclick="adjM('shortMistakes',-1)">-</button>
-                                </div>
-                            </div>
+                            <div style="flex:2"><label>ފެށޭ</label><div style="display:flex; gap:2px;"><select id="shortSurah" class="arabic-input" style="flex:1"><option>...</option></select><input type="number" id="shortStart" placeholder="އާޔަތް" style="flex:0.6"></div></div>
+                            <div style="flex:2"><label>ނިމޭ</label><div style="display:flex; gap:2px;"><select id="shortEndSurah" class="arabic-input" style="flex:1"><option>...</option></select><input type="number" id="shortEnd" placeholder="އާޔަތް" style="flex:0.6"></div></div>
+                            <div style="flex:1; min-width:100px;"><label>ކުށް</label><div class="mistake-wrapper"><button class="mistake-btn" onclick="adjM('shortMistakes',1)">+</button><input id="shortMistakes" class="mistake-display" value="0" readonly><button class="mistake-btn" onclick="adjM('shortMistakes',-1)">-</button></div></div>
                         </div>
                     </div>
 
@@ -310,32 +322,13 @@
                             <label class="radio-label"><input type="radio" name="activeSec" value="long"> ކުށްޖެހުން</label>
                         </div>
                         <div class="form-row">
-                            <div style="flex:0.5">
+                            <div style="flex:1; min-width:80px;">
                                 <label>ޞަފްޙާ</label>
-                                <input type="number" id="longPage" placeholder="Page" onchange="handlePageChange(this.value, 'long')" style="text-align:center; font-weight:bold;">
+                                <input type="number" id="longPage" placeholder="#" onchange="handlePageChange(this.value, 'long')" style="text-align:center; font-weight:bold;">
                             </div>
-                            <div style="flex:1.5">
-                                <label>ފެށޭ</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="longSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="longStart" placeholder="އާޔަތް" style="flex:0.5">
-                                </div>
-                            </div>
-                            <div style="flex:1.5">
-                                <label>ނިމޭ</label>
-                                <div style="display:flex; gap:5px;">
-                                    <select id="longEndSurah" class="arabic-input" style="flex:1"><option>ސޫރަތް...</option></select>
-                                    <input type="number" id="longEnd" placeholder="އާޔަތް" style="flex:0.5">
-                                </div>
-                            </div>
-                            <div style="flex:0.5">
-                                <label>ކުށް</label>
-                                <div class="mistake-wrapper">
-                                    <button class="mistake-btn" onclick="adjM('longMistakes',1)">+</button>
-                                    <input id="longMistakes" class="mistake-display" value="0" readonly>
-                                    <button class="mistake-btn" onclick="adjM('longMistakes',-1)">-</button>
-                                </div>
-                            </div>
+                            <div style="flex:2"><label>ފެށޭ</label><div style="display:flex; gap:2px;"><select id="longSurah" class="arabic-input" style="flex:1"><option>...</option></select><input type="number" id="longStart" placeholder="އާޔަތް" style="flex:0.6"></div></div>
+                            <div style="flex:2"><label>ނިމޭ</label><div style="display:flex; gap:2px;"><select id="longEndSurah" class="arabic-input" style="flex:1"><option>...</option></select><input type="number" id="longEnd" placeholder="އާޔަތް" style="flex:0.6"></div></div>
+                            <div style="flex:1; min-width:100px;"><label>ކުށް</label><div class="mistake-wrapper"><button class="mistake-btn" onclick="adjM('longMistakes',1)">+</button><input id="longMistakes" class="mistake-display" value="0" readonly><button class="mistake-btn" onclick="adjM('longMistakes',-1)">-</button></div></div>
                         </div>
                     </div>
                 </div>
@@ -345,28 +338,29 @@
                     <div id="box-exam" class="section-box section-new active-section" style="border-color:#f1c40f;">
                         <h3 style="margin-top:0; color:#d35400;">🏆 އިމްތިޙާން</h3>
                         
-                        <div class="stopwatch-container" style="background:#34495e; padding:15px; border-radius:5px; margin-bottom:15px; display:flex; align-items:center; gap:10px; color:white;">
+                        <div class="stopwatch-container" style="background:#34495e; padding:15px; border-radius:5px; margin-bottom:15px; display:flex; align-items:center; gap:10px; color:white; flex-wrap:wrap;">
                             <div id="timerDisplay" style="font-family:monospace; font-size:28px; font-weight:bold; color:#f1c40f;">00:00</div>
-                            <button class="btn btn-green" onclick="startTimer()">▶ ފަށާ</button>
-                            <button class="btn btn-red" onclick="stopTimer()">⏹ ހުއްޓާ</button>
+                            <button class="btn btn-green" onclick="startTimer()">▶ Start</button>
+                            <button class="btn btn-red" onclick="stopTimer()">⏹ Stop</button>
                             <input type="number" id="examDuration" placeholder="މިނެޓް" style="width:70px; text-align:center; margin-right:auto; font-size:16px;">
                         </div>
 
                         <div class="form-row">
-                            <div style="flex:2"><label>ބައި:</label><input type="text" id="examJuzu" placeholder="30 ވަނަ ޖުޒުއު"></div>
-                            <div style="flex:1"><label>މިންވަރު:</label>
-                                <select id="examPortion">
-                                    <option value="whole">މުޅި</option>
-                                    <option value="half">1/2</option>
-                                    <option value="third">1/3</option>
-                                    <option value="quarter">1/4</option>
+                            <div style="flex:2"><label>ބައި / ޖުޒުއު</label><input type="text" id="examJuzu" placeholder="30"></div>
+                            <div style="flex:1"><label>ފޮތް (Page)</label><input type="number" id="examPage" placeholder="#" onchange="loadMushaf(this.value)"></div>
+                            <div style="flex:1"><label>މިންވަރު</label>
+                                <select id="examPortion" onchange="calcExam()">
+                                    <option value="whole">މުޅި (1)</option>
+                                    <option value="half">1/2 (0.5)</option>
+                                    <option value="third">1/3 (0.33)</option>
+                                    <option value="quarter">1/4 (0.25)</option>
                                 </select>
                             </div>
                         </div>
                         
-                        <div style="background:#fff3e0; padding:15px; border-radius:8px; margin:15px 0;">
+                        <div style="background:#fff3e0; padding:15px; border-radius:5px; margin:15px 0;">
                             <label>ކުށްތައް (ޖުމްލަ 80):</label>
-                            <div style="display:flex; gap:15px;">
+                            <div style="display:flex; gap:15px; flex-wrap:wrap;">
                                 <div style="flex:1">މުދައްރިސް (-2): <input type="number" id="examTMistakes" value="0" onchange="calcExam()"></div>
                                 <div style="flex:1">އަމިއްލަ (-1): <input type="number" id="examSMistakes" value="0" onchange="calcExam()"></div>
                             </div>
@@ -384,17 +378,27 @@
             </div>
 
             <!-- HISTORY -->
-            <div style="margin-top:20px;">
-                <h4>ރެކޯޑްތައް</h4>
+            <div style="margin-top:20px; padding-bottom:50px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4>ރެކޯޑްތައް</h4>
+                    <div class="filter-bar">
+                        <button class="filter-btn active" id="btnAll" onclick="filterHistory('all')">All</button>
+                        <button class="filter-btn" id="btnNew" onclick="filterHistory('new')">New</button>
+                        <button class="filter-btn" id="btnShort" onclick="filterHistory('short')">Short</button>
+                        <button class="filter-btn" id="btnLong" onclick="filterHistory('long')">Long</button>
+                        <button class="filter-btn" id="btnExam" onclick="filterHistory('exam')">Exam</button>
+                    </div>
+                </div>
                 <div id="historyContainer"></div>
             </div>
         </div>
 
-        <!-- MUSHAF -->
+        <!-- MUSHAF PANEL -->
         <div class="mushaf-panel" id="mushafPanel">
             <div class="mushaf-header">
-                <div id="mushafInfoDisplay" class="mushaf-info">---</div>
-                <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn btn-red" onclick="toggleMushaf(false)" style="position:absolute; left:10px;">×</button>
+                <div id="mushafInfoDisplay" class="mushaf-info" style="margin-top:15px;">---</div>
+                <div style="display:flex; gap:10px; align-items:center; margin-top:5px;">
                     <button class="btn btn-grey" onclick="changePage(1)">></button>
                     <input type="number" id="navPage" style="width:60px; text-align:center; font-weight:bold;" onchange="loadMushaf(this.value)">
                     <button class="btn btn-grey" onclick="changePage(-1)"><</button>
@@ -410,37 +414,37 @@
 
     <!-- STUDENT DASHBOARD -->
     <div id="student-dashboard">
-        <div class="sidebar">
-            <h3 style="text-align:center; color:var(--student-color);">ދަރިވަރުންގެ ޕޯޓަލް</h3>
-            <div style="margin-bottom:20px; padding:10px;">
-                <label>ކްލާސް:</label>
-                <select id="stClassSelect" onchange="stLoadStudents(this.value)" style="width:100%; margin-bottom:10px; padding:8px;"></select>
-                <label>ނަން:</label>
-                <select id="stNameSelect" onchange="stSelectStudent(this.value)" style="width:100%; padding:8px;"></select>
-            </div>
-            <button class="btn btn-red" onclick="logout()" style="margin:auto 10px 10px 10px;">🚪 ލޮގްއައުޓް</button>
-        </div>
-
         <div class="main-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--student-color);">ދަރިވަރުންގެ ޕޯޓަލް</h3>
+                <button class="btn btn-red" onclick="logout()">Logout</button>
+            </div>
+
             <div class="student-header-banner">
                 <h2 id="stWelcomeName" style="margin:0;">މަރުޙަބާ!</h2>
-                <div id="stWelcomeID"></div>
-                <p>ތިރީގައިވާ ތާވަލުން ކުރީގެ ރެކޯޑްތަކާއި ފާހަގަކުރެވިފައިވާ ކުށްތައް ބައްލަވާ.</p>
+                <div id="stWelcomeID" style="color:#eee; font-weight:bold; margin-top:5px;"></div>
             </div>
-            <div id="stHistoryContainer"></div>
-        </div>
-    </div>
+            
+            <div class="filter-bar">
+                <button class="filter-btn active" id="stBtnAll" onclick="stFilterHistory('all')">All</button>
+                <button class="filter-btn" id="stBtnNew" onclick="stFilterHistory('new')">New</button>
+                <button class="filter-btn" id="stBtnExam" onclick="stFilterHistory('exam')">Exam</button>
+            </div>
 
-    <!-- STUDENT MUSHAF MODAL -->
-    <div id="stMushafModal" class="modal">
-        <div class="modal-content" style="width:600px; text-align:center;">
-            <div class="modal-header">
-                <h3>ފާހަގަކުރެވިފައިވާ ކުށްތައް</h3>
-                <span class="close-modal" onclick="document.getElementById('stMushafModal').style.display='none'">&times;</span>
-            </div>
-            <div class="modal-body" style="background:#fdfdfd;">
-                <div style="position:relative; display:inline-block;" id="stMushafWrapper">
-                    <img id="stMushafImg" style="max-width:100%; border:1px solid #ddd;">
+            <div id="stHistoryContainer" style="padding-bottom:50px;"></div>
+        </div>
+        
+        <!-- Student Mushaf Modal -->
+        <div id="stMushafModal" class="modal">
+            <div class="modal-content" style="width:100%; height:100%; max-width:100%; border-radius:0;">
+                <div class="modal-header" style="background:#2c3e50; color:white;">
+                    <h3>ފާހަގަކުރެވިފައިވާ ކުށްތައް</h3>
+                    <button class="btn btn-red" onclick="document.getElementById('stMushafModal').style.display='none'">ބަންދުކުރޭ</button>
+                </div>
+                <div class="modal-body" style="background:#333; display:flex; justify-content:center; align-items:center; padding:0;">
+                    <div style="position:relative; display:inline-block;" id="stMushafWrapper">
+                        <img id="stMushafImg" style="max-width:100%; max-height:90vh;">
+                    </div>
                 </div>
             </div>
         </div>
@@ -507,14 +511,19 @@
     const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
     let classes = {};
     let records = [];
+    let users = {}; // Stores passwords: { "ID123": "password" }
+    
     let currentClass = "";
-    let currentStudent = null;
+    let currentStudent = null; // Stores Full Name String "Name IUM123"
+    let currentStudentId = ""; // Stores ID "IUM123"
     let currentActiveSection = 'new';
     let currentPage = 1;
     let sessionDots = []; 
+    let historyFilter = 'all';
+    
     let timerInterval, startTime, elapsedTime = 0;
 
-    // --- HELPER: Parse Student Name & ID ---
+    // --- HELPER: Parse Info ---
     function parseStudentInfo(fullString) {
         let name = fullString;
         let id = "";
@@ -538,17 +547,28 @@
         loadMushaf(1);
 
         if(db) {
+            // Load Classes
             db.ref('classes').on('value', snap => {
                 classes = snap.val() || {};
                 refreshDropdowns();
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('login-screen').style.display = 'flex';
             });
+            // Load Records
             db.ref('records').on('value', snap => {
                 records = [];
                 const data = snap.val();
                 if(data) Object.keys(data).forEach(k => records.push({...data[k], key: k}));
-                if(currentStudent) renderTeacherHistory();
+                
+                // Refresh views if active
+                if(currentStudent) {
+                    if(document.getElementById('teacher-dashboard').style.display === 'flex') renderTeacherHistory();
+                    if(document.getElementById('student-dashboard').style.display === 'flex') stFilterHistory('all');
+                }
+            });
+            // Load Users (Passwords)
+            db.ref('users').on('value', snap => {
+                users = snap.val() || {};
             });
         }
     });
@@ -565,19 +585,72 @@
         });
     }
 
-    // --- NAVIGATION ---
-    function loginAs(role) {
-        document.getElementById('login-screen').style.display = 'none';
-        if(role === 'teacher') {
-            if(prompt("ޕާސްވޯޑް:") === "1234") {
-                document.getElementById('teacher-dashboard').classList.add('dashboard-active');
-            } else { location.reload(); }
-        } else {
-            document.getElementById('student-dashboard').classList.add('dashboard-active');
-            setupStudentView();
-        }
+    // --- LOGIN LOGIC ---
+    function loginTeacher() {
+        if(prompt("ޕާސްވޯޑް:") === "1234") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('teacher-dashboard').classList.add('dashboard-active');
+        } else { alert("ޕާސްވޯޑް ނުބައި"); }
     }
+
+    function showStudentLogin() {
+        document.getElementById('roleSelection').style.display = 'none';
+        document.getElementById('studentLoginForm').style.display = 'block';
+    }
+
+    function processStudentLogin() {
+        const id = document.getElementById('stLoginId').value.trim().toUpperCase();
+        let pass = document.getElementById('stLoginPass').value.trim();
+        if(!pass) pass = "1234"; // Default fallback if empty
+
+        if(!id) return alert("އައިޑީ ޖަހާ");
+
+        // Verify ID exists in a class
+        let found = false;
+        let studentFullName = "";
+        let studentClass = "";
+        
+        Object.keys(classes).forEach(cls => {
+            if(classes[cls].students) {
+                classes[cls].students.forEach(s => {
+                    const info = parseStudentInfo(s);
+                    if(info.id === id) {
+                        found = true;
+                        studentFullName = s;
+                        studentClass = cls;
+                    }
+                });
+            }
+        });
+
+        if(!found) return alert("މި އައިޑީ ރަޖިސްޓްރީވެފައެއް ނެތް");
+
+        // Check Password
+        if(users[id] && users[id] !== pass) {
+            return alert("ޕާސްވޯޑް ނުބައި");
+        }
+        
+        // If first time (no user entry), create it
+        if(!users[id]) {
+            db.ref('users/' + id).set(pass);
+        }
+
+        // Login Success
+        currentStudent = studentFullName;
+        currentStudentId = id;
+        currentClass = studentClass;
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('student-dashboard').classList.add('dashboard-active');
+        initStudentDashboard();
+    }
+
     function logout() { location.reload(); }
+    
+    // --- SIDEBAR TOGGLE ---
+    function toggleSidebar() {
+        document.getElementById('teacherSidebar').classList.toggle('open');
+    }
 
     // --- TEACHER LOGIC ---
     function refreshDropdowns() {
@@ -618,33 +691,35 @@
     function selectTeacherStudent(fullString, btnEl) {
         currentStudent = fullString;
         const info = parseStudentInfo(fullString);
+        currentStudentId = info.id;
         
         document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
         if(btnEl) btnEl.classList.add('active');
         
         document.getElementById('studentHeader').innerText = info.name;
-        document.getElementById('studentHeaderId').innerHTML = info.id ? `<span class="id-badge" style="background:#eafaf1; border-color:#27ae60; color:#27ae60;">${info.id}</span>` : "";
+        document.getElementById('studentHeaderId').innerHTML = info.id ? `<span class="id-badge" style="background:#eafaf1; border-color:#27ae60; color:#27ae60; font-size:14px;">${info.id}</span>` : "";
         
+        // Auto Close Sidebar on Mobile after selection
+        if(window.innerWidth <= 768) document.getElementById('teacherSidebar').classList.remove('open');
+
         clearForm();
         sessionDots = [];
-        autoFillAllSections(); // Auto-fill on selection
+        autoFillAllSections();
         renderTeacherHistory();
     }
 
-    // --- MUSHAF & DOTS ---
+    // --- MUSHAF LOGIC ---
     function loadMushaf(p) {
         if(!p || p < 1 || p > 604) return;
         currentPage = parseInt(p);
         document.getElementById('navPage').value = currentPage;
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
         
-        // Fetch Metadata for Header (Juzu & Surah)
         fetch(`https://api.quran.com/api/v4/verses/by_page/${currentPage}?per_page=1`)
         .then(r => r.json())
         .then(d => {
             if(d.verses && d.verses.length > 0) {
                 const juzu = d.verses[0].juz_number;
-                // Rough estimate for Surah name from first verse on page
                 const surahId = d.verses[0].verse_key.split(':')[0];
                 const surahName = surahNames[surahId-1];
                 document.getElementById('mushafInfoDisplay').innerText = `ޖުޒުއު ${juzu} - ${surahName}`;
@@ -658,9 +733,21 @@
     }
     
     function changePage(d) { loadMushaf(parseInt(currentPage) + d); }
-    function toggleMushaf() { 
+    function toggleMushaf(show) { 
         const p = document.getElementById('mushafPanel');
-        p.style.width = p.style.width === '0px' ? '40%' : '0px';
+        if(show === undefined) {
+             p.classList.toggle('open'); // Mobile toggle
+             // Desktop toggle logic
+             if(window.innerWidth > 768) p.style.width = p.style.width === '0px' ? '30%' : '0px';
+        } else {
+            if(show) {
+                if(window.innerWidth <= 768) p.classList.add('open');
+                else p.style.width = '30%';
+            } else {
+                if(window.innerWidth <= 768) p.classList.remove('open');
+                else p.style.width = '0px';
+            }
+        }
     }
 
     function setActiveSection(sec) {
@@ -669,7 +756,6 @@
         if(sec !== 'exam') {
             document.getElementById('box-'+sec).classList.add('active-section');
             document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
-            // Load the page specific to this section
             const pageVal = document.getElementById(sec+'Page').value;
             if(pageVal) loadMushaf(pageVal);
         }
@@ -708,20 +794,15 @@
         if(el) el.value = Math.max(0, parseInt(el.value || 0) + val);
     }
 
-    // --- AUTO FILL LOGIC (V7.1 Smart) ---
-    // Handle Page Input Change: Auto-fill Verses
+    // --- AUTO FILL LOGIC ---
     function handlePageChange(page, section) {
         if(!page) return;
         loadMushaf(page);
-        
-        // Fetch Start and End verses of this page
         fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`)
-        .then(r => r.json())
-        .then(d => {
+        .then(r => r.json()).then(d => {
             if(d.verses && d.verses.length > 0) {
                 const first = d.verses[0].verse_key.split(':');
                 const last = d.verses[d.verses.length - 1].verse_key.split(':');
-                
                 document.getElementById(section+'Surah').value = first[0];
                 document.getElementById(section+'Start').value = first[1];
                 document.getElementById(section+'EndSurah').value = last[0];
@@ -732,53 +813,43 @@
 
     function autoFillAllSections() {
         if(!currentStudent) return;
-        // Check last records
         const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily');
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
         
         if(myRecs.length > 0) {
             const lastRec = myRecs[0];
-
-            // 1. New Lesson: Next page after last 'New'
+            // 1. New Lesson
             if (lastRec.new && lastRec.new.en) {
                  const surahIdx = surahNames.indexOf(lastRec.new.s) + 1;
                  const lastVerse = parseInt(lastRec.new.en);
-                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_
-                 number`)
-                .then(r => r.json()).then(d => {
+                 fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
+                 .then(r => r.json()).then(d => {
                     if(d.verse) {
                         const nextPage = d.verse.page_number + 1;
                         if(nextPage <= 604) {
                             document.getElementById('newPage').value = nextPage;
-                            // Auto fill verses for this page
                             handlePageChange(nextPage, 'new');
-                            // If this is the active section, load the mushaf
                             if(currentActiveSection === 'new') loadMushaf(nextPage);
                         }
                     }
                 });
             }
-
-            // 2. Short Revision: Page where last lesson STARTED
+            // 2. Short Revision (Load Same Page)
             if (lastRec.short && lastRec.short.st) {
                  const surahIdx = surahNames.indexOf(lastRec.short.s) + 1;
                  const startVerse = parseInt(lastRec.short.st);
-                 
                  fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${startVerse}?fields=page_number`)
                  .then(r => r.json()).then(d => {
                      if(d.verse) {
                          document.getElementById('shortPage').value = d.verse.page_number;
                          handlePageChange(d.verse.page_number, 'short');
-                         if(currentActiveSection === 'short') loadMushaf(d.verse.page_number);
                      }
                  });
             }
-
-            // 3. Long Revision: Next page after last END
-            if (lastRec.long && lastRec.long.en) {
+            // 3. Long Revision (Next Page)
+             if (lastRec.long && lastRec.long.en) {
                  const surahIdx = surahNames.indexOf(lastRec.long.s) + 1;
                  const lastVerse = parseInt(lastRec.long.en);
-                 
                  fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIdx}:${lastVerse}?fields=page_number`)
                  .then(r => r.json()).then(d => {
                      if(d.verse) {
@@ -786,7 +857,6 @@
                          if(nextPage <= 604) {
                              document.getElementById('longPage').value = nextPage;
                              handlePageChange(nextPage, 'long');
-                             if(currentActiveSection === 'long') loadMushaf(nextPage);
                          }
                      }
                  });
@@ -796,7 +866,7 @@
 
     // --- SAVE LOGIC ---
     function saveRecord() {
-        if(!currentStudent) return alert("ދަރިވަރަކު އިޚްތިޔާރުކުރައްވާ");
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
         const type = document.getElementById('lessonType').value;
         
         let record = {
@@ -810,8 +880,7 @@
         if(type === 'daily') {
             const sec = currentActiveSection; 
             const sVal = document.getElementById(sec+'Surah').value;
-            
-            if(sVal === "ސޫރަތް..." || sVal === "") return alert("ސޫރަތް އިޚްތިޔާރުކުރައްވާ");
+            if(sVal === "..." || !sVal) return alert("ސޫރަތް އިޚްތިޔާރުކުރައްވާ");
 
             record[sec] = {
                 s: surahNames[parseInt(sVal)-1],
@@ -819,7 +888,7 @@
                 en: document.getElementById(sec+'End').value,
                 endSurah: surahNames[parseInt(document.getElementById(sec+'EndSurah').value)-1] || surahNames[parseInt(sVal)-1],
                 m: document.getElementById(sec+'Mistakes').value,
-                dots: sessionDots // Save mistakes location
+                dots: sessionDots 
             };
         } else {
             record.juzu = document.getElementById('examJuzu').value;
@@ -837,11 +906,8 @@
         
         sessionDots = [];
         clearDots();
-        // Clear specific section fields
-        if(type === 'daily') {
-            document.getElementById(currentActiveSection+'Mistakes').value = 0;
-        }
-        autoFillAllSections(); // Refresh suggestions
+        if(type === 'daily') document.getElementById(currentActiveSection+'Mistakes').value = 0;
+        autoFillAllSections(); 
     }
 
     function toggleFormSection(val) {
@@ -850,13 +916,30 @@
         setActiveSection(val === 'daily' ? 'new' : 'exam');
     }
 
+    function filterHistory(filter) {
+        historyFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        let btnId = filter === 'all' ? 'btnAll' : filter === 'new' ? 'btnNew' : filter === 'short' ? 'btnShort' : filter === 'long' ? 'btnLong' : 'btnExam';
+        document.getElementById(btnId).classList.add('active');
+        renderTeacherHistory();
+    }
+
     function renderTeacherHistory() {
         const div = document.getElementById('historyContainer');
         div.innerHTML = '';
         const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent);
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-        myRecs.forEach(r => {
+        // Filtering
+        let displayRecs = myRecs;
+        if(historyFilter !== 'all') {
+            displayRecs = myRecs.filter(r => {
+                if(r.type === 'exam') return historyFilter === 'exam';
+                return r[historyFilter];
+            });
+        }
+
+        displayRecs.forEach(r => {
             let html = `<div class="history-card ${r.type==='exam'?'card-exam':'card-new'}">
                 <div class="card-header">
                     <span>📅 ${r.date}</span>
@@ -869,15 +952,15 @@
                         const secName = sec === 'new' ? 'އާ ފިލާވަޅު' : sec === 'short' ? 'ކުރު މުރާޖަޢާ' : 'ދިގު މުރާޖަޢާ';
                         const color = sec === 'new' ? 'green' : sec === 'short' ? 'blue' : 'orange';
                         
-                        html += `<div style="font-size:13px; margin-top:5px;">
+                        html += `<div style="font-size:14px; margin-top:5px;">
                             <span style="font-weight:bold; color:${color}">${secName}:</span> 
                             ${r[sec].s} ${r[sec].st} - ${r[sec].endSurah || r[sec].s} ${r[sec].en}
-                            <span style="color:red;">(${r[sec].m || 0} ކުށް)</span>
+                            <span style="color:red; font-weight:bold;">(${r[sec].m || 0} ކުށް)</span>
                         </div>`;
                     }
                 });
             } else {
-                html += `<div>${r.juzu} (${r.portion}) - ނަތީޖާ: ${r.scores.total}</div>`;
+                html += `<div>ޖުޒުއު ${r.juzu} (${r.portion}) - ނަތީޖާ: <b>${r.scores.total}</b></div>`;
             }
             html += `</div>`;
             div.innerHTML += html;
@@ -885,53 +968,45 @@
     }
 
     // --- STUDENT VIEW LOGIC ---
-    function setupStudentView() {
-        const sel = document.getElementById('stClassSelect');
-        sel.innerHTML = '<option>ކްލާސް ނަގާ</option>';
-        Object.keys(classes).forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-    }
-    
-    function stLoadStudents(cls) {
-        const sel = document.getElementById('stNameSelect');
-        sel.innerHTML = '<option>ނަން ނަގާ</option>';
-        (classes[cls]?.students || []).forEach(s => {
-             const info = parseStudentInfo(s);
-             sel.innerHTML += `<option value="${s}">${info.name} ${info.id ? '('+info.id+')' : ''}</option>`;
-        });
-    }
-
-    function stSelectStudent(name) {
-        const cls = document.getElementById('stClassSelect').value;
-        const info = parseStudentInfo(name);
-        
+    function initStudentDashboard() {
+        const info = parseStudentInfo(currentStudent);
         document.getElementById('stWelcomeName').innerText = "މަރުޙަބާ, " + info.name;
         document.getElementById('stWelcomeID').innerHTML = info.id ? `<span class="id-badge">${info.id}</span>` : "";
-        
+        stFilterHistory('all');
+    }
+
+    function stFilterHistory(filter) {
         const div = document.getElementById('stHistoryContainer');
         div.innerHTML = '';
         
-        const myRecs = records.filter(r => r.class === cls && r.student === name);
+        // Update Buttons
+        document.querySelectorAll('#student-dashboard .filter-btn').forEach(b => b.classList.remove('active'));
+        let btnId = filter === 'all' ? 'stBtnAll' : filter === 'new' ? 'stBtnNew' : 'stBtnExam';
+        document.getElementById(btnId).classList.add('active');
+
+        const myRecs = records.filter(r => r.class === currentClass && r.student === currentStudent);
         myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         myRecs.forEach(r => {
             let content = '';
-            if(r.type === 'daily') {
+            if(r.type === 'daily' && filter !== 'exam') {
                 ['new', 'short', 'long'].forEach(sec => {
-                    if(r[sec]) {
+                    // If filter is specific (e.g. NEW), only show new. If ALL, show all sections
+                    if(r[sec] && (filter === 'all' || (filter === 'new' && sec === 'new'))) {
                         const dotsData = encodeURIComponent(JSON.stringify(r[sec].dots || []));
                         const secName = sec === 'new' ? 'އާ ފިލާވަޅު' : sec === 'short' ? 'ކުރު' : 'ދިގު';
                         
                         content += `
                         <div style="background:#f9f9f9; padding:10px; margin-top:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <strong>${secName}</strong>: ${r[sec].s} ${r[sec].st} - ${r[sec].endSurah || r[sec].s} ${r[sec].en}
+                                <strong>${secName}</strong>: ${r[sec].s} ${r[sec].st} - ${r[sec].en}
                                 <br><span style="color:red; font-size:12px;">${r[sec].m} ކުށް</span>
                             </div>
-                            ${r[sec].dots && r[sec].dots.length > 0 ? `<button class="btn btn-blue" style="font-size:12px; padding:5px;" onclick="stOpenMushaf('${dotsData}')">📖 ބަލާލުމަށް</button>` : ''}
+                            ${r[sec].dots && r[sec].dots.length > 0 ? `<button class="btn btn-blue" style="font-size:12px; padding:5px 10px;" onclick="stOpenMushaf('${dotsData}')">👁️ ބަލާލުމަށް</button>` : ''}
                         </div>`;
                     }
                 });
-            } else {
+            } else if (r.type === 'exam' && (filter === 'all' || filter === 'exam')) {
                 content = `<div style="padding:10px; background:#fff8e1;">🏆 އިމްތިޙާން: ${r.juzu} - ${r.scores.total}</div>`;
             }
 
@@ -957,7 +1032,6 @@
         while(wrapper.children.length > 1) { wrapper.removeChild(wrapper.lastChild); }
 
         dots.forEach(d => {
-            // Check if page matches (simple logic for now)
             if(d.page == page) {
                 let dot = document.createElement('div');
                 dot.className = 'mistake-dot readonly';
@@ -987,61 +1061,52 @@
     function calcExam() {
         const t = parseInt(document.getElementById('examTMistakes').value)||0;
         const s = parseInt(document.getElementById('examSMistakes').value)||0;
-        let score = 80 - (t*2) - s;
-        if(score < 0) score = 0;
+        const portion = document.getElementById('examPortion').value;
+        
+        // Dynamic Base Score based on portion (optional)
+        // Usually scores are normalized to 100%, but here is the logic:
+        let baseScore = 100; // Always out of 100%
+        
+        let hifzLoss = (t*2) + s; 
+        let hifzScore = 80 - hifzLoss;
+        if(hifzScore < 0) hifzScore = 0;
+        
+        // Add marks
+        let score = hifzScore;
         score += (parseFloat(document.getElementById('markTajweed').value)||0) + (parseFloat(document.getElementById('markFluency').value)||0) + 5; 
+        
         document.getElementById('examTotal').innerText = score + "%";
     }
 
     function clearForm() {
-        // Reset all sections
         ['new','short','long'].forEach(s => {
             document.getElementById(s+'Page').value='';
             document.getElementById(s+'Start').value='';
             document.getElementById(s+'End').value='';
             document.getElementById(s+'Mistakes').value='0';
-            document.getElementById(s+'Surah').value='Surah...';
-            document.getElementById(s+'EndSurah').value='Surah...';
         });
-        
         document.getElementById('examJuzu').value = '';
         document.getElementById('examDuration').value = '';
         document.getElementById('timerDisplay').innerText = '00:00';
         stopTimer();
         elapsedTime = 0;
-        document.getElementById('examTMistakes').value = 0;
-        document.getElementById('examSMistakes').value = 0;
-        document.getElementById('examTotal').innerText = "100%";
-        
         clearDots();
     }
 
-    // --- MODAL & SETTINGS ---
     function openModal() { document.getElementById('classModal').style.display='flex'; document.getElementById('modalClassSelect').innerHTML = document.getElementById('classSelect').innerHTML; renderModalStudentList(); }
     function closeModal() { document.getElementById('classModal').style.display='none'; }
-    
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if(tabId === 'tab-students') document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        else if (tabId === 'tab-class') document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        else document.querySelectorAll('.tab-btn')[2].classList.add('active');
-    }
-
     function createClass() { 
         const n = document.getElementById('newClassName').value; 
         const t = document.getElementById('newClassTeacher').value;
-        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); alert('ކްލާސް ހެދިއްޖެ'); closeModal(); }
+        if(n) { db.ref('classes/'+n).set({teacher:t, students:[]}); closeModal(); }
     }
-    
     function importStudents() {
         const c = document.getElementById('modalClassSelect').value;
         const txt = document.getElementById('bulkStudents').value;
         const list = txt.split('\n').filter(x=>x.trim());
         const old = classes[c]?.students || [];
         db.ref('classes/'+c+'/students').set([...new Set([...old, ...list])]);
-        alert('ކުދިން އިތުރުކުރެވިއްޖެ');
+        alert('އެޑް ކުރެވިއްޖެ');
         document.getElementById('bulkStudents').value = '';
     }
     
