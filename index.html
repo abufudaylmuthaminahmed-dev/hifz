@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V9.2 (Fixed Layout)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - V9.3 (Fixed)</title>
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase SDK -->
@@ -11,338 +11,255 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        /* FONTS */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Thaana:wght@400;700&display=swap');
         @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
         @font-face { font-family: 'Mv Waheed'; src: local('Mv Waheed'), local('Mv Waheed-Regular'); }
         
         :root {
             --primary: #2c3e50;
-            --secondary: #34495e;
             --accent: #27ae60;
-            --highlight: #f39c12;
-            --bg: #f4f6f8;
-            --sidebar-w: 280px;
+            --student: #e67e22;
+            --bg: #f4f7f6;
         }
 
-        * { box-sizing: border-box; outline: none; }
-        
-        body {
-            font-family: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            background-color: var(--bg);
-            margin: 0; padding: 0;
-            height: 100vh; overflow: hidden;
-            color: #333;
-        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Faruma', 'Noto Sans Thaana', sans-serif; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        h1, h2, h3 { font-family: 'Mv Waheed', 'Faruma'; margin: 0; }
 
-        h1, h2, h3 { font-family: 'Mv Waheed', 'Faruma', sans-serif; margin: 0 0 10px 0; }
-        button { font-family: inherit; cursor: pointer; }
-
-        /* --- LAYOUT UTILS --- */
-        .hidden { display: none !important; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .center { align-items: center; justify-content: center; }
-        .gap-10 { gap: 10px; }
-        .w-full { width: 100%; }
-
-        /* --- FULL SCREEN OVERLAYS --- */
-        #loading-overlay, #login-screen {
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9999; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
         }
-        #loading-overlay { background: white; }
-        #login-screen { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
-
-        /* --- LOGIN BOX --- */
         .login-box {
-            background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; color: #333;
+            background: white; padding: 30px; border-radius: 15px; width: 320px;
+            text-align: center; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         .login-input {
-            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd;
-            border-radius: 8px; font-size: 16px; text-align: center;
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc;
+            border-radius: 8px; text-align: center; font-size: 16px;
         }
         .btn-big {
-            width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: bold; transition: 0.2s;
+            width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: bold; cursor: pointer; color: white;
         }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-accent { background: var(--accent); color: white; }
 
-        /* --- MAIN DASHBOARD LAYOUT --- */
-        .app-container { display: flex; height: 100vh; width: 100%; overflow: hidden; }
-
-        /* SIDEBAR */
+        /* --- APP LAYOUT --- */
+        #app-container { display: none; width: 100%; height: 100%; }
+        
         .sidebar {
-            width: var(--sidebar-w); background: white; border-left: 1px solid #ddd;
-            display: flex; flex-direction: column; flex-shrink: 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05); z-index: 100;
+            width: 280px; background: white; border-left: 1px solid #ddd;
+            display: flex; flex-direction: column; z-index: 100;
         }
-        .sidebar-header { padding: 20px; background: var(--primary); color: white; }
-        .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
+        .main-content { flex: 1; padding: 15px; overflow-y: auto; position: relative; }
         
-        /* STUDENT CARD IN SIDEBAR */
-        .student-card {
-            background: white; border: 1px solid #eee; padding: 10px; border-radius: 8px;
-            margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.2s;
-        }
-        .student-card:hover { background: #eafaf1; border-color: var(--accent); }
-        .student-card.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .student-card.active .id-badge { background: white; color: var(--accent); }
-        
-        .st-avatar { 
-            width: 35px; height: 35px; background: #eee; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555;
-        }
-        .id-badge {
-            font-size: 10px; background: #eee; color: #555; padding: 2px 6px; 
-            border-radius: 4px; font-family: sans-serif;
-        }
-
-        /* MAIN CONTENT AREA */
-        .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .top-bar {
-            padding: 15px; background: white; border-bottom: 1px solid #ddd;
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-        }
-        .scrollable-content { flex: 1; overflow-y: auto; padding: 20px; }
-
-        /* MUSHAF PANEL */
-        .mushaf-panel {
-            width: 0; background: #34495e; overflow: hidden;
-            transition: width 0.3s ease; display: flex; flex-direction: column;
-            border-right: 1px solid #ccc;
-        }
-        .mushaf-panel.open { width: 35%; }
-        .mushaf-img { max-width: 100%; display: block; }
-        .mistake-dot {
-            position: absolute; width: 24px; height: 24px; background: rgba(231, 76, 60, 0.8);
-            border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
-            cursor: pointer; z-index: 10;
-        }
-
-        /* FORMS */
-        .entry-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .form-group { flex: 1; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 14px; }
-        .section-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .sec-btn { 
-            flex: 1; padding: 10px; border: 2px solid transparent; border-radius: 8px; 
-            cursor: pointer; text-align: center; font-weight: bold; background: #f8f9fa;
-        }
-        .sec-btn.active { background: white; border-color: var(--accent); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-        /* TABLE */
-        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .data-table th, .data-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: right; }
-        .data-table th { background: #f8f9fa; color: #555; }
-
-        /* MOBILE RESPONSIVE */
+        /* Mobile */
         @media (max-width: 768px) {
-            .sidebar { position: fixed; top: 0; right: 0; height: 100%; transform: translateX(100%); width: 280px; }
+            #app-container { flex-direction: column; }
+            .sidebar { 
+                position: fixed; top: 0; right: 0; height: 100%; transform: translateX(100%); 
+                transition: transform 0.3s; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            }
             .sidebar.open { transform: translateX(0); }
-            .mushaf-panel.open { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; }
-            .mobile-menu-btn { display: block !important; font-size: 24px; cursor: pointer; }
-            .desktop-only { display: none; }
-            .form-row { flex-direction: column; gap: 5px; }
         }
-        .mobile-menu-btn { display: none; }
 
-        /* UTILS */
-        .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; font-family: inherit;}
-        .btn-sm { font-size: 12px; padding: 4px 8px; }
+        /* --- COMPONENTS --- */
+        .student-card {
+            background: white; border: 1px solid #eee; padding: 10px; margin-bottom: 5px;
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+        }
+        .student-card:hover, .student-card.active { background: #eafaf1; border-color: var(--accent); }
+        .st-avatar {
+            width: 35px; height: 35px; background: #eee; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+        
+        .entry-form { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+
+        /* Section Tabs */
+        .section-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .sec-tab { flex: 1; padding: 10px; text-align: center; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .sec-tab.active { color: white; }
+        #tab-new.active { background: var(--accent); }
+        #tab-short.active { background: #3498db; }
+        #tab-long.active { background: #e67e22; }
+        #tab-exam.active { background: #f1c40f; color: black; }
+
+        /* Mushaf */
+        .mushaf-panel {
+            position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: 2000;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+        }
+        .mushaf-content {
+            background: white; width: 95%; height: 95%; max-width: 600px; border-radius: 10px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .mushaf-img-wrapper { flex: 1; overflow: auto; position: relative; background: #fdfdfd; display:flex; justify-content:center;}
+        .mushaf-img { max-width: 100%; display: block; }
+        
+        .mistake-dot {
+            position: absolute; width: 20px; height: 20px; background: rgba(231,76,60,0.8);
+            border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%);
+        }
+
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
         .bg-green { background: var(--accent); }
         .bg-blue { background: #3498db; }
         .bg-red { background: #e74c3c; }
-        .bg-grey { background: #95a5a6; }
 
-        /* MODAL */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 5000; display: flex; align-items: center; justify-content: center; }
-        .modal-box { background: white; width: 500px; max-width: 95%; max-height: 90vh; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 15px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 20px; overflow-y: auto; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- LOADING -->
-    <div id="loading-overlay">
-        <h3>...ޑޭޓާބޭސް އަށް ގުޅަނީ</h3>
-        <div style="margin-top:10px; width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite;"></div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-    </div>
-
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="hidden">
-        <div class="login-box">
-            <h2>ޙިފްޡް ޕްރޮގްރާމް V9.2</h2>
-            <div id="role-select">
-                <button class="btn-big btn-accent" onclick="toggleLoginView('student')">🎓 ދަރިވަރުން</button>
-                <button class="btn-big btn-primary" onclick="toggleLoginView('teacher')">👨‍🏫 މުދައްރިސް</button>
-            </div>
-            
-            <div id="login-form" class="hidden">
-                <h3 id="login-title">Login</h3>
-                <input type="text" id="login-id" class="login-input" placeholder="ID / Username">
-                <input type="password" id="login-pass" class="login-input" placeholder="Password">
-                <button class="btn-big btn-green" onclick="processLogin()">ވަންނަވާ</button>
-                <button class="btn-big btn-grey" onclick="toggleLoginView('back')">ފަހަތަށް</button>
-            </div>
+    <div id="login-screen">
+        <div class="login-box" id="role-view">
+            <h2>ޙިފްޡް ޕްރޮގްރާމް V9.3</h2>
+            <button class="btn-big" style="background:var(--student);" onclick="showLogin('student')">🎓 ދަރިވަރުން</button>
+            <button class="btn-big" style="background:var(--primary);" onclick="showLogin('teacher')">👨‍🏫 މުދައްރިސް</button>
+        </div>
+
+        <div class="login-box hidden" id="login-form-view">
+            <h3 id="login-title">Login</h3>
+            <input type="text" id="login-id" class="login-input" placeholder="ID / User">
+            <input type="password" id="login-pass" class="login-input" placeholder="Password">
+            <button class="btn-big bg-green" onclick="processLogin()">Login</button>
+            <button class="btn-big bg-red" onclick="backToRole()">Back</button>
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div id="app-container" class="app-container hidden">
+    <!-- MAIN APP -->
+    <div id="app-container">
         
-        <!-- SIDEBAR (Teacher & Student Shared Structure) -->
-        <aside class="sidebar" id="mainSidebar">
-            <div class="sidebar-header">
-                <div class="flex" style="justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0; color:white;" id="sidebarTitle">މުދައްރިސް</h3>
-                    <span onclick="toggleSidebar()" style="cursor:pointer; font-size:24px;">&times;</span>
-                </div>
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div style="padding:15px; background:var(--primary); color:white; display:flex; justify-content:space-between;">
+                <h3 id="sidebar-title">Menu</h3>
+                <span onclick="toggleSidebar()" style="cursor:pointer; font-size:24px;">&times;</span>
             </div>
             
-            <!-- Filter Controls (Teacher Only) -->
-            <div id="teacher-controls" style="padding:10px; background:#f8f9fa; border-bottom:1px solid #ddd;">
-                <select id="classSelect" onchange="loadStudents(this.value)" style="width:100%; margin-bottom:5px;"></select>
-                <div class="flex gap-10">
-                    <button class="btn bg-blue w-full btn-sm" onclick="openModal('settings')">⚙️ ސެޓިންގްސް</button>
-                    <button class="btn bg-grey w-full btn-sm" onclick="logout()">🚪 Logout</button>
+            <div id="teacher-controls" style="padding:10px; border-bottom:1px solid #eee;">
+                <select id="classSelect" onchange="loadStudents(this.value)" style="width:100%; padding:10px;"></select>
+                <div style="margin-top:5px; display:flex; gap:5px;">
+                    <button class="btn bg-blue" style="flex:1; font-size:12px;" onclick="openSettings()">⚙️ Settings</button>
+                    <button class="btn bg-red" onclick="location.reload()">🚪</button>
                 </div>
             </div>
 
-            <!-- Student Info (Student Only) -->
-            <div id="student-controls" class="hidden" style="padding:10px; text-align:center; background:#f8f9fa;">
-                <h4 id="stNameDisplay" style="margin:0; color:var(--primary);">Name</h4>
-                <span id="stIdDisplay" class="id-badge">ID</span>
-                <button class="btn bg-red w-full btn-sm" style="margin-top:5px;" onclick="logout()">🚪 Logout</button>
-            </div>
-
-            <!-- Student List -->
-            <div id="studentList" class="sidebar-content">
-                <!-- Students Generated Here -->
+            <div id="studentList" style="flex:1; overflow-y:auto; padding:10px;">
+                <!-- Students go here -->
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="content-area">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <div class="flex center gap-10">
-                    <span class="mobile-menu-btn" onclick="toggleSidebar()">☰</span>
+        <!-- CONTENT -->
+        <main class="main-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; border-radius:10px; margin-bottom:20px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span onclick="toggleSidebar()" style="font-size:24px; cursor:pointer; color:var(--primary);">☰</span>
                     <div>
-                        <h2 id="mainHeader" style="margin:0; color:var(--primary);">Dashboard</h2>
-                        <small id="subHeader" style="color:#777;">Select a student</small>
+                        <h2 id="page-header" style="color:var(--primary); margin:0;">Dashboard</h2>
+                        <small id="page-sub" style="color:#777;">Welcome</small>
                     </div>
                 </div>
-                <div class="flex gap-10">
-                    <button class="btn bg-green" onclick="exportData()">Excel</button>
-                    <button class="btn bg-blue" onclick="toggleMushaf()">📖 <span class="desktop-only">މުޞްޙަފް</span></button>
-                </div>
+                <button class="btn bg-blue" onclick="toggleMushaf(true)">📖 Mushaf</button>
             </div>
 
-            <!-- Scrollable Area -->
-            <div class="scrollable-content">
-                
-                <!-- TEACHER: Entry Form -->
-                <div id="entryForm" class="entry-box hidden">
+            <!-- TEACHER FORM -->
+            <div id="teacher-entry" class="entry-form hidden">
+                <div class="form-row">
+                    <div style="flex:1"><label>Date</label><input type="date" id="entryDate"></div>
+                </div>
+
+                <div class="section-tabs">
+                    <div class="sec-tab active" id="tab-new" onclick="setSection('new')">New</div>
+                    <div class="sec-tab" id="tab-short" onclick="setSection('short')">Short</div>
+                    <div class="sec-tab" id="tab-long" onclick="setSection('long')">Long</div>
+                    <div class="sec-tab" id="tab-exam" onclick="setSection('exam')">Exam</div>
+                </div>
+
+                <!-- Daily Inputs -->
+                <div id="daily-inputs">
                     <div class="form-row">
-                        <div class="form-group"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
-                        <div class="form-group"><label>ބާވަތް</label>
-                            <select id="lessonType" onchange="toggleLessonType(this.value)">
-                                <option value="daily">ފިލާވަޅު</option>
-                                <option value="exam">އިމްތިޙާން</option>
-                            </select>
-                        </div>
+                        <div style="flex:0.5"><label>Page</label><input type="number" id="inpPage" onchange="loadMushaf(this.value)"></div>
+                        <div style="flex:1"><label>Surah</label><select id="inpSurah" class="arabic-input"><option>...</option></select></div>
+                        <div style="flex:0.5"><label>Start</label><input type="number" id="inpStart"></div>
+                        <div style="flex:0.5"><label>End</label><input type="number" id="inpEnd"></div>
                     </div>
-
-                    <!-- Daily Lesson Sections -->
-                    <div id="daily-sections">
-                        <div class="section-selector">
-                            <div class="sec-btn active" id="btn-new" onclick="setSection('new')">އާ ފިލާވަޅު</div>
-                            <div class="sec-btn" id="btn-short" onclick="setSection('short')">ކުރު މުރާޖަޢާ</div>
-                            <div class="sec-btn" id="btn-long" onclick="setSection('long')">ދިގު މުރާޖަޢާ</div>
-                        </div>
-
-                        <!-- Dynamic Inputs based on active section -->
-                        <div class="form-row">
-                            <div style="flex:1"><label>ޞަފްޙާ</label><input type="number" id="inpPage" placeholder="#" onchange="handlePage(this.value)"></div>
-                            <div style="flex:2"><label>ފެށޭ</label><div class="flex gap-10"><select id="inpSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpStart" placeholder="Verse"></div></div>
-                            <div style="flex:2"><label>ނިމޭ</label><div class="flex gap-10"><select id="inpEndSurah" class="arabic-input"><option>...</option></select><input type="number" id="inpEnd" placeholder="Verse"></div></div>
-                            <div style="flex:1"><label>ކުށް</label><input type="number" id="inpMistakes" value="0" readonly style="background:#eee; font-weight:bold; text-align:center;"></div>
-                        </div>
+                    <div class="form-row">
+                         <div style="flex:1; display:flex; align-items:center; gap:5px; background:#eee; padding:5px; border-radius:5px;">
+                            <button class="btn bg-red" onclick="adjM(1)">+</button>
+                            <span style="font-weight:bold;">Mistakes: </span>
+                            <input id="inpMistakes" value="0" readonly style="width:50px; text-align:center; border:none; background:transparent; font-weight:bold;">
+                            <button class="btn bg-green" onclick="adjM(-1)">-</button>
+                         </div>
                     </div>
-
-                    <!-- Exam Section -->
-                    <div id="exam-section" class="hidden">
-                        <div class="form-row">
-                            <div style="flex:1"><label>ޖުޒުއު</label><input type="text" id="examJuzu" placeholder="30"></div>
-                            <div style="flex:1"><label>މިންވަރު</label>
-                                <select id="examPortion" onchange="calcExam()">
-                                    <option value="whole">މުޅި</option>
-                                    <option value="half">1/2</option>
-                                </select>
-                            </div>
-                            <div style="flex:1"><label>މާކްސް</label><h3 id="examMark" style="margin:0; color:blue;">100%</h3></div>
-                        </div>
-                        <div class="form-row">
-                            <div style="flex:1"><label>ޓީޗަރު (-2)</label><input type="number" id="examT" value="0" onchange="calcExam()"></div>
-                            <div style="flex:1"><label>އަމިއްލަ (-1)</label><input type="number" id="examS" value="0" onchange="calcExam()"></div>
-                            <div style="flex:1"><label>ތަޖްވީދު (10)</label><input type="number" id="examTaj" value="10" onchange="calcExam()"></div>
-                        </div>
-                    </div>
-
-                    <button class="btn bg-green w-full" style="margin-top:10px; padding:12px;" onclick="saveData()">💾 ސޭވް</button>
                 </div>
 
-                <!-- HISTORY TABLE -->
-                <div style="margin-top:20px;">
-                    <h3>ރެކޯޑްތައް</h3>
-                    <div id="historyList"></div>
+                <!-- Exam Inputs -->
+                <div id="exam-inputs" class="hidden">
+                    <div class="form-row">
+                        <div style="flex:1"><label>Juzu</label><input type="text" id="exJuzu"></div>
+                        <div style="flex:1"><label>Score</label><input type="text" id="exScore" placeholder="100%"></div>
+                    </div>
                 </div>
 
+                <button class="btn bg-green" style="width:100%; margin-top:10px;" onclick="saveData()">SAVE RECORD</button>
             </div>
+
+            <!-- HISTORY -->
+            <div id="history-container"></div>
         </main>
 
-        <!-- MUSHAF PANEL -->
-        <aside class="mushaf-panel" id="mushafPanel">
-            <div class="mushaf-header">
-                <span id="mushafTitle">Page 1</span>
-                <div>
-                    <button class="btn btn-sm bg-grey" onclick="changePage(1)">Next</button>
-                    <button class="btn btn-sm bg-red" onclick="toggleMushaf()">Close</button>
+        <!-- MUSHAF MODAL -->
+        <div id="mushaf-modal" class="mushaf-panel">
+            <div class="mushaf-content">
+                <div style="padding:10px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Mushaf View</span>
+                    <button class="btn bg-red" style="padding:5px 10px;" onclick="toggleMushaf(false)">Close</button>
                 </div>
-            </div>
-            <div class="mushaf-container">
-                <div style="position:relative; display:inline-block;" id="mushafWrapper" onclick="placeDot(event)">
+                <div style="padding:10px; text-align:center; background:#eee;">
+                    <button onclick="changePage(1)">Next</button>
+                    <input type="number" id="navPage" style="width:50px; text-align:center;" onchange="loadMushaf(this.value)">
+                    <button onclick="changePage(-1)">Prev</button>
+                </div>
+                <div class="mushaf-img-wrapper" id="mushafWrapper" onclick="placeDot(event)">
                     <img id="mushafImg" class="mushaf-img" src="">
                 </div>
             </div>
-        </aside>
+        </div>
 
     </div>
 
-    <!-- MODAL (Settings/Student Info) -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="modalTitle">Settings</h3>
-                <span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span>
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="mushaf-panel" style="background:rgba(0,0,0,0.5);">
+        <div class="mushaf-content" style="height:auto; max-height:80%;">
+             <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                <h3>Settings</h3>
+                <span onclick="document.getElementById('settings-modal').style.display='none'" style="cursor:pointer; font-size:24px;">&times;</span>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content injected by JS -->
+            <div style="padding:20px;">
+                <label>Add Class:</label>
+                <div style="display:flex; gap:5px; margin-bottom:15px;">
+                    <input id="newClassName" placeholder="Name">
+                    <button class="btn bg-blue" onclick="createClass()">Add</button>
+                </div>
+                <label>Import Students (Name IUM123):</label>
+                <textarea id="bulkData" style="width:100%; height:100px; margin-bottom:5px;"></textarea>
+                <button class="btn bg-green w-100" onclick="importStudents()">Import</button>
+                <hr>
+                <button class="btn bg-blue w-100" onclick="downloadBackup()">Download Backup</button>
             </div>
         </div>
     </div>
 
 <script>
-    // --- CONFIG ---
-    // PASTE YOUR FIREBASE CONFIG HERE
+    // --- FIREBASE CONFIGURATION ---
+    // *** IMPORTANT: PASTE YOUR CONFIG HERE ***
     const firebaseConfig = {
       apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
       authDomain: "hifz-cde3b.firebaseapp.com",
@@ -361,76 +278,56 @@
 
     // --- STATE ---
     let appState = {
-        userRole: null, // 'teacher' or 'student'
+        role: null,
         classes: {},
         records: [],
         users: {},
-        currentClass: null,
-        currentStudent: null, // Full Name
-        activeSection: 'new', // new, short, long
-        currentPage: 1,
-        dots: [] // Current session dots
+        currClass: null,
+        currStudent: null, // Name
+        activeSec: 'new',
+        currPage: 1,
+        dots: []
     };
 
     const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الضف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الخاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","الطفيفين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","الهمزة","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
 
-    // --- INITIALIZE ---
+    // --- INIT ---
     window.onload = function() {
-        populateSurahDropdowns();
-        document.getElementById('entryDate').valueAsDate = new Date();
-        loadMushafImage(1);
+        // Populate Surahs
+        const sel = document.getElementById('inpSurah');
+        surahNames.forEach((s,i) => sel.innerHTML += `<option value="${i+1}">${i+1}. ${s}</option>`);
         
-        if(db) {
-            // Load Data
-            db.ref('/').on('value', snap => {
-                const data = snap.val() || {};
-                appState.classes = data.classes || {};
-                appState.users = data.users || {};
-                
-                // Convert records object to array
-                appState.records = [];
-                if(data.records) {
-                    Object.keys(data.records).forEach(k => {
-                        appState.records.push({ ...data.records[k], key: k });
-                    });
-                }
-                
-                // Refresh UI if logged in
-                if(appState.userRole === 'teacher') {
-                    renderClassDropdown();
-                    if(appState.currentStudent) renderHistory();
-                } else if (appState.userRole === 'student') {
-                    renderHistory(); // Filtered for student
-                }
+        document.getElementById('entryDate').valueAsDate = new Date();
+        loadMushaf(1);
 
-                document.getElementById('loading-overlay').classList.add('hidden');
-                if(!appState.userRole) document.getElementById('login-screen').style.display = 'flex';
+        if(db) {
+            db.ref('/').on('value', snap => {
+                const val = snap.val() || {};
+                appState.classes = val.classes || {};
+                appState.users = val.users || {};
+                
+                appState.records = [];
+                if(val.records) {
+                    Object.keys(val.records).forEach(k => appState.records.push({...val.records[k], key: k}));
+                }
+                
+                if(appState.role === 'teacher') renderClasses();
+                if(appState.currStudent) renderHistory();
             });
         }
     };
 
-    function populateSurahDropdowns() {
-        const selects = ['inpSurah', 'inpEndSurah'];
-        selects.forEach(id => {
-            const el = document.getElementById(id);
-            el.innerHTML = '<option>...</option>';
-            surahNames.forEach((s, i) => {
-                el.innerHTML += `<option value="${i+1}">${i+1}. ${s}</option>`;
-            });
-        });
+    // --- AUTH ---
+    function showLogin(role) {
+        appState.tempRole = role;
+        document.getElementById('role-view').classList.add('hidden');
+        document.getElementById('login-form-view').classList.remove('hidden');
+        document.getElementById('login-title').innerText = role === 'teacher' ? 'Teacher Login' : 'Student Login';
     }
 
-    // --- AUTH ---
-    function toggleLoginView(view) {
-        if(view === 'back') {
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('role-select').classList.remove('hidden');
-        } else {
-            document.getElementById('role-select').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('login-title').innerText = view === 'teacher' ? 'މުދައްރިސް ލޮގިން' : 'ދަރިވަރު ލޮގިން';
-            appState.tempRole = view;
-        }
+    function backToRole() {
+        document.getElementById('role-view').classList.remove('hidden');
+        document.getElementById('login-form-view').classList.add('hidden');
     }
 
     function processLogin() {
@@ -438,94 +335,66 @@
         const pass = document.getElementById('login-pass').value.trim();
         
         if(appState.tempRole === 'teacher') {
-            if(pass === '1234') {
-                appState.userRole = 'teacher';
-                showDashboard('teacher');
-            } else alert('Wrong Password');
+            if(pass === '1234') initApp('teacher');
+            else alert('Wrong password');
         } else {
-            // Student Login
-            let foundStudent = null;
-            let foundClass = null;
-            // Check ID in all classes
+            // Student Login Logic
+            let foundName = null, foundClass = null;
             Object.keys(appState.classes).forEach(c => {
-                const students = appState.classes[c].students || [];
-                students.forEach(s => {
-                    if(s.includes(id)) { foundStudent = s; foundClass = c; }
+                (appState.classes[c].students || []).forEach(s => {
+                    if(s.includes(id)) { foundName = s; foundClass = c; }
                 });
             });
 
-            if(foundStudent) {
-                // Check password or create default
-                if(!appState.users[id]) db.ref('users/'+id).set('1234');
+            if(foundName) {
+                // Check pass
+                if(!appState.users[id] && pass === '1234') db.ref('users/'+id).set('1234');
+                else if (appState.users[id] && appState.users[id] !== pass) return alert('Wrong Password');
                 
-                if(appState.users[id] && appState.users[id] !== pass && pass !== '1234') {
-                    alert('Wrong Password');
-                } else {
-                    appState.userRole = 'student';
-                    appState.currentStudent = foundStudent;
-                    appState.currentClass = foundClass;
-                    showDashboard('student');
-                }
+                appState.currClass = foundClass;
+                appState.currStudent = foundName;
+                initApp('student');
             } else {
                 alert('ID not found');
             }
         }
     }
 
-    function showDashboard(role) {
+    function initApp(role) {
+        appState.role = role;
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').classList.remove('hidden');
+        document.getElementById('app-container').style.display = 'flex';
         
         if(role === 'teacher') {
+            renderClasses();
             document.getElementById('teacher-controls').classList.remove('hidden');
-            document.getElementById('student-controls').classList.add('hidden');
-            renderClassDropdown();
+            document.getElementById('sidebar-title').innerText = "Teacher Panel";
         } else {
             document.getElementById('teacher-controls').classList.add('hidden');
-            document.getElementById('student-controls').classList.remove('hidden');
-            document.getElementById('stNameDisplay').innerText = appState.currentStudent;
-            document.getElementById('entryForm').classList.add('hidden'); // Hide entry form for student
-            document.getElementById('mainHeader').innerText = "Student Portal";
+            document.getElementById('sidebar-title').innerText = "Student Panel";
+            document.getElementById('page-header').innerText = appState.currStudent;
             renderHistory();
         }
     }
 
-    function logout() { location.reload(); }
-
-    // --- SIDEBAR & LISTS ---
-    function renderClassDropdown() {
+    // --- TEACHER ---
+    function renderClasses() {
         const sel = document.getElementById('classSelect');
         sel.innerHTML = '';
-        const classes = Object.keys(appState.classes);
-        classes.forEach(c => {
-            sel.innerHTML += `<option value="${c}">${c}</option>`;
-        });
-        if(classes.length > 0 && !appState.currentClass) loadStudents(classes[0]);
+        Object.keys(appState.classes).forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+        if(Object.keys(appState.classes).length > 0 && !appState.currClass) loadStudents(Object.keys(appState.classes)[0]);
     }
 
-    function loadStudents(className) {
-        appState.currentClass = className;
+    function loadStudents(cls) {
+        appState.currClass = cls;
         const list = document.getElementById('studentList');
         list.innerHTML = '';
-        
-        const students = appState.classes[className]?.students || [];
-        students.forEach(s => {
+        (appState.classes[cls].students || []).forEach(s => {
             const div = document.createElement('div');
             div.className = 'student-card';
-            // Parse Name and ID
-            let name = s; let id = "";
-            if(s.includes("IUM")) {
-                const p = s.split("IUM"); name = p[0]; id = "IUM"+p[1];
-            } else if (s.includes("(")) {
-                const p = s.split("("); name = p[0]; id = p[1].replace(")","");
-            }
-            
             div.innerHTML = `
-                <div class="st-avatar">${name.trim().charAt(0)}</div>
-                <div>
-                    <div style="font-weight:bold;">${name}</div>
-                    ${id ? `<span class="id-badge">${id}</span>` : ''}
-                </div>
+                <div class="st-avatar">${s.charAt(0)}</div>
+                <div style="font-weight:bold;">${s.split('IUM')[0]}</div>
             `;
             div.onclick = () => selectStudent(s, div);
             list.appendChild(div);
@@ -533,140 +402,70 @@
     }
 
     function selectStudent(name, el) {
-        appState.currentStudent = name;
+        appState.currStudent = name;
         document.querySelectorAll('.student-card').forEach(e => e.classList.remove('active'));
         el.classList.add('active');
         
-        document.getElementById('mainHeader').innerText = name;
-        document.getElementById('subHeader').innerText = appState.currentClass;
-        document.getElementById('entryForm').classList.remove('hidden');
+        document.getElementById('page-header').innerText = name.split('IUM')[0];
+        document.getElementById('page-sub').innerText = name.includes('IUM') ? 'ID: ' + name.split('Name')[1] : '';
         
-        // Clear Form & Load Data
-        clearInputs();
-        appState.dots = [];
-        loadMushafImage(1);
-        autoFill();
-        renderHistory();
-        
+        document.getElementById('teacher-entry').classList.remove('hidden');
         if(window.innerWidth <= 768) toggleSidebar();
-    }
-
-    // --- MAIN LOGIC (AutoFill, Save, etc) ---
-    function setSection(sec) {
-        appState.activeSection = sec;
-        document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+sec).classList.add('active');
-        // Clear inputs for this section to avoid confusion or reload from autofill
-        autoFill(); 
-    }
-
-    function autoFill() {
-        if(!appState.currentStudent) return;
-        // Logic to find last lesson and populate inputs
-        // Simplified for this version
-        const myRecs = appState.records.filter(r => r.student === appState.currentStudent && r.type === 'daily');
-        myRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
         
-        if(myRecs.length > 0) {
-            const last = myRecs[0][appState.activeSection];
-            if(last && last.en) {
-                // Try to find next page logic here...
-            }
-        }
-    }
-
-    function saveData() {
-        const type = document.getElementById('lessonType').value;
-        const rec = {
-            id: Date.now(),
-            date: document.getElementById('entryDate').value,
-            class: appState.currentClass,
-            student: appState.currentStudent,
-            type: type
-        };
-
-        if(type === 'daily') {
-            const sec = appState.activeSection;
-            rec[sec] = {
-                s: surahNames[document.getElementById('inpSurah').value - 1] || 'Unknown',
-                st: document.getElementById('inpStart').value,
-                en: document.getElementById('inpEnd').value,
-                m: document.getElementById('inpMistakes').value,
-                dots: appState.dots
-            };
-        } else {
-            rec.juzu = document.getElementById('examJuzu').value;
-            rec.score = document.getElementById('examTotal').innerText;
-        }
-
-        db.ref('records').push(rec);
-        alert('Saved');
         appState.dots = [];
         clearInputs();
-        loadMushafImage(appState.currentPage); // Clear dots visually
+        renderHistory();
     }
 
-    function renderHistory() {
-        const div = document.getElementById('historyList');
-        div.innerHTML = '';
-        const recs = appState.records.filter(r => r.student === appState.currentStudent);
-        recs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        recs.forEach(r => {
-            let html = `<div style="background:white; border-radius:8px; padding:10px; margin-bottom:10px; border-right:4px solid ${r.type==='exam'?'orange':'green'}; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div class="flex" style="justify-content:space-between;">
-                    <strong>${r.date}</strong>
-                    ${appState.userRole === 'teacher' ? `<button style="color:red; background:none; border:none;" onclick="deleteRec('${r.key}')">×</button>` : ''}
-                </div>`;
-            
-            if(r.type === 'daily') {
-                ['new', 'short', 'long'].forEach(s => {
-                    if(r[s]) {
-                        const dotsData = encodeURIComponent(JSON.stringify(r[s].dots || []));
-                        html += `<div style="margin-top:5px; font-size:14px;">
-                            <span style="font-weight:bold; color:#555">${s.toUpperCase()}:</span> 
-                            ${r[s].s} (${r[s].st}-${r[s].en}) - <span style="color:red">${r[s].m} Mist.</span>
-                            ${r[s].dots ? `<button class="btn-sm bg-blue" onclick="viewDots('${dotsData}')">👁️</button>` : ''}
-                        </div>`;
-                    }
-                });
-            } else {
-                html += `<div>Exam Juzu ${r.juzu}: ${r.score}</div>`;
-            }
-            html += `</div>`;
-            div.innerHTML += html;
-        });
-    }
-
-    // --- MUSHAF ---
-    function toggleMushaf(forceOpen) {
-        const p = document.getElementById('mushafPanel');
-        if(forceOpen || !p.classList.contains('open')) p.classList.add('open');
-        else p.classList.remove('open');
-    }
-    
-    function loadMushafImage(page) {
-        if(!page) return;
-        appState.currentPage = page;
-        document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${page.toString().padStart(3,'0')}.png`;
-        document.getElementById('mushafTitle').innerText = "Page " + page;
+    // --- FORM & MUSHAF ---
+    function setSection(sec) {
+        appState.activeSec = sec;
+        document.querySelectorAll('.sec-tab').forEach(e => e.classList.remove('active'));
+        document.getElementById('tab-'+sec).classList.add('active');
         
-        // Remove existing dots
+        if(sec === 'exam') {
+            document.getElementById('daily-inputs').classList.add('hidden');
+            document.getElementById('exam-inputs').classList.remove('hidden');
+        } else {
+            document.getElementById('daily-inputs').classList.remove('hidden');
+            document.getElementById('exam-inputs').classList.add('hidden');
+        }
+        
+        // Auto fill would trigger here
+        appState.dots = [];
+        loadMushaf(appState.currPage);
+    }
+
+    function loadMushaf(p) {
+        if(!p) return;
+        appState.currPage = parseInt(p);
+        document.getElementById('navPage').value = appState.currPage;
+        document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${appState.currPage.toString().padStart(3,'0')}.png`;
+        
+        // Clear dots
         document.querySelectorAll('.mistake-dot').forEach(e => e.remove());
-        
         // Draw session dots
         appState.dots.forEach(d => {
-            if(d.page == page) drawDot(d.x, d.y);
+            if(d.p == appState.currPage) drawDot(d.x, d.y);
         });
+    }
+    
+    function changePage(d) { loadMushaf(appState.currPage + d); }
+    function toggleMushaf(show) { 
+        const p = document.getElementById('mushaf-modal');
+        p.style.display = show ? 'flex' : 'none';
+    }
+    function toggleSidebar() { 
+        document.getElementById('sidebar').classList.toggle('open');
     }
 
     function placeDot(e) {
-        if(appState.userRole !== 'teacher') return;
+        if(appState.role !== 'teacher') return;
         const rect = e.target.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        appState.dots.push({x, y, page: appState.currentPage});
+        appState.dots.push({x, y, p: appState.currPage});
         document.getElementById('inpMistakes').value = parseInt(document.getElementById('inpMistakes').value) + 1;
         drawDot(x, y);
     }
@@ -677,80 +476,126 @@
         d.style.left = x + 'px'; d.style.top = y + 'px';
         document.getElementById('mushafWrapper').appendChild(d);
     }
-
-    function viewDots(data) {
-        const dots = JSON.parse(decodeURIComponent(data));
-        if(!dots || dots.length === 0) return alert("No mistakes marked");
-        
-        // Load the page of the first dot
-        loadMushafImage(dots[0].page);
-        toggleMushaf(true);
-        
-        // Draw readonly dots
-        setTimeout(() => {
-            dots.forEach(d => {
-                const dot = document.createElement('div');
-                dot.className = 'mistake-dot readonly';
-                dot.style.left = d.x + 'px'; dot.style.top = d.y + 'px';
-                dot.style.background = 'gold';
-                document.getElementById('mushafWrapper').appendChild(dot);
-            });
-        }, 500); // Slight delay for image load
-    }
-
-    function changePage(d) { loadMushafImage(parseInt(appState.currentPage) + d); }
-    function handlePage(v) { loadMushafImage(v); }
-    function adjM(id, val) { 
-        // Not used in simplified HTML structure but good to keep logic
-    }
     
-    // --- UTILS ---
-    function toggleSidebar() { document.getElementById('mainSidebar').classList.toggle('open'); }
-    function toggleLessonType(val) {
-        document.getElementById('daily-sections').style.display = val === 'daily' ? 'block' : 'none';
-        document.getElementById('exam-section').style.display = val === 'exam' ? 'block' : 'none';
+    function adjM(val) {
+        const el = document.getElementById('inpMistakes');
+        el.value = Math.max(0, parseInt(el.value) + val);
     }
+
     function clearInputs() {
         document.getElementById('inpStart').value = '';
         document.getElementById('inpEnd').value = '';
-        document.getElementById('inpMistakes').value = '0';
-    }
-    function deleteRec(k) { if(confirm('Delete?')) db.ref('records/'+k).remove(); }
-    
-    // --- MODAL ---
-    function openModal(type) {
-        const modal = document.getElementById('modal');
-        const body = document.getElementById('modalBody');
-        const title = document.getElementById('modalTitle');
-        modal.classList.remove('hidden');
-        
-        if(type === 'settings') {
-            title.innerText = "Settings & Backup";
-            body.innerHTML = `
-                <label>Add Class:</label><div class="flex gap-10"><input id="newCls"><button class="btn bg-blue" onclick="addClass()">Add</button></div>
-                <hr>
-                <label>Add Students (Bulk):</label>
-                <textarea id="bulkSt" style="width:100%; height:100px; border:1px solid #ddd;" placeholder="Name IUM123"></textarea>
-                <button class="btn bg-green w-full" onclick="addBulk()">Add to ${appState.currentClass}</button>
-                <hr>
-                <button class="btn bg-grey w-full" onclick="alert('Student Passwords managed automatically (1234)')">Manage Passwords</button>
-            `;
-        }
-    }
-    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-    
-    function addClass() {
-        const n = document.getElementById('newCls').value;
-        if(n) { db.ref('classes/'+n).set({students:[]}); alert('Done'); }
-    }
-    function addBulk() {
-        const txt = document.getElementById('bulkSt').value;
-        const arr = txt.split('\n').filter(s=>s.trim());
-        const current = appState.classes[appState.currentClass].students || [];
-        db.ref('classes/'+appState.currentClass+'/students').set([...current, ...arr]);
-        alert('Done');
+        document.getElementById('inpMistakes').value = 0;
     }
 
+    // --- SAVE ---
+    function saveData() {
+        if(!appState.currStudent) return alert('Select Student');
+        
+        const sec = appState.activeSec;
+        let rec = {
+            id: Date.now(),
+            date: document.getElementById('entryDate').value,
+            class: appState.currClass,
+            student: appState.currStudent,
+            type: sec === 'exam' ? 'exam' : 'daily'
+        };
+
+        if(rec.type === 'daily') {
+            rec[sec] = {
+                s: surahNames[document.getElementById('inpSurah').value - 1],
+                st: document.getElementById('inpStart').value,
+                en: document.getElementById('inpEnd').value,
+                m: document.getElementById('inpMistakes').value,
+                dots: appState.dots
+            };
+        } else {
+            rec.juzu = document.getElementById('exJuzu').value;
+            rec.score = document.getElementById('exScore').value;
+        }
+
+        db.ref('records').push(rec);
+        alert('Saved');
+        appState.dots = [];
+        clearInputs();
+        loadMushaf(appState.currPage);
+    }
+
+    function renderHistory() {
+        const div = document.getElementById('history-container');
+        div.innerHTML = '';
+        const recs = appState.records.filter(r => r.student === appState.currStudent);
+        recs.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        recs.forEach(r => {
+            let html = `<div style="background:white; padding:10px; margin-bottom:10px; border-radius:8px; border-left:4px solid var(--primary); box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                <div class="flex" style="justify-content:space-between; font-weight:bold; color:#555;">
+                    <span>${r.date}</span>
+                    ${appState.role === 'teacher' ? `<span style="color:red; cursor:pointer;" onclick="delRec('${r.key}')">×</span>` : ''}
+                </div>`;
+            
+            if(r.type === 'daily') {
+                ['new', 'short', 'long'].forEach(s => {
+                    if(r[s]) {
+                        const dotsData = encodeURIComponent(JSON.stringify(r[s].dots || []));
+                        html += `<div style="margin-top:5px; font-size:14px;">
+                            <span style="color:var(--accent); font-weight:bold;">${s.toUpperCase()}</span>: 
+                            ${r[s].s || ''} (${r[s].st}-${r[s].en}) 
+                            <span style="color:red;">(${r[s].m} Mist.)</span>
+                            ${r[s].dots ? `<button class="btn-sm bg-blue" onclick="viewDots('${dotsData}')">View</button>` : ''}
+                        </div>`;
+                    }
+                });
+            } else {
+                html += `<div>Exam: ${r.juzu} - ${r.score}</div>`;
+            }
+            div.innerHTML += html + `</div>`;
+        });
+    }
+
+    function delRec(k) { if(confirm('Delete?')) db.ref('records/'+k).remove(); }
+
+    function viewDots(data) {
+        const dots = JSON.parse(decodeURIComponent(data));
+        if(!dots || !dots.length) return alert('No mistakes');
+        
+        loadMushaf(dots[0].p);
+        toggleMushaf(true);
+        setTimeout(() => {
+            dots.forEach(d => {
+                const dot = document.createElement('div');
+                dot.className = 'mistake-dot';
+                dot.style.background = 'gold'; // Readonly color
+                dot.style.left = d.x + 'px'; dot.style.top = d.y + 'px';
+                document.getElementById('mushafWrapper').appendChild(dot);
+            });
+        }, 500);
+    }
+
+    // --- SETTINGS ---
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function openModal(t) { if(t==='settings') openSettings(); }
+    
+    function createClass() {
+        const n = document.getElementById('newClassName').value;
+        if(n) { db.ref('classes/'+n).set({students:[]}); alert('Created'); }
+    }
+    
+    function importStudents() {
+        const c = appState.currClass;
+        const txt = document.getElementById('bulkData').value;
+        const list = txt.split('\n').filter(s=>s.trim());
+        const old = appState.classes[c]?.students || [];
+        db.ref('classes/'+c+'/students').set([...new Set([...old, ...list])]);
+        alert('Imported');
+    }
+    
+    function downloadBackup() {
+        const data = { classes: appState.classes, records: appState.records };
+        const a = document.createElement('a');
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        a.download = "backup.json"; a.click();
+    }
 </script>
 </body>
 </html>
