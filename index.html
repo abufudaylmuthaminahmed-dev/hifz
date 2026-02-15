@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Mobile Ready v7.0</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v8.0 Dhivehi</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -28,7 +28,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: var(--font-body);
+            font-family: var(--font-body) !important; /* Force Faruma everywhere */
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
@@ -37,8 +37,12 @@
             font-size: 16px;
         }
         
-        h1, h2, h3, h4, h5, h6, .modal-header h3, .login-title, label, th, .tab-btn, .section-label {
-            font-family: var(--font-heading);
+        h1, h2, h3, h4, h5, h6, .modal-header h3, .login-title, label, th, .tab-btn, .section-label, .exam-header {
+            font-family: var(--font-heading) !important;
+        }
+
+        input, select, button, textarea {
+            font-family: var(--font-body) !important;
         }
 
         /* --- LOGIN SCREEN --- */
@@ -55,19 +59,18 @@
         }
         .login-input {
             width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd;
-            border-radius: 8px; font-family: var(--font-body); box-sizing: border-box;
-            font-size: 16px; text-align: center; /* 16px prevents zoom on iOS */
+            border-radius: 8px; font-size: 16px; text-align: center;
         }
         .login-btn {
             width: 100%; padding: 14px; margin-top: 15px; border: none;
             border-radius: 8px; font-size: 16px; cursor: pointer;
-            font-family: var(--font-heading); font-weight: bold; transition: 0.2s;
+            font-weight: bold; transition: 0.2s;
         }
         .btn-teacher-login { background: #2c3e50; color: white; }
         .btn-student-login { background: #27ae60; color: white; }
         
         .login-tab { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
-        .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; font-family: var(--font-heading); background: none; border: none; border-bottom: 3px solid transparent; font-size: 14px; }
+        .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; font-size: 14px; }
         .login-tab-btn.active { border-color: var(--accent-color); color: var(--accent-color); }
 
         body.student-mode .teacher-only { display: none !important; }
@@ -82,16 +85,15 @@
             flex-shrink: 0; z-index: 20; transition: transform 0.3s ease;
         }
         .class-control-area { background-color: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
-        .class-select { width: 100%; padding: 10px; font-family: inherit; font-size: 14px; font-weight: bold; color: #2c3e50; border: 2px solid #3498db; border-radius: 5px; background-color: white; margin-bottom: 10px; cursor: pointer; }
-        .manage-btn { width: 100%; background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: var(--font-body); }
+        .class-select { width: 100%; padding: 10px; font-size: 14px; font-weight: bold; color: #2c3e50; border: 2px solid #3498db; border-radius: 5px; background-color: white; margin-bottom: 10px; cursor: pointer; }
+        .manage-btn { width: 100%; background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .student-list-container { flex: 1; overflow-y: auto; }
-        .student-btn { background: none; border: none; padding: 14px 10px; text-align: right; width: 100%; cursor: pointer; font-family: inherit; font-size: 16px; border-radius: 6px; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; transition: 0.2s; color: #2c3e50; }
+        .student-btn { background: none; border: none; padding: 14px 10px; text-align: right; width: 100%; cursor: pointer; font-size: 16px; border-radius: 6px; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; transition: 0.2s; color: #2c3e50; }
         .student-btn.active { background-color: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
         
         /* --- MAIN CONTENT --- */
         .main-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        /* Mobile Header (Only visible on mobile) */
         .mobile-header { display: none; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .hamburger-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-color); padding: 5px; }
 
@@ -101,13 +103,13 @@
         .mushaf-container { flex: 1; overflow: auto; background: #fdfdfd; display: flex; justify-content: center; position: relative; }
         .mushaf-wrapper { position: relative; display: inline-block; margin: 10px; }
         .mushaf-page-img { max-width: 100%; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: crosshair; border: 1px solid #ddd; }
-        .mistake-dot { position: absolute; width: 25px; height: 25px; background-color: rgba(231, 76, 60, 0.9); border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .mistake-dot { position: absolute; width: 25px; height: 25px; background-color: rgba(231, 76, 60, 0.8); border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
         .entry-form { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
         .form-group { flex: 1; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #dcdcdc; border-radius: 5px; box-sizing: border-box; font-family: inherit; font-size: 16px; }
-        .arabic-input { font-family: 'Amiri', serif; direction: rtl; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #dcdcdc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        .arabic-input { font-family: 'Amiri', serif !important; direction: rtl; }
         .section-box { padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 2px solid transparent; transition: 0.2s; }
         .section-new { background-color: #eafaf1; }
         .section-short { background-color: #ebf5fb; }
@@ -132,52 +134,39 @@
         .modal-content { background-color: white; padding: 0; border-radius: 10px; width: 550px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #3498db; overflow: hidden; display:flex; flex-direction:column; max-height:90vh;}
         .modal-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
         .modal-body { padding: 20px; overflow-y: auto; }
-        .btn { padding: 10px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-family: inherit; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;}
+        .btn { padding: 10px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;}
         .btn-green { background: var(--accent-color); }
         .btn-blue { background: #3498db; }
         .btn-red { background: #e74c3c; }
         .btn-grey { background: #95a5a6; color: white; }
+        .btn-yellow { background: #f39c12; color: white; }
         .filter-btn { padding:8px 14px; font-size:13px; margin-bottom: 5px; border-radius: 20px; }
 
         /* --- MOBILE SPECIFIC STYLES --- */
         @media (max-width: 768px) {
             body { flex-direction: column; position: relative; }
-            
-            /* Sidebar becomes a Drawer */
             .sidebar {
                 position: fixed; top: 0; right: 0; width: 80%; max-width: 300px; height: 100%;
                 transform: translateX(100%); z-index: 5000; box-shadow: -2px 0 10px rgba(0,0,0,0.2);
             }
             .sidebar.active { transform: translateX(0); }
-            
-            /* Overlay for sidebar */
             #sidebar-overlay {
                 display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(0,0,0,0.5); z-index: 4000;
             }
             #sidebar-overlay.active { display: block; }
-
             .mobile-header { display: flex; }
             .main-content { width: 100%; padding: 10px; }
-            
-            /* Form Adjustments */
             .form-row { flex-direction: column; gap: 10px; }
             .form-row > div { width: 100%; }
             .form-group { width: 100%; }
-            
-            /* Mushaf Panel Full Screen */
             .mushaf-panel {
                 position: fixed; top: 0; left: 0; width: 100% !important; height: 100%;
                 z-index: 6000; transform: translateY(100%); transition: transform 0.3s ease;
                 border-right: none;
             }
             .mushaf-panel.active { transform: translateY(0); }
-            
-            /* Header Adjustments */
             h2 { font-size: 20px; }
-            
-            /* Hide the original Mushaf toggle button in header, we use a different approach or keep it */
-            /* Buttons bigger for touch */
             .btn { flex: 1; justify-content: center; padding: 12px; }
             .history-card { font-size: 14px; }
         }
@@ -200,11 +189,10 @@
 
             <!-- Student Login -->
             <div id="login-form-student">
-                <select id="loginClassSelect" class="login-input"><option value="">ކްލާސް ނަގާ...</option></select>
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (މިސާލު: IUM123)" style="text-transform: uppercase;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް (ފުރަތަމަ ފަހަރު ހުސްކޮށް)">
                 <button class="login-btn btn-student-login" onclick="handleStudentLogin()">ލޮގިން</button>
-                <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
+                <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު ވަންނަނަމަ، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
             </div>
 
             <!-- Teacher Login -->
@@ -214,7 +202,7 @@
                 <button class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ޓީޗަރ ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v7.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v8.0</p>
     </div>
 
     <!-- NEW PASSWORD MODAL -->
@@ -251,7 +239,7 @@
             
             <h4 style="margin: 10px 0; color:#555; border-bottom:1px solid #eee; padding-bottom:5px;">ދަރިވަރުން</h4>
             <div id="studentListContainer" class="student-list-container"></div>
-            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; width:100%; justify-content:center;">🚪 Logout</button>
+            <button class="btn btn-grey" onclick="logout()" style="margin-top:10px; width:100%; justify-content:center;">🚪 ނުކުމެވަޑައިގަންނަވާ</button>
         </div>
 
         <!-- MAIN CONTENT -->
@@ -266,7 +254,7 @@
             <div style="background:white; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
                     <div>
-                        <small style="color:#7f8c8d; font-weight:bold; display:block;" id="currentClassDisplay">Class: -</small>
+                        <small style="color:#7f8c8d; font-weight:bold; display:block;" id="currentClassDisplay">ކްލާސް: -</small>
                         <div style="display:flex; align-items:baseline; gap:10px;">
                             <h2 id="studentHeader" style="margin:0; color:var(--primary-color);">ދަރިވަރެއް ނެތް</h2>
                             <span id="classTeacherDisplay" style="font-size:12px; color:#27ae60; background:#eafaf1; padding:2px 8px; border-radius:10px; display:none;"></span>
@@ -302,7 +290,7 @@
                             <label style="color:#27ae60; font-size:16px;">އާ ފިލާވަޅު <span id="loader-new" style="display:none;" class="loader-spin"></span></label>
                             <label class="radio-label">
                                 <input type="radio" name="activeSec" value="new" checked onchange="setActiveSection('new')">
-                                <span>ކުށްޖެހުން</span>
+                                <span>މިބަޔަށް ކުށްޖެހުން</span>
                             </label>
                         </div>
                         <div class="form-row">
@@ -327,16 +315,16 @@
                     <div id="box-short" class="section-box section-short">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#2980b9; font-size:16px;">ކުރު މުރާޖަޢާ <span id="loader-short" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="short" onchange="setActiveSection('short')"> <span>ކުށްޖެހުން</span></label>
+                            <label class="radio-label"><input type="radio" name="activeSec" value="short" onchange="setActiveSection('short')"> <span>މިބަޔަށް ކުށްޖެހުން</span></label>
                         </div>
                         <div class="form-row">
                             <div style="flex:1"><input type="number" id="shortPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('short')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
                             <div style="flex:2"><select id="shortSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="shortStart" placeholder="ފެށި"></div>
+                            <div style="flex:1"><input type="number" id="shortStart" placeholder="ފެށި އާޔަތް"></div>
                         </div>
                         <div class="form-row">
                             <div style="flex:2"><select id="shortEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="shortEnd" placeholder="ނިންމި"></div>
+                            <div style="flex:1"><input type="number" id="shortEnd" placeholder="ނިންމި އާޔަތް"></div>
                             <div>
                                 <div class="mistake-wrapper">
                                     <button class="mistake-btn plus" onclick="adjustMistake('shortMistakes', 1)">+</button>
@@ -351,16 +339,16 @@
                     <div id="box-long" class="section-box section-long">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#d35400; font-size:16px;">ދިގު މުރާޖަޢާ <span id="loader-long" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="long" onchange="setActiveSection('long')"> <span>ކުށްޖެހުން</span></label>
+                            <label class="radio-label"><input type="radio" name="activeSec" value="long" onchange="setActiveSection('long')"> <span>މިބަޔަށް ކުށްޖެހުން</span></label>
                         </div>
                         <div class="form-row">
                             <div style="flex:1"><input type="number" id="longPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('long')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
                             <div style="flex:2"><select id="longSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="longStart" placeholder="ފެށި"></div>
+                            <div style="flex:1"><input type="number" id="longStart" placeholder="ފެށި އާޔަތް"></div>
                         </div>
                         <div class="form-row">
                             <div style="flex:2"><select id="longEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="longEnd" placeholder="ނިންމި"></div>
+                            <div style="flex:1"><input type="number" id="longEnd" placeholder="ނިންމި އާޔަތް"></div>
                             <div>
                                 <div class="mistake-wrapper">
                                     <button class="mistake-btn plus" onclick="adjustMistake('longMistakes', 1)">+</button>
@@ -377,7 +365,20 @@
                     <div id="box-exam" class="section-box section-exam active-section">
                         <div class="exam-header"><span>🏆 ޖުޒުއު އިމްތިޙާން</span> <span id="totalExamScore">100%</span></div>
                         <div class="form-row">
-                            <div style="flex:1"><label>ބައި:</label><input type="text" id="examJuzu" placeholder="ޖުޒުއު"></div>
+                            <div style="flex:1">
+                                <label>ޖުޒުއު:</label>
+                                <select id="examJuzu"></select>
+                            </div>
+                            <div style="flex:1">
+                                <label>ބައި:</label>
+                                <select id="examPortion">
+                                    <option value="whole">މުޅި ޖުޒުއު އެއްކޮށް</option>
+                                    <option value="half">އެއްބައި (1/2)</option>
+                                    <option value="third">ތިންބައިކުޅަ އެއްބައި (1/3)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div style="flex:1"><label>އެގްޒާމިނަރ:</label><input type="text" id="examExaminer" placeholder="ނަން"></div>
                         </div>
                         <div class="form-row" style="background:white; padding:10px; border-radius:6px; border:1px solid #ddd;">
@@ -386,7 +387,7 @@
                             <div style="flex:0.5; text-align:center;"><label>މިނެޓް</label><br><span id="examDuration" style="font-weight:bold; color:blue;">0</span></div>
                         </div>
                         <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
-                            <h5 style="margin:5px 0;">ކުށްތައް (80%)</h5>
+                            <h5 style="margin:5px 0;">ހިފްޡް ކުށްތައް (80%)</h5>
                             <div style="display:flex; gap:10px;">
                                 <div style="flex:1; background:#ffebee; padding:5px; border-radius:5px;">
                                     <label style="color:#c0392b; font-size:12px;">މުދައްރިސް (-2)</label>
@@ -410,8 +411,8 @@
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn btn-green" style="flex:1; justify-content: center;" onclick="saveRecord()">ސޭވް</button>
-                    <button class="btn btn-red" style="width:auto; justify-content: center;" onclick="clearForm()">ސާފު</button>
+                    <button class="btn btn-green" style="flex:1; justify-content: center;" onclick="saveRecord()">ސޭވް ކުރައްވާ</button>
+                    <button class="btn btn-red" style="width:auto; justify-content: center;" onclick="clearForm()">ސާފުކުރޭ</button>
                 </div>
             </div>
 
@@ -419,11 +420,11 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px 0; border-bottom: 2px solid #eee; padding-bottom:8px; flex-wrap:wrap; gap:5px;">
                 <h4 style="margin:0; color:#555;">ރެކޯޑް ތާވަލް</h4>
                 <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                    <button class="filter-btn active" id="btnFilterAll" onclick="setHistoryFilter('all')">All</button>
-                    <button class="filter-btn" id="btnFilterNew" onclick="setHistoryFilter('new')">New</button>
-                    <button class="filter-btn" id="btnFilterShort" onclick="setHistoryFilter('short')">Short</button>
-                    <button class="filter-btn" id="btnFilterLong" onclick="setHistoryFilter('long')">Long</button>
-                    <button class="filter-btn" id="btnFilterExam" onclick="setHistoryFilter('exam')">Exam</button>
+                    <button class="filter-btn active" id="btnFilterAll" onclick="setHistoryFilter('all')">ހުރިހާ</button>
+                    <button class="filter-btn" id="btnFilterNew" onclick="setHistoryFilter('new')">އާ</button>
+                    <button class="filter-btn" id="btnFilterShort" onclick="setHistoryFilter('short')">ކުރު</button>
+                    <button class="filter-btn" id="btnFilterLong" onclick="setHistoryFilter('long')">ދިގު</button>
+                    <button class="filter-btn" id="btnFilterExam" onclick="setHistoryFilter('exam')">އިމްތިޙާން</button>
                 </div>
             </div>
             
@@ -467,7 +468,7 @@
                     <select id="modalClassSelect" class="class-select" style="margin-bottom:15px;" onchange="renderModalStudentList()"></select>
                     <div style="background:#f9f9f9; padding:10px; border:1px solid #eee; border-radius:5px;">
                         <label>ކުދިން އިތުރުކުރުން:</label>
-                        <p style="font-size:11px; margin:5px 0;">Format: <code>IUM-ID (Name)</code></p>
+                        <p style="font-size:11px; margin:5px 0;">ފޯމެޓް: <code>IUM-ID (ނަން)</code></p>
                         <textarea id="bulkStudents" placeholder="IUM202301 (Ali Ahmed)"></textarea>
                         <button class="btn btn-green" style="width:100%; justify-content: center;" onclick="importStudents()">➕ އެޑް</button>
                     </div>
@@ -540,6 +541,8 @@
     let currentClass = ""; let currentStudent = null; 
     let currentActiveSection = 'new'; let currentPage = 1; let historyFilter = 'all'; 
     let tempLoginClass = ""; let tempLoginStudentIdx = -1;
+    let editingRecordId = null; // Track if we are editing
+    let currentDots = { new: [], short: [], long: [], exam: [] }; // Store dots temporarily
 
     // Load Data
     const dbRef = ref(db, 'hifz_data');
@@ -548,7 +551,9 @@
         if (data) {
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
-            if(document.getElementById('login-screen').style.display !== 'none') populateLoginClasses();
+            if(document.getElementById('login-screen').style.display !== 'none') {
+                // Populate class select just in case, but student login uses ID now
+            }
             if(currentClass) { refreshClassDropdowns(); if(currentStudent) renderHistory(); }
         } else {
             classes = { "Default Class": { teacher: "", students: [] } };
@@ -564,6 +569,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         populateSurahSelects();
+        populateJuzuSelect();
         document.getElementById('entryDate').valueAsDate = new Date();
         loadMushaf(1);
     });
@@ -574,7 +580,6 @@
         const overlay = document.getElementById('sidebar-overlay');
         sb.classList.toggle('active');
         overlay.classList.toggle('active');
-        // Show close button only on mobile when active
         const closeBtn = document.querySelector('.mobile-close-sidebar');
         if(sb.classList.contains('active')) closeBtn.style.display = 'block';
         else closeBtn.style.display = 'none';
@@ -594,43 +599,41 @@
         }
     }
 
-    window.populateLoginClasses = function() {
-        const sel = document.getElementById('loginClassSelect');
-        sel.innerHTML = '<option value="">ކްލާސް ނަގާ...</option>';
-        Object.keys(classes).forEach(k => {
-            let opt = document.createElement('option');
-            opt.value = k; opt.innerText = k;
-            sel.appendChild(opt);
-        });
-    }
-
     window.handleStudentLogin = function() {
-        const clsName = document.getElementById('loginClassSelect').value;
         const inputId = document.getElementById('loginStudentId').value.trim();
         const pass = document.getElementById('studentPassword').value;
 
-        if(!clsName || !inputId) return alert("ކްލާހާއި އައިޑީ ޖައްސަވާ");
+        if(!inputId) return alert("އައިޑީ ޖައްސަވާ");
 
-        const students = classes[clsName].students;
-        const studentIdx = students.findIndex(s => {
-            const storedName = s.name.trim();
-            const input = inputId.trim().toLowerCase();
-            const firstPart = storedName.split(/[\s\(]+/)[0].toLowerCase();
-            if (firstPart === input) return true;
-            const match = storedName.match(/\(([^)]+)\)/);
-            if (match && match[1]) return match[1].trim().toLowerCase() === input;
-            return false;
+        let foundClass = null;
+        let foundStudentIdx = -1;
+
+        // Search in ALL classes
+        Object.keys(classes).forEach(cls => {
+            const students = classes[cls].students;
+            const idx = students.findIndex(s => {
+                const storedName = s.name.trim();
+                const input = inputId.trim().toLowerCase();
+                // Check ID (Name) format or Name (ID) format
+                const firstPart = storedName.split(/[\s\(]+/)[0].toLowerCase();
+                if (firstPart === input) return true;
+                const match = storedName.match(/\(([^)]+)\)/);
+                if (match && match[1]) return match[1].trim().toLowerCase() === input;
+                return false;
+            });
+            if(idx !== -1) { foundClass = cls; foundStudentIdx = idx; }
         });
 
-        if(studentIdx === -1) return alert("ތިޔަ އައިޑީ ނުފެނުނު");
+        if(!foundClass) return alert("ތިޔަ އައިޑީ ނުފެނުނު");
 
-        const studentObj = students[studentIdx];
+        const studentObj = classes[foundClass].students[foundStudentIdx];
+        
         if ((!studentObj.password || studentObj.password === "") && pass === "") {
-            tempLoginClass = clsName; tempLoginStudentIdx = studentIdx;
+            tempLoginClass = foundClass; tempLoginStudentIdx = foundStudentIdx;
             document.getElementById('passwordSetupModal').style.display = 'flex';
             return;
         }
-        if (pass === studentObj.password) loginSuccess(clsName, studentObj.name, 'student');
+        if (pass === studentObj.password) loginSuccess(foundClass, studentObj.name, 'student');
         else alert("ޕާސްވޯޑް ނުބައި");
     }
 
@@ -662,7 +665,7 @@
             setTimeout(() => {
                 const btns = document.querySelectorAll('.student-btn');
                 btns.forEach(b => { if(b.innerText === studentName) b.click(); });
-                // Hide sidebar on mobile after selection
+                // Sidebar cleanup
                 const sb = document.getElementById('sidebar');
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
@@ -694,6 +697,15 @@
         });
     }
 
+    function populateJuzuSelect() {
+        const sel = document.getElementById('examJuzu');
+        for(let i=1; i<=30; i++) {
+            let opt = document.createElement('option');
+            opt.value = i; opt.innerText = i + " ވަނަ ޖުޒުއު";
+            sel.appendChild(opt);
+        }
+    }
+
     window.refreshClassDropdowns = function() {
         const mainSel = document.getElementById('classSelect');
         const modalSel = document.getElementById('modalClassSelect');
@@ -709,10 +721,10 @@
 
     window.switchClass = function(className) {
         currentClass = className;
-        document.getElementById('currentClassDisplay').innerText = "Class: " + currentClass;
+        document.getElementById('currentClassDisplay').innerText = "ކްލާސް: " + currentClass;
         const teacherDisplay = document.getElementById('classTeacherDisplay');
         const teacherName = classes[currentClass].teacher;
-        if(teacherName) { teacherDisplay.style.display = 'inline-block'; teacherDisplay.innerText = "Tr. " + teacherName; document.getElementById('teacherName').value = teacherName; }
+        if(teacherName) { teacherDisplay.style.display = 'inline-block'; teacherDisplay.innerText = "މުދައްރިސް: " + teacherName; document.getElementById('teacherName').value = teacherName; }
         else teacherDisplay.style.display = 'none';
 
         const list = document.getElementById('studentListContainer');
@@ -726,7 +738,6 @@
             btn.className = 'student-btn'; btn.innerText = s.name;
             btn.onclick = () => {
                 selectStudent(s.name, btn);
-                // On mobile, close sidebar when student is clicked
                 if(window.innerWidth <= 768) toggleSidebar();
             };
             list.appendChild(btn);
@@ -791,7 +802,7 @@
 
     window.createClass = function() {
         const name = document.getElementById('newClassName').value.trim();
-        if(!name || classes[name]) return alert("Invalid Class Name");
+        if(!name || classes[name]) return alert("ނަން ރަނގަޅެއް ނޫން");
         classes[name] = { teacher: document.getElementById('newClassTeacher').value.trim(), students: [] };
         saveData(); refreshClassDropdowns(); document.getElementById('classSelect').value = name; switchClass(name); closeModal();
     }
@@ -816,7 +827,7 @@
                 classes[cls].students.push({ name: fullName, password: "" }); count++;
             }
         });
-        saveData(); document.getElementById('bulkStudents').value = ''; renderModalStudentList(); if(currentClass === cls) switchClass(cls); alert(count + " Added");
+        saveData(); document.getElementById('bulkStudents').value = ''; renderModalStudentList(); if(currentClass === cls) switchClass(cls); alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
     }
 
     window.renderModalStudentList = function() {
@@ -829,10 +840,10 @@
         });
     }
 
-    window.deleteStudent = function(n) { if(confirm("Sure?")) { const c = document.getElementById('modalClassSelect').value; classes[c].students = classes[c].students.filter(s=>s.name!==n); saveData(); renderModalStudentList(); if(currentClass===c) switchClass(c); } }
-    window.resetPass = function(n) { if(confirm("Reset Pwd?")) { const c = document.getElementById('modalClassSelect').value; classes[c].students.find(s=>s.name===n).password=""; saveData(); renderModalStudentList(); } }
-    window.deleteSelectedClass = function() { const c = document.getElementById('deleteClassSelect').value; if(confirm("Delete Class?")) { delete classes[c]; saveData(); refreshClassDropdowns(); } }
-    window.hardReset = function() { if(confirm("ALL DATA WILL BE LOST")) { set(ref(db, 'hifz_data'), null); location.reload(); } }
+    window.deleteStudent = function(n) { if(confirm("ޔަޤީން؟")) { const c = document.getElementById('modalClassSelect').value; classes[c].students = classes[c].students.filter(s=>s.name!==n); saveData(); renderModalStudentList(); if(currentClass===c) switchClass(c); } }
+    window.resetPass = function(n) { if(confirm("ޕާސްވޯޑް ރިސެޓްކުރަންވީ؟")) { const c = document.getElementById('modalClassSelect').value; classes[c].students.find(s=>s.name===n).password=""; saveData(); renderModalStudentList(); } }
+    window.deleteSelectedClass = function() { const c = document.getElementById('deleteClassSelect').value; if(confirm("ކްލާސް ފޮހެލަންވީ؟")) { delete classes[c]; saveData(); refreshClassDropdowns(); } }
+    window.hardReset = function() { if(confirm("ހުރިހާ ޑޭޓާއެއް ފޮހެވޭނެ!")) { set(ref(db, 'hifz_data'), null); location.reload(); } }
     window.downloadBackup = function() { 
         const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({classes, records})); 
         a.download = "backup.json"; document.body.appendChild(a); a.click(); a.remove(); 
@@ -848,16 +859,33 @@
         document.getElementById('navPage').value = currentPage; document.getElementById('pageIndicator').innerText = "Page "+currentPage;
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
         clearDots();
-        if(sync && !document.body.classList.contains('student-mode')) {
-            const inp = document.getElementById(currentActiveSection+'Page'); if(inp) { inp.value=currentPage; fillSurahFromPage(currentPage, currentActiveSection); }
+        
+        // Redraw dots if viewing/editing
+        if(editingRecordId) {
+            // Logic handled in edit setup, but page change redraws active dots
+            const rec = records.find(r => r.id === editingRecordId);
+            if(rec) {
+                // If we are editing, we should ideally show dots for that page from currentDots
+                const sec = currentActiveSection;
+                (currentDots[sec] || []).forEach(dot => {
+                    if(parseInt(dot.page) === currentPage) drawDot(dot.x, dot.y, true);
+                });
+            }
+        } else {
+            // New Entry mode - draw dots from currentDots state
+            (currentDots[currentActiveSection] || []).forEach(dot => {
+                if(parseInt(dot.page) === currentPage) drawDot(dot.x, dot.y, true);
+            });
+        }
+
+        if(sync && !document.body.classList.contains('student-mode') && document.getElementById('lessonType').value !== 'exam') {
+            const inp = document.getElementById(currentActiveSection+'Page'); if(inp && !editingRecordId) { inp.value=currentPage; fillSurahFromPage(currentPage, currentActiveSection); }
         }
     }
     window.changePage = (d) => loadMushaf(currentPage+d, false);
     window.toggleMushaf = function() { 
         const panel = document.getElementById('mushafPanel');
         panel.classList.toggle('active');
-        
-        // If desktop mode, handle width style instead
         if(window.innerWidth > 768) {
             const w = getComputedStyle(document.documentElement).getPropertyValue('--mushaf-width').trim();
             document.documentElement.style.setProperty('--mushaf-width', w === '0px' ? '35%' : '0px');
@@ -883,12 +911,63 @@
         if(document.body.classList.contains('student-mode')) return;
         if(e.target.classList.contains('mistake-dot')) return;
         const rect = document.getElementById('mushafWrapper').getBoundingClientRect();
-        const dot = document.createElement('div'); dot.className = 'mistake-dot';
-        dot.style.left = (e.clientX - rect.left)+'px'; dot.style.top = (e.clientY - rect.top)+'px';
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Save dot
+        const sec = document.getElementById('lessonType').value === 'exam' ? 'exam' : currentActiveSection;
+        currentDots[sec].push({ page: currentPage, x: x, y: y });
+        
+        drawDot(x, y, true);
+        
         const isEx = document.getElementById('lessonType').value==='exam';
-        dot.onclick = (ev) => { ev.stopPropagation(); dot.remove(); isEx ? updateExamMistake('teacher', -1) : adjustMistake(currentActiveSection+'Mistakes', -1); };
-        document.getElementById('mushafWrapper').appendChild(dot);
         isEx ? updateExamMistake('teacher', 1) : adjustMistake(currentActiveSection+'Mistakes', 1);
+    }
+
+    function drawDot(x, y, isInteractive) {
+        const dot = document.createElement('div'); dot.className = 'mistake-dot';
+        dot.style.left = x+'px'; dot.style.top = y+'px';
+        if(isInteractive) {
+            dot.onclick = (ev) => { 
+                ev.stopPropagation(); 
+                dot.remove(); 
+                // Remove from data
+                const sec = document.getElementById('lessonType').value === 'exam' ? 'exam' : currentActiveSection;
+                currentDots[sec] = currentDots[sec].filter(d => d.x !== x || d.y !== y);
+
+                const isEx = document.getElementById('lessonType').value==='exam';
+                isEx ? updateExamMistake('teacher', -1) : adjustMistake(currentActiveSection+'Mistakes', -1); 
+            };
+        }
+        document.getElementById('mushafWrapper').appendChild(dot);
+    }
+
+    window.viewMistakes = function(id) {
+        const r = records.find(rec => rec.id === id);
+        if(!r) return;
+        
+        // Find dots. For daily, aggregate all. For exam, just exam.
+        let dots = [];
+        if(r.type === 'exam' && r.new && r.new.dots) dots = r.new.dots; // Reuse 'new' structure for exam dots if saved there
+        else {
+            if(r.new && r.new.dots) dots = dots.concat(r.new.dots);
+            if(r.short && r.short.dots) dots = dots.concat(r.short.dots);
+            if(r.long && r.long.dots) dots = dots.concat(r.long.dots);
+        }
+
+        if(dots.length === 0) return alert("މި ރެކޯޑްގައި ފާހަގަކޮށްފައިވާ ކުށެއް ނެތް");
+
+        // Open Mushaf to the page of the first dot
+        loadMushaf(dots[0].page, false);
+        toggleMushaf(); // Open panel
+        
+        // Draw dots (non-interactive)
+        setTimeout(() => {
+            clearDots();
+            dots.forEach(d => {
+                if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, false);
+            });
+        }, 300);
     }
 
     window.adjustMistake = (id, d) => { const el=document.getElementById(id); let v=parseInt(el.value)||0; el.value = Math.max(0, v+d); }
@@ -903,8 +982,17 @@
         document.getElementById('totalExamScore').innerText = total + "%";
     }
     function clearDots() { document.querySelectorAll('.mistake-dot').forEach(d=>d.remove()); }
+    
     window.clearForm = () => {
-        ['new','short','long'].forEach(s => { document.getElementById(s+'Mistakes').value=0; document.getElementById(s+'Page').value=''; document.getElementById(s+'Start').value=''; document.getElementById(s+'End').value=''; });
+        ['new','short','long'].forEach(s => { 
+            document.getElementById(s+'Mistakes').value=0; document.getElementById(s+'Page').value=''; 
+            document.getElementById(s+'Start').value=''; document.getElementById(s+'End').value=''; 
+        });
+        document.getElementById('examJuzu').value = "1";
+        document.getElementById('examPortion').value = "whole";
+        document.getElementById('examExaminer').value = "";
+        currentDots = { new: [], short: [], long: [], exam: [] };
+        editingRecordId = null;
         clearDots();
     }
     window.toggleFormSection = (v) => { 
@@ -915,18 +1003,102 @@
     window.setHistoryFilter = (t) => { historyFilter=t; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); document.getElementById('btnFilter'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active'); renderHistory(); }
 
     window.saveRecord = () => {
-        if(!currentStudent) return alert("No Student");
+        if(!currentStudent) return alert("ދަރިވަރަކު ނެތް");
         const type = document.getElementById('lessonType').value;
         const getV = id => document.getElementById(id).value;
         const getS = id => { const el=document.getElementById(id); return el.value ? el.options[el.selectedIndex].text.split('. ')[1] : ""; };
         
-        let rec = { id: Date.now(), class: currentClass, student: currentStudent, date: getV('entryDate'), teacher: getV('teacherName') };
+        let rec = { 
+            id: editingRecordId || Date.now(), 
+            class: currentClass, 
+            student: currentStudent, 
+            date: getV('entryDate'), 
+            teacher: getV('teacherName') 
+        };
+
         if(type==='exam') {
-            rec = { ...rec, type:'exam', juzu:getV('examJuzu'), examiner:getV('examExaminer'), duration:document.getElementById('examDuration').innerText, mistakes:{teacher:getV('examTeacherMistakes'), self:getV('examSelfMistakes')}, scores:{mutha1:getV('markMutha1'), mutha2:getV('markMutha2'), tajweed:getV('markTajweed'), fluency:getV('markFluency'), total:document.getElementById('totalExamScore').innerText} };
+            rec = { 
+                ...rec, type:'exam', 
+                juzu: getV('examJuzu'), 
+                portion: getV('examPortion'),
+                examiner: getV('examExaminer'), 
+                duration: document.getElementById('examDuration').innerText, 
+                mistakes: { teacher:getV('examTeacherMistakes'), self:getV('examSelfMistakes') }, 
+                scores: { 
+                    mutha1:getV('markMutha1'), mutha2:getV('markMutha2'), 
+                    tajweed:getV('markTajweed'), fluency:getV('markFluency'), 
+                    total:document.getElementById('totalExamScore').innerText 
+                },
+                new: { dots: currentDots.exam } // Store dots in 'new' structure as generic
+            };
         } else {
-            rec = { ...rec, type:'daily', new:{s:getS('newSurah'), es:getS('newEndSurah'), st:getV('newStart'), en:getV('newEnd'), m:getV('newMistakes'), p:getV('newPage')}, short:{s:getS('shortSurah'), es:getS('shortEndSurah'), st:getV('shortStart'), en:getV('shortEnd'), m:getV('shortMistakes')}, long:{s:getS('longSurah'), es:getS('longEndSurah'), st:getV('longStart'), en:getV('longEnd'), m:getV('longMistakes')} };
+            rec = { 
+                ...rec, type:'daily', 
+                new: { s:getS('newSurah'), es:getS('newEndSurah'), st:getV('newStart'), en:getV('newEnd'), m:getV('newMistakes'), p:getV('newPage'), dots: currentDots.new }, 
+                short: { s:getS('shortSurah'), es:getS('shortEndSurah'), st:getV('shortStart'), en:getV('shortEnd'), m:getV('shortMistakes'), dots: currentDots.short }, 
+                long: { s:getS('longSurah'), es:getS('longEndSurah'), st:getV('longStart'), en:getV('longEnd'), m:getV('longMistakes'), dots: currentDots.long } 
+            };
         }
-        records.push(rec); saveData(); renderHistory(); if(type==='daily') autoFillNextLesson(); alert("Saved");
+        
+        if(editingRecordId) {
+            records = records.filter(r => r.id !== editingRecordId);
+        }
+        records.push(rec); 
+        saveData(); 
+        renderHistory(); 
+        clearForm(); // Reset
+        alert("ސޭވް ކުރެވިއްޖެ");
+    }
+
+    window.editRecord = function(id) {
+        const r = records.find(rec => rec.id === id);
+        if(!r) return;
+        editingRecordId = id;
+        document.getElementById('entryDate').value = r.date;
+        document.getElementById('teacherName').value = r.teacher;
+        document.getElementById('lessonType').value = r.type;
+        toggleFormSection(r.type);
+
+        // Clear current dots and load from record
+        currentDots = { new: [], short: [], long: [], exam: [] };
+
+        if(r.type === 'exam') {
+            document.getElementById('examJuzu').value = r.juzu;
+            document.getElementById('examPortion').value = r.portion || 'whole';
+            document.getElementById('examExaminer').value = r.examiner;
+            document.getElementById('examTeacherMistakes').value = r.mistakes.teacher;
+            document.getElementById('examSelfMistakes').value = r.mistakes.self;
+            document.getElementById('markMutha1').value = r.scores.mutha1;
+            document.getElementById('markMutha2').value = r.scores.mutha2;
+            document.getElementById('markTajweed').value = r.scores.tajweed;
+            document.getElementById('markFluency').value = r.scores.fluency;
+            document.getElementById('totalExamScore').innerText = r.scores.total;
+            currentDots.exam = r.new?.dots || []; // Exam dots stored in new.dots usually
+        } else {
+            const loadSec = (sec, data) => {
+                const sEl = document.getElementById(sec+'Surah');
+                // Try to find value by text
+                for(let i=0; i<sEl.options.length; i++) {
+                    if(sEl.options[i].text.includes(data.s)) sEl.value = sEl.options[i].value;
+                }
+                const esEl = document.getElementById(sec+'EndSurah');
+                for(let i=0; i<esEl.options.length; i++) {
+                    if(esEl.options[i].text.includes(data.es)) esEl.value = esEl.options[i].value;
+                }
+                document.getElementById(sec+'Start').value = data.st;
+                document.getElementById(sec+'End').value = data.en;
+                document.getElementById(sec+'Mistakes').value = data.m;
+                if(sec==='new') document.getElementById('newPage').value = data.p;
+                currentDots[sec] = data.dots || [];
+            };
+            loadSec('new', r.new);
+            loadSec('short', r.short);
+            loadSec('long', r.long);
+        }
+        
+        // Scroll to top
+        window.scrollTo(0,0);
+        alert("ރެކޯޑް އެޑިޓްކުރަން ހުޅުވިއްޖެ");
     }
 
     function renderHistory() {
@@ -939,23 +1111,46 @@
             const card = document.createElement('div'); 
             if(r.type === 'exam') {
                 card.className = 'history-card exam-card';
-                card.innerHTML = `<button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button><div class="card-header"><span class="card-date">🏆 Exam (${r.juzu}) - ${r.date}</span><span class="card-teacher">${r.scores.total}</span></div><div class="card-body"><div class="card-section exam">Examiner: ${r.examiner}<br>Mistakes: T(${r.mistakes.teacher}) S(${r.mistakes.self})</div></div>`;
+                let portionText = "";
+                if(r.portion === 'half') portionText = "(އެއްބައި)";
+                if(r.portion === 'third') portionText = "(1/3)";
+                
+                card.innerHTML = `
+                    <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
+                    <div class="card-header">
+                        <span class="card-date">🏆 އިމްތިޙާން (ޖުޒުއު ${r.juzu}) ${portionText} - ${r.date}</span>
+                        <span class="card-teacher">${r.scores.total}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-section exam">އެގްޒާމިނަރ: ${r.examiner}<br>ކުށް: T(${r.mistakes.teacher}) S(${r.mistakes.self})</div>
+                    </div>
+                    <div style="padding:10px; border-top:1px solid #eee; display:flex; gap:10px;">
+                        <button class="btn btn-yellow" style="font-size:12px; padding:5px 10px;" onclick="editRecord(${r.id})">އިޞްލާޙް</button>
+                        <button class="btn btn-blue" style="font-size:12px; padding:5px 10px;" onclick="viewMistakes(${r.id})">ކުށްތައް</button>
+                    </div>`;
             } else {
                 card.className = 'history-card';
-                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>Ayah: ${o.st}-${o.en}</div><span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} Mistakes</span></div>`;
-                card.innerHTML = `<button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button><div class="card-header"><span class="card-date">📅 ${r.date}</span><span class="card-teacher">${r.teacher}</span></div><div class="card-body">${sec('New', r.new, 'new')}${sec('Short', r.short, 'short')}${sec('Long', r.long, 'long')}</div>`;
+                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div><span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
+                card.innerHTML = `
+                    <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
+                    <div class="card-header"><span class="card-date">📅 ${r.date}</span><span class="card-teacher">${r.teacher}</span></div>
+                    <div class="card-body">${sec('އާ', r.new, 'new')}${sec('ކުރު', r.short, 'short')}${sec('ދިގު', r.long, 'long')}</div>
+                    <div style="padding:10px; border-top:1px solid #eee; display:flex; gap:10px;">
+                        <button class="btn btn-yellow" style="font-size:12px; padding:5px 10px;" onclick="editRecord(${r.id})">އިޞްލާޙް</button>
+                        <button class="btn btn-blue" style="font-size:12px; padding:5px 10px;" onclick="viewMistakes(${r.id})">ކުށްތައް</button>
+                    </div>`;
             }
             con.appendChild(card);
         });
-        if(con.innerHTML === '') con.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">No Records</div>';
+        if(con.innerHTML === '') con.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">ރެކޯޑެއް ނެތް</div>';
     }
 
-    window.delRec = (id) => { if(confirm("Delete?")) { records = records.filter(r=>r.id!==id); saveData(); renderHistory(); } }
+    window.delRec = (id) => { if(confirm("ފޮހެލަންވީ؟")) { records = records.filter(r=>r.id!==id); saveData(); renderHistory(); } }
     
     window.exportExcel = () => {
-        if(!records.length) return alert("No Data");
+        if(!records.length) return alert("ނޯ ޑޭޓާ");
         const data = records.filter(r => r.class === currentClass).map(r => {
-            if(r.type === 'exam') return { Date: r.date, Student: r.student, Type: 'Exam', Juzu: r.juzu, Total: r.scores.total };
+            if(r.type === 'exam') return { Date: r.date, Student: r.student, Type: 'Exam', Juzu: r.juzu, Portion: r.portion, Total: r.scores.total };
             const s = (o) => o.s ? `${o.s} ${o.st}-${o.en} (${o.m})` : '';
             return { Date: r.date, Student: r.student, New: s(r.new), Short: s(r.short), Long: s(r.long) };
         });
@@ -967,7 +1162,7 @@
     window.closeProgressModal = () => document.getElementById('progressModal').style.display='none';
     window.calculateProgress = () => {
         const s = new Date(document.getElementById('progStartDate').value), e = new Date(document.getElementById('progEndDate').value);
-        if(isNaN(s)||isNaN(e)) return alert("Select Dates");
+        if(isNaN(s)||isNaN(e)) return alert("ތާރީޚް ނަގާ");
         const c = records.filter(r => r.class===currentClass && r.student===currentStudent && r.type==='daily' && r.new.s && new Date(r.date)>=s && new Date(r.date)<=e).length;
         document.getElementById('progCount').innerText = c; document.getElementById('progressResult').style.display='block';
     }
