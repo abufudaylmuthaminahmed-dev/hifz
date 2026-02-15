@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v8.0 Dhivehi</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v9.0 Final</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -28,7 +28,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: var(--font-body) !important; /* Force Faruma everywhere */
+            font-family: var(--font-body) !important;
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
@@ -129,11 +129,19 @@
         .card-section { flex: 1; min-width: 150px; padding: 10px; border-radius: 6px; font-size: 13px; }
         .card-section.new { background-color: #eafaf1; color: #27ae60; }
         
-        /* Modal Styles */
+        /* IMPROVED MODAL STUDENT LIST */
         .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background-color: white; padding: 0; border-radius: 10px; width: 550px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #3498db; overflow: hidden; display:flex; flex-direction:column; max-height:90vh;}
         .modal-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
         .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-student-list { max-height: 300px; overflow-y: auto; }
+        .modal-student-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px; margin-bottom: 8px; border-radius: 8px;
+            background: #f9f9f9; border: 1px solid #eee; transition: 0.2s;
+        }
+        .modal-student-item:hover { background: #f0f8ff; border-color: #3498db; }
+        
         .btn { padding: 10px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;}
         .btn-green { background: var(--accent-color); }
         .btn-blue { background: #3498db; }
@@ -174,7 +182,6 @@
 </head>
 <body>
 
-    <!-- SIDEBAR OVERLAY (Mobile) -->
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- LOGIN SCREEN -->
@@ -187,7 +194,6 @@
                 <button class="login-tab-btn" id="tabTeacher" onclick="switchLoginTab('teacher')">މުދައްރިސް</button>
             </div>
 
-            <!-- Student Login -->
             <div id="login-form-student">
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (މިސާލު: IUM123)" style="text-transform: uppercase;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް (ފުރަތަމަ ފަހަރު ހުސްކޮށް)">
@@ -195,17 +201,16 @@
                 <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު ވަންނަނަމަ، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
             </div>
 
-            <!-- Teacher Login -->
             <div id="login-form-teacher" style="display:none;">
                 <p style="font-size:14px; margin-bottom:15px;">މުދައްރިސުންގެ ޚާއްޞަ ޕާސްވޯޑް ޖައްސަވާ</p>
                 <input type="password" id="teacherPassword" class="login-input" placeholder="ޕާސްވޯޑް">
                 <button class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ޓީޗަރ ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v8.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v9.0</p>
     </div>
 
-    <!-- NEW PASSWORD MODAL -->
+    <!-- PASSWORD MODAL -->
     <div id="passwordSetupModal" class="modal">
         <div class="modal-content" style="width:90%; max-width:400px;">
             <div class="modal-header">
@@ -222,7 +227,7 @@
         </div>
     </div>
 
-    <!-- APP CONTAINER -->
+    <!-- MAIN APP -->
     <div id="app-container" style="display:none; width:100%; height:100%;">
         <!-- SIDEBAR -->
         <div class="sidebar" id="sidebar">
@@ -244,13 +249,11 @@
 
         <!-- MAIN CONTENT -->
         <div class="main-content">
-            <!-- Mobile Header -->
             <div class="mobile-header">
                 <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
                 <h3 style="margin:0; color:var(--primary-color);">ޙިފްޡް ޓްރެކަރ</h3>
             </div>
 
-            <!-- Dashboard Header -->
             <div style="background:white; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
                     <div>
@@ -268,10 +271,10 @@
                 </div>
             </div>
 
-            <!-- Entry Form (TEACHER ONLY) -->
+            <!-- ENTRY FORM -->
             <div class="entry-form teacher-only">
                 <div class="form-row">
-                    <div class="form-group"><label>ތާރީޚް</label><input type="date" id="entryDate"></div>
+                    <div class="form-group"><label>ތާރީޚް</label><input type="date" id="entryDate" onchange="updateSelectedDate()"></div>
                     <div class="form-group"><label>މުދައްރިސް</label><input type="text" id="teacherName" placeholder="ނަން"></div>
                     <div class="form-group">
                         <label>ވައްތަރު</label>
@@ -284,13 +287,12 @@
 
                 <!-- DAILY LESSONS -->
                 <div id="container-daily">
-                    <!-- New Lesson -->
                     <div id="box-new" class="section-box section-new active-section">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#27ae60; font-size:16px;">އާ ފިލާވަޅު <span id="loader-new" style="display:none;" class="loader-spin"></span></label>
                             <label class="radio-label">
                                 <input type="radio" name="activeSec" value="new" checked onchange="setActiveSection('new')">
-                                <span>މިބަޔަށް ކުށްޖެހުން</span>
+                                <span>މިބައި ސޭވްކުރޭ</span>
                             </label>
                         </div>
                         <div class="form-row">
@@ -311,20 +313,19 @@
                         </div>
                     </div>
 
-                    <!-- Short Revision -->
                     <div id="box-short" class="section-box section-short">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#2980b9; font-size:16px;">ކުރު މުރާޖަޢާ <span id="loader-short" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="short" onchange="setActiveSection('short')"> <span>މިބަޔަށް ކުށްޖެހުން</span></label>
+                            <label class="radio-label"><input type="radio" name="activeSec" value="short" onchange="setActiveSection('short')"> <span>މިބައި ސޭވްކުރޭ</span></label>
                         </div>
                         <div class="form-row">
                             <div style="flex:1"><input type="number" id="shortPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('short')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
                             <div style="flex:2"><select id="shortSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="shortStart" placeholder="ފެށި އާޔަތް"></div>
+                            <div style="flex:1"><input type="number" id="shortStart" placeholder="ފެށި"></div>
                         </div>
                         <div class="form-row">
                             <div style="flex:2"><select id="shortEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="shortEnd" placeholder="ނިންމި އާޔަތް"></div>
+                            <div style="flex:1"><input type="number" id="shortEnd" placeholder="ނިންމި"></div>
                             <div>
                                 <div class="mistake-wrapper">
                                     <button class="mistake-btn plus" onclick="adjustMistake('shortMistakes', 1)">+</button>
@@ -335,20 +336,19 @@
                         </div>
                     </div>
 
-                    <!-- Long Revision -->
                     <div id="box-long" class="section-box section-long">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#d35400; font-size:16px;">ދިގު މުރާޖަޢާ <span id="loader-long" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="long" onchange="setActiveSection('long')"> <span>މިބަޔަށް ކުށްޖެހުން</span></label>
+                            <label class="radio-label"><input type="radio" name="activeSec" value="long" onchange="setActiveSection('long')"> <span>މިބައި ސޭވްކުރޭ</span></label>
                         </div>
                         <div class="form-row">
                             <div style="flex:1"><input type="number" id="longPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('long')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
                             <div style="flex:2"><select id="longSurah" class="arabic-input"><option value="">ފެށޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="longStart" placeholder="ފެށި އާޔަތް"></div>
+                            <div style="flex:1"><input type="number" id="longStart" placeholder="ފެށި"></div>
                         </div>
                         <div class="form-row">
                             <div style="flex:2"><select id="longEndSurah" class="arabic-input"><option value="">ނިމޭ ސޫރަތް...</option></select></div>
-                            <div style="flex:1"><input type="number" id="longEnd" placeholder="ނިންމި އާޔަތް"></div>
+                            <div style="flex:1"><input type="number" id="longEnd" placeholder="ނިންމި"></div>
                             <div>
                                 <div class="mistake-wrapper">
                                     <button class="mistake-btn plus" onclick="adjustMistake('longMistakes', 1)">+</button>
@@ -431,7 +431,7 @@
             <div id="historyContainer" class="history-container"></div>
         </div>
 
-        <!-- MUSHAF PANEL (Mobile Fullscreen) -->
+        <!-- MUSHAF PANEL -->
         <div class="mushaf-panel" id="mushafPanel">
             <div class="mushaf-header">
                 <span id="pageIndicator" style="font-weight:bold; font-size:16px;">Page 1</span>
@@ -541,8 +541,23 @@
     let currentClass = ""; let currentStudent = null; 
     let currentActiveSection = 'new'; let currentPage = 1; let historyFilter = 'all'; 
     let tempLoginClass = ""; let tempLoginStudentIdx = -1;
-    let editingRecordId = null; // Track if we are editing
-    let currentDots = { new: [], short: [], long: [], exam: [] }; // Store dots temporarily
+    let editingRecordId = null;
+    let currentDots = { new: [], short: [], long: [], exam: [] };
+    let selectedDate = new Date().toISOString().split('T')[0]; // Persist date
+
+    // PERSISTENT LOGIN CHECK
+    function checkSession() {
+        const session = JSON.parse(localStorage.getItem('hifz_session'));
+        if(session) {
+            if(session.type === 'teacher') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                // Wait for data load
+            } else if (session.type === 'student') {
+                loginSuccess(session.class, session.student, 'student');
+            }
+        }
+    }
 
     // Load Data
     const dbRef = ref(db, 'hifz_data');
@@ -551,10 +566,20 @@
         if (data) {
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
-            if(document.getElementById('login-screen').style.display !== 'none') {
-                // Populate class select just in case, but student login uses ID now
+            
+            // Re-apply state if logged in
+            if(document.getElementById('app-container').style.display !== 'none') {
+                if(!currentClass) {
+                    // Try to restore from session or default
+                    const session = JSON.parse(localStorage.getItem('hifz_session'));
+                    if(session && session.type === 'teacher') {
+                        refreshClassDropdowns();
+                    }
+                } else {
+                    refreshClassDropdowns();
+                    if(currentStudent) renderHistory();
+                }
             }
-            if(currentClass) { refreshClassDropdowns(); if(currentStudent) renderHistory(); }
         } else {
             classes = { "Default Class": { teacher: "", students: [] } };
             records = [];
@@ -570,8 +595,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         populateSurahSelects();
         populateJuzuSelect();
-        document.getElementById('entryDate').valueAsDate = new Date();
+        document.getElementById('entryDate').value = selectedDate;
         loadMushaf(1);
+        checkSession();
     });
 
     // --- MOBILE SIDEBAR LOGIC ---
@@ -608,13 +634,11 @@
         let foundClass = null;
         let foundStudentIdx = -1;
 
-        // Search in ALL classes
         Object.keys(classes).forEach(cls => {
             const students = classes[cls].students;
             const idx = students.findIndex(s => {
                 const storedName = s.name.trim();
                 const input = inputId.trim().toLowerCase();
-                // Check ID (Name) format or Name (ID) format
                 const firstPart = storedName.split(/[\s\(]+/)[0].toLowerCase();
                 if (firstPart === input) return true;
                 const match = storedName.match(/\(([^)]+)\)/);
@@ -640,7 +664,7 @@
     window.saveNewPassword = function() {
         const p1 = document.getElementById('newPass1').value;
         const p2 = document.getElementById('newPass2').value;
-        if(!p1 || p1 !== p2) return alert("ޕާސްވޯޑް ދިމާނުވޭ ނުވަތަ ހުސްކޮށް އިން");
+        if(!p1 || p1 !== p2) return alert("ޕާސްވޯޑް ދިމާނުވޭ");
         classes[tempLoginClass].students[tempLoginStudentIdx].password = p1;
         saveData();
         document.getElementById('passwordSetupModal').style.display = 'none';
@@ -658,6 +682,13 @@
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
         
+        // Save Session
+        localStorage.setItem('hifz_session', JSON.stringify({
+            type: mode,
+            class: cls,
+            student: studentName
+        }));
+
         if (mode === 'student') {
             document.body.classList.add('student-mode');
             document.getElementById('classSelect').value = cls;
@@ -665,11 +696,9 @@
             setTimeout(() => {
                 const btns = document.querySelectorAll('.student-btn');
                 btns.forEach(b => { if(b.innerText === studentName) b.click(); });
-                // Sidebar cleanup
                 const sb = document.getElementById('sidebar');
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
-                
                 let displayName = studentName.includes('(') ? studentName.match(/\(([^)]+)\)/)[1] : studentName;
                 document.querySelector('.mobile-header h3').innerText = displayName;
             }, 100);
@@ -679,7 +708,10 @@
         }
     }
 
-    window.logout = function() { location.reload(); }
+    window.logout = function() { 
+        localStorage.removeItem('hifz_session');
+        location.reload(); 
+    }
 
     // --- MAIN APP ---
     function populateSurahSelects() {
@@ -714,8 +746,17 @@
         const keys = Object.keys(classes);
         if(keys.length === 0) { classes = {"Default Class": { teacher: "", students: [] }}; keys.push("Default Class"); saveData(); }
         keys.forEach(k => { [mainSel, modalSel, deleteSel].forEach(sel => { let opt = document.createElement('option'); opt.value = k; opt.innerText = k; sel.appendChild(opt); }); });
-        if(keys.includes(currentClass)) mainSel.value = currentClass;
-        else { mainSel.value = keys[0]; currentClass = keys[0]; }
+        
+        // Restore session class if available
+        const session = JSON.parse(localStorage.getItem('hifz_session'));
+        if(session && session.class && classes[session.class]) {
+            currentClass = session.class;
+        } else if (keys.includes(currentClass)) {
+            // keep current
+        } else { 
+            mainSel.value = keys[0]; currentClass = keys[0]; 
+        }
+        mainSel.value = currentClass;
         switchClass(mainSel.value);
     }
 
@@ -749,42 +790,46 @@
         document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
         if(btnEl) btnEl.classList.add('active');
         document.getElementById('studentHeader').innerText = name;
-        autoFillNextLesson();
+        
+        // Update Session
+        const session = JSON.parse(localStorage.getItem('hifz_session'));
+        if(session && session.type === 'teacher') {
+            session.class = currentClass;
+            localStorage.setItem('hifz_session', JSON.stringify(session));
+        }
+
+        // Keep date
+        document.getElementById('entryDate').value = selectedDate;
+
         renderHistory();
     }
 
-    async function autoFillNextLesson() {
-        if(!currentStudent) return;
-        const studentRecords = records.filter(r => r.class === currentClass && r.student === currentStudent);
-        studentRecords.sort((a,b) => new Date(b.date) - new Date(a.date)); 
-        if(studentRecords.length === 0) return;
-        const lastRecord = studentRecords[0];
-        
-        if(lastRecord.new && lastRecord.new.s && lastRecord.new.en) {
-            const lastEndSurahName = lastRecord.new.es || lastRecord.new.s;
-            const lastEndVerse = parseInt(lastRecord.new.en);
-            const surahIndex = surahNames.indexOf(lastEndSurahName) + 1;
-            if(surahIndex === 0) return; 
-            const nextVerse = lastEndVerse + 1;
-            document.getElementById('loader-new').style.display = 'inline-block';
-            try {
-                const res = await fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex}:${nextVerse}?fields=page_number`);
-                const data = await res.json();
-                if(data.verse) {
-                    document.getElementById('newSurah').value = surahIndex;
-                    document.getElementById('newStart').value = nextVerse;
-                    if(data.verse.page_number) { loadMushaf(data.verse.page_number); document.getElementById('newPage').value = data.verse.page_number; }
-                } else if(surahIndex < 114) {
-                    document.getElementById('newSurah').value = surahIndex + 1;
-                    document.getElementById('newStart').value = 1;
-                    const res2 = await fetch(`https://api.quran.com/api/v4/verses/by_key/${surahIndex+1}:1?fields=page_number`);
-                    const data2 = await res2.json();
-                    if(data2.verse) { loadMushaf(data2.verse.page_number); document.getElementById('newPage').value = data2.verse.page_number; }
-                }
-                setActiveSection('new');
-                document.querySelector(`input[name="activeSec"][value="new"]`).checked = true;
-            } catch(e) {} finally { document.getElementById('loader-new').style.display = 'none'; }
-        }
+    window.updateSelectedDate = function() {
+        selectedDate = document.getElementById('entryDate').value;
+    }
+
+    // --- AUTO FILL DATA ---
+    window.autoLoadPage = async function(sec) {
+        const p = document.getElementById(sec+'Page').value;
+        if(!p) return;
+        loadMushaf(p, true);
+        setActiveSection(sec);
+        document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
+    }
+
+    async function fillSurahFromPage(page, section) {
+        document.getElementById('loader-'+section).style.display = 'inline-block';
+        try {
+            const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`); const d = await res.json();
+            if(d.verses.length) {
+                // Fill Start
+                document.getElementById(section+'Surah').value = d.verses[0].verse_key.split(':')[0];
+                document.getElementById(section+'Start').value = d.verses[0].verse_key.split(':')[1];
+                // Fill End
+                document.getElementById(section+'EndSurah').value = d.verses[d.verses.length-1].verse_key.split(':')[0];
+                document.getElementById(section+'End').value = d.verses[d.verses.length-1].verse_key.split(':')[1];
+            }
+        } catch(e){} finally { document.getElementById('loader-'+section).style.display='none'; }
     }
 
     // --- UTILS ---
@@ -835,7 +880,15 @@
         const listDiv = document.getElementById('modalStudentList'); listDiv.innerHTML = '';
         (classes[cls] ? classes[cls].students : []).forEach(s => {
             const item = document.createElement('div'); item.className = 'modal-student-item';
-            item.innerHTML = `<span>${s.name} ${s.password?'🔒':'🔓'}</span><div><button class="btn-del-mini" onclick="resetPass('${s.name}')">Reset</button><button class="btn-del-mini" onclick="deleteStudent('${s.name}')">Del</button></div>`;
+            item.innerHTML = `
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:bold; color:#2c3e50;">${s.name}</span>
+                    <span style="font-size:12px; color:#95a5a6;">${s.password ? '🔑 Pwd: '+s.password : '🔓 No Pwd'}</span>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-del-mini" style="background:#3498db; color:white;" onclick="resetPass('${s.name}')">Reset</button>
+                    <button class="btn-del-mini" onclick="deleteStudent('${s.name}')">Del</button>
+                </div>`;
             listDiv.appendChild(item);
         });
     }
@@ -860,26 +913,25 @@
         document.getElementById('mushafImg').src = `https://android.quran.com/data/width_1260/page${currentPage.toString().padStart(3,'0')}.png`;
         clearDots();
         
-        // Redraw dots if viewing/editing
+        const sec = document.getElementById('lessonType').value === 'exam' ? 'exam' : currentActiveSection;
+        // Display dots logic
         if(editingRecordId) {
-            // Logic handled in edit setup, but page change redraws active dots
-            const rec = records.find(r => r.id === editingRecordId);
-            if(rec) {
-                // If we are editing, we should ideally show dots for that page from currentDots
-                const sec = currentActiveSection;
-                (currentDots[sec] || []).forEach(dot => {
-                    if(parseInt(dot.page) === currentPage) drawDot(dot.x, dot.y, true);
-                });
-            }
+             const r = records.find(rec => rec.id === editingRecordId);
+             if(r) {
+                 if(r.type === 'exam') {
+                     (currentDots.exam || []).forEach(d => { if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, true); });
+                 } else {
+                     // For Daily, only show dots for the active section being edited? 
+                     // Or all? Let's show all for clarity but only allow edit of active section
+                     (currentDots[sec] || []).forEach(d => { if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, true); });
+                 }
+             }
         } else {
-            // New Entry mode - draw dots from currentDots state
-            (currentDots[currentActiveSection] || []).forEach(dot => {
-                if(parseInt(dot.page) === currentPage) drawDot(dot.x, dot.y, true);
-            });
+             (currentDots[sec] || []).forEach(d => { if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, true); });
         }
 
         if(sync && !document.body.classList.contains('student-mode') && document.getElementById('lessonType').value !== 'exam') {
-            const inp = document.getElementById(currentActiveSection+'Page'); if(inp && !editingRecordId) { inp.value=currentPage; fillSurahFromPage(currentPage, currentActiveSection); }
+            const inp = document.getElementById(currentActiveSection+'Page'); if(inp && !editingRecordId && inp.value == "") { inp.value=currentPage; fillSurahFromPage(currentPage, currentActiveSection); }
         }
     }
     window.changePage = (d) => loadMushaf(currentPage+d, false);
@@ -892,21 +944,7 @@
         }
     }
     window.setActiveSection = (s) => { currentActiveSection=s; document.querySelectorAll('.section-box').forEach(b=>b.classList.remove('active-section')); document.getElementById('box-'+s).classList.add('active-section'); }
-    window.autoLoadPage = (s) => { const p = document.getElementById(s+'Page').value; if(p) { loadMushaf(p,true); setActiveSection(s); document.querySelector(`input[name="activeSec"][value="${s}"]`).checked=true; } }
     
-    async function fillSurahFromPage(page, section) {
-        document.getElementById('loader-'+section).style.display = 'inline-block';
-        try {
-            const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${page}?per_page=300`); const d = await res.json();
-            if(d.verses.length) {
-                document.getElementById(section+'Surah').value = d.verses[0].verse_key.split(':')[0];
-                document.getElementById(section+'Start').value = d.verses[0].verse_key.split(':')[1];
-                document.getElementById(section+'EndSurah').value = d.verses[d.verses.length-1].verse_key.split(':')[0];
-                document.getElementById(section+'End').value = d.verses[d.verses.length-1].verse_key.split(':')[1];
-            }
-        } catch(e){} finally { document.getElementById('loader-'+section).style.display='none'; }
-    }
-
     window.onImageClick = function(e) {
         if(document.body.classList.contains('student-mode')) return;
         if(e.target.classList.contains('mistake-dot')) return;
@@ -914,7 +952,6 @@
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // Save dot
         const sec = document.getElementById('lessonType').value === 'exam' ? 'exam' : currentActiveSection;
         currentDots[sec].push({ page: currentPage, x: x, y: y });
         
@@ -931,10 +968,8 @@
             dot.onclick = (ev) => { 
                 ev.stopPropagation(); 
                 dot.remove(); 
-                // Remove from data
                 const sec = document.getElementById('lessonType').value === 'exam' ? 'exam' : currentActiveSection;
                 currentDots[sec] = currentDots[sec].filter(d => d.x !== x || d.y !== y);
-
                 const isEx = document.getElementById('lessonType').value==='exam';
                 isEx ? updateExamMistake('teacher', -1) : adjustMistake(currentActiveSection+'Mistakes', -1); 
             };
@@ -945,28 +980,20 @@
     window.viewMistakes = function(id) {
         const r = records.find(rec => rec.id === id);
         if(!r) return;
-        
-        // Find dots. For daily, aggregate all. For exam, just exam.
         let dots = [];
-        if(r.type === 'exam' && r.new && r.new.dots) dots = r.new.dots; // Reuse 'new' structure for exam dots if saved there
+        if(r.type === 'exam' && r.new && r.new.dots) dots = r.new.dots; 
         else {
             if(r.new && r.new.dots) dots = dots.concat(r.new.dots);
             if(r.short && r.short.dots) dots = dots.concat(r.short.dots);
             if(r.long && r.long.dots) dots = dots.concat(r.long.dots);
         }
-
-        if(dots.length === 0) return alert("މި ރެކޯޑްގައި ފާހަގަކޮށްފައިވާ ކުށެއް ނެތް");
-
-        // Open Mushaf to the page of the first dot
+        if(dots.length === 0) return alert("ކުށެއް ނެތް");
         loadMushaf(dots[0].page, false);
-        toggleMushaf(); // Open panel
-        
-        // Draw dots (non-interactive)
+        const panel = document.getElementById('mushafPanel');
+        if(!panel.classList.contains('active')) toggleMushaf(); // Open if closed
         setTimeout(() => {
             clearDots();
-            dots.forEach(d => {
-                if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, false);
-            });
+            dots.forEach(d => { if(parseInt(d.page) === currentPage) drawDot(d.x, d.y, false); });
         }, 300);
     }
 
@@ -986,11 +1013,16 @@
     window.clearForm = () => {
         ['new','short','long'].forEach(s => { 
             document.getElementById(s+'Mistakes').value=0; document.getElementById(s+'Page').value=''; 
-            document.getElementById(s+'Start').value=''; document.getElementById(s+'End').value=''; 
+            document.getElementById(s+'Start').value=''; document.getElementById(s+'End').value='';
+            document.getElementById(s+'Surah').value=''; document.getElementById(s+'EndSurah').value=''; 
         });
         document.getElementById('examJuzu').value = "1";
         document.getElementById('examPortion').value = "whole";
         document.getElementById('examExaminer').value = "";
+        document.getElementById('examTeacherMistakes').value = 0;
+        document.getElementById('examSelfMistakes').value = 0;
+        document.getElementById('markMutha1').value = 2.5; document.getElementById('markMutha2').value = 2.5;
+        document.getElementById('markTajweed').value = 10; document.getElementById('markFluency').value = 5;
         currentDots = { new: [], short: [], long: [], exam: [] };
         editingRecordId = null;
         clearDots();
@@ -1029,15 +1061,30 @@
                     tajweed:getV('markTajweed'), fluency:getV('markFluency'), 
                     total:document.getElementById('totalExamScore').innerText 
                 },
-                new: { dots: currentDots.exam } // Store dots in 'new' structure as generic
+                new: { dots: currentDots.exam } 
             };
         } else {
-            rec = { 
-                ...rec, type:'daily', 
-                new: { s:getS('newSurah'), es:getS('newEndSurah'), st:getV('newStart'), en:getV('newEnd'), m:getV('newMistakes'), p:getV('newPage'), dots: currentDots.new }, 
-                short: { s:getS('shortSurah'), es:getS('shortEndSurah'), st:getV('shortStart'), en:getV('shortEnd'), m:getV('shortMistakes'), dots: currentDots.short }, 
-                long: { s:getS('longSurah'), es:getS('longEndSurah'), st:getV('longStart'), en:getV('longEnd'), m:getV('longMistakes'), dots: currentDots.long } 
-            };
+            // ONLY SAVE ACTIVE SECTION
+            rec.type = 'daily';
+            // Start with blank objects
+            rec.new = {s:"", es:"", st:"", en:"", m:0};
+            rec.short = {s:"", es:"", st:"", en:"", m:0};
+            rec.long = {s:"", es:"", st:"", en:"", m:0};
+
+            const active = currentActiveSection; // 'new', 'short', 'long'
+            
+            // Helper to build object from inputs
+            const buildObj = (sec) => ({
+                s:getS(sec+'Surah'), es:getS(sec+'EndSurah'), 
+                st:getV(sec+'Start'), en:getV(sec+'End'), 
+                m:getV(sec+'Mistakes'), p: sec==='new'?getV('newPage'):"",
+                dots: currentDots[sec]
+            });
+
+            // Populate only the active section
+            if(active === 'new') rec.new = buildObj('new');
+            if(active === 'short') rec.short = buildObj('short');
+            if(active === 'long') rec.long = buildObj('long');
         }
         
         if(editingRecordId) {
@@ -1046,7 +1093,7 @@
         records.push(rec); 
         saveData(); 
         renderHistory(); 
-        clearForm(); // Reset
+        clearForm(); // Reset fields
         alert("ސޭވް ކުރެވިއްޖެ");
     }
 
@@ -1059,7 +1106,6 @@
         document.getElementById('lessonType').value = r.type;
         toggleFormSection(r.type);
 
-        // Clear current dots and load from record
         currentDots = { new: [], short: [], long: [], exam: [] };
 
         if(r.type === 'exam') {
@@ -1073,32 +1119,33 @@
             document.getElementById('markTajweed').value = r.scores.tajweed;
             document.getElementById('markFluency').value = r.scores.fluency;
             document.getElementById('totalExamScore').innerText = r.scores.total;
-            currentDots.exam = r.new?.dots || []; // Exam dots stored in new.dots usually
+            currentDots.exam = r.new?.dots || [];
         } else {
+            // Function to load data to inputs
             const loadSec = (sec, data) => {
+                if(!data || !data.s) return; // Skip if empty
+                setActiveSection(sec); document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
+                
                 const sEl = document.getElementById(sec+'Surah');
-                // Try to find value by text
-                for(let i=0; i<sEl.options.length; i++) {
-                    if(sEl.options[i].text.includes(data.s)) sEl.value = sEl.options[i].value;
-                }
+                for(let i=0; i<sEl.options.length; i++) { if(sEl.options[i].text.includes(data.s)) sEl.value = sEl.options[i].value; }
+                
                 const esEl = document.getElementById(sec+'EndSurah');
-                for(let i=0; i<esEl.options.length; i++) {
-                    if(esEl.options[i].text.includes(data.es)) esEl.value = esEl.options[i].value;
-                }
+                for(let i=0; i<esEl.options.length; i++) { if(esEl.options[i].text.includes(data.es)) esEl.value = esEl.options[i].value; }
+                
                 document.getElementById(sec+'Start').value = data.st;
                 document.getElementById(sec+'End').value = data.en;
                 document.getElementById(sec+'Mistakes').value = data.m;
                 if(sec==='new') document.getElementById('newPage').value = data.p;
                 currentDots[sec] = data.dots || [];
             };
-            loadSec('new', r.new);
-            loadSec('short', r.short);
-            loadSec('long', r.long);
+            
+            // Prioritize loading active data. Since we only save active, usually only one is full.
+            if(r.new && r.new.s) loadSec('new', r.new);
+            else if(r.short && r.short.s) loadSec('short', r.short);
+            else if(r.long && r.long.s) loadSec('long', r.long);
         }
-        
-        // Scroll to top
         window.scrollTo(0,0);
-        alert("ރެކޯޑް އެޑިޓްކުރަން ހުޅުވިއްޖެ");
+        alert("އެޑިޓްކުރަން ހުޅުވިއްޖެ");
     }
 
     function renderHistory() {
@@ -1130,7 +1177,7 @@
                     </div>`;
             } else {
                 card.className = 'history-card';
-                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div><span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
+                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div>${o.p ? '<div>ޞަފްޙާ: '+o.p+'</div>' : ''}<span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
                 card.innerHTML = `
                     <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
                     <div class="card-header"><span class="card-date">📅 ${r.date}</span><span class="card-teacher">${r.teacher}</span></div>
