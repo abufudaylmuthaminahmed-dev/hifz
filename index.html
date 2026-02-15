@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Online v6.0</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - Cloud v6.1</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -218,7 +218,7 @@
                 <button class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ޓީޗަރ ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v6.0 (Online)</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px;">© Quran Hifz Tracker v6.1 (Firebase)</p>
     </div>
 
     <!-- NEW PASSWORD SETUP MODAL -->
@@ -611,13 +611,14 @@
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
-     apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
-  authDomain: "hifz-cde3b.firebaseapp.com",
-  databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
-  projectId: "hifz-cde3b",
-  storageBucket: "hifz-cde3b.firebasestorage.app",
-  messagingSenderId: "566754658580",
-  appId: "1:566754658580:web:d63d0f167960f53bab9a01"
+      apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
+      authDomain: "hifz-cde3b.firebaseapp.com",
+      databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
+      projectId: "hifz-cde3b",
+      storageBucket: "hifz-cde3b.firebasestorage.app",
+      messagingSenderId: "566754658580",
+      appId: "1:566754658580:web:d63d0f167960f53bab9a01"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
