@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v14.0 (Data Recovery)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v15.0 (Restore Fixed)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -67,6 +67,7 @@
             border-radius: 8px; font-size: 16px; cursor: pointer;
             font-weight: bold; transition: 0.2s;
         }
+        .login-btn:disabled { background: #95a5a6; cursor: not-allowed; opacity: 0.7; }
         .btn-teacher-login { background: #2c3e50; color: white; }
         .btn-student-login { background: #27ae60; color: white; }
         
@@ -191,7 +192,7 @@
                 <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v14.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v15.0</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -542,16 +543,20 @@
             // Populate login class select
             populateLoginClasses();
             
-            // If logged in as teacher, refresh UI
-            if(document.getElementById('app-container').style.display !== 'none') {
-                if(!currentClass) {
-                    const session = JSON.parse(localStorage.getItem('hifz_session'));
-                    if(session && session.class && classes[session.class]) {
-                        currentClass = session.class;
+            // Check Session only after data is loaded
+            const session = JSON.parse(localStorage.getItem('hifz_session'));
+            if(session) {
+                if(session.type === 'teacher') {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'flex';
+                    if(!currentClass && session.class && classes[session.class]) currentClass = session.class;
+                    refreshClassDropdowns();
+                } else if (session.type === 'student') {
+                    // Verify student still exists
+                    if(classes[session.class] && classes[session.class].students.find(s => s.name === session.student)) {
+                        loginSuccess(session.class, session.student, 'student');
                     }
                 }
-                refreshClassDropdowns();
-                if(currentStudent) renderHistory();
             }
 
         } else {
@@ -560,7 +565,8 @@
     });
 
     function saveData() {
-        set(ref(db, 'hifz_data'), { classes: classes, records: records }).catch(err => alert("Error saving: " + err));
+        // Return promise so we can wait for it
+        return set(ref(db, 'hifz_data'), { classes: classes, records: records });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -568,18 +574,7 @@
         populateJuzuSelect();
         document.getElementById('entryDate').value = selectedDate;
         loadMushaf(1);
-        
-        // Check session only after data might have loaded or set timeout
-        setTimeout(checkSession, 1000); 
     });
-    
-    function checkSession() {
-         const session = JSON.parse(localStorage.getItem('hifz_session'));
-         if(session && session.type === 'teacher') {
-             document.getElementById('login-screen').style.display = 'none';
-             document.getElementById('app-container').style.display = 'flex';
-         }
-    }
 
     // --- MOBILE SIDEBAR ---
     window.toggleSidebar = function() {
@@ -670,8 +665,9 @@
                 const sb = document.getElementById('sidebar');
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
-                document.querySelector('.mobile-header h3').innerText = studentName;
-            }, 500); // Slight delay to ensure list is rendered
+                let displayName = studentName.includes('(') ? studentName.match(/\(([^)]+)\)/)[1] : studentName;
+                document.querySelector('.mobile-header h3').innerText = displayName;
+            }, 500); 
         } else {
             document.body.classList.remove('student-mode');
             refreshClassDropdowns();
@@ -767,7 +763,7 @@
         document.getElementById('entryDate').value = selectedDate;
         
         // Auto fill logic from last record
-        const studRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily');
+        const studRecs = records.filter(r => r.class === currentClass && (r.student === name || r.student.includes(name)));
         if(studRecs.length > 0) {
             studRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
             const last = studRecs[0];
@@ -879,9 +875,49 @@
         const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({classes, records})); 
         a.download = "backup.json"; document.body.appendChild(a); a.click(); a.remove(); 
     }
+    
+    // RESTORE WITH FIXED RELOAD LOGIC
     window.restoreBackup = function() {
         const f = document.getElementById('restoreFile').files[0];
-        if(f) { const r = new FileReader(); r.onload = e => { const d = JSON.parse(e.target.result); classes = d.classes; records = d.records; saveData(); location.reload(); }; r.readAsText(f); }
+        if(f) { 
+            const r = new FileReader(); 
+            r.onload = e => { 
+                const d = JSON.parse(e.target.result); 
+                
+                // DATA CLEANING: Ensure format {id, name}
+                if(d.classes) {
+                    Object.keys(d.classes).forEach(cls => {
+                         if(d.classes[cls].students) {
+                             d.classes[cls].students.forEach((s, i) => {
+                                 if(typeof s === 'string') {
+                                      // Extract ID
+                                      const match = s.match(/(IUM\d+)/i);
+                                      if(match) {
+                                          d.classes[cls].students[i] = {
+                                              id: match[0],
+                                              name: s.replace(match[0], '').replace(/[()]/g, '').trim(),
+                                              password: ""
+                                          };
+                                      } else {
+                                          d.classes[cls].students[i] = { id: "", name: s, password: "" };
+                                      }
+                                 }
+                             });
+                         }
+                    });
+                }
+                
+                classes = d.classes; 
+                records = d.records; 
+                
+                // WAIT FOR SAVE TO COMPLETE
+                saveData().then(() => {
+                    alert("Restore Complete. Page will reload.");
+                    location.reload();
+                });
+            }; 
+            r.readAsText(f); 
+        }
     }
 
     // --- MUSHAF/RECORD ---
@@ -1221,7 +1257,13 @@
 
     function renderHistory() {
         const con = document.getElementById('historyContainer'); con.innerHTML = '';
-        const data = records.filter(r => r.class === currentClass && r.student === currentStudent).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        
+        // SMART FILTER: Matches Exact Name OR if old records contain the name (e.g. "IUM123 (Ali)" contains "Ali")
+        const data = records.filter(r => {
+             const matchClass = r.class === currentClass;
+             const matchStudent = (r.student === currentStudent) || (r.student.includes(currentStudent));
+             return matchClass && matchStudent;
+        }).sort((a,b)=>new Date(b.date)-new Date(a.date));
         
         data.forEach(r => {
             if(historyFilter !== 'all' && r.type !== historyFilter && !(r.type==='daily' && (r[historyFilter]?.s || r[historyFilter]?.st))) return;
