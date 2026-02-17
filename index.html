@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v16.0 (Student View)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v17.0 (Auto-Fill Fixed)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -75,15 +75,10 @@
         .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; font-size: 14px; }
         .login-tab-btn.active { border-color: var(--accent-color); color: var(--accent-color); }
 
-        /* --- STUDENT MODE RESTRICTIONS --- */
-        /* Hides everything a student shouldn't see/touch */
         body.student-mode .teacher-only { display: none !important; }
         body.student-mode .delete-card-btn { display: none !important; }
         body.student-mode .entry-form { display: none !important; }
-        body.student-mode .mushaf-panel { pointer-events: none; }
-        body.student-mode .class-control-area { display: none !important; } /* Hide class selector */
-        body.student-mode #studentListContainer { display: none !important; } /* Hide student list */
-        body.student-mode .btn-edit-record { display: none !important; } /* Hide Edit Button */
+        body.student-mode .mushaf-panel { pointer-events: none; } 
         
         /* --- SIDEBAR --- */
         .sidebar {
@@ -197,7 +192,7 @@
                 <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v16.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v17.0</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -634,6 +629,7 @@
 
         if(!clsName || !inputId) return alert("ކްލާސް އަދި އައިޑީ ޖައްސަވާ");
 
+        // Find student by ID field (new structure)
         const students = classes[clsName].students;
         const studentIdx = students.findIndex(s => s.id === inputId);
 
@@ -679,10 +675,7 @@
                 const sb = document.getElementById('sidebar');
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
-                
-                // Show clean name without ID
-                let displayName = studentName;
-                if(studentName.includes('(')) displayName = studentName.match(/\(([^)]+)\)/)[1];
+                let displayName = studentName.includes('(') ? studentName.match(/\(([^)]+)\)/)[1] : studentName;
                 document.querySelector('.mobile-header h3').innerText = displayName;
             }, 500); 
         } else {
@@ -779,8 +772,8 @@
         }
         document.getElementById('entryDate').value = selectedDate;
         
-        // Auto fill logic
-        const studRecs = records.filter(r => r.class === currentClass && (r.student === name || r.student.includes(name)));
+        // Auto fill logic from last record
+        const studRecs = records.filter(r => r.class === currentClass && r.student === currentStudent && r.type === 'daily');
         if(studRecs.length > 0) {
             studRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
             const last = studRecs[0];
@@ -848,14 +841,16 @@
         lines.forEach(line => {
             if(!line.trim()) return;
             let parts = line.split(/[\t,]+/); if(parts.length < 2 && line.includes('-')) parts = line.split('-');
-            
-            let id = parts[0].trim().toUpperCase();
-            let name = parts[1] ? parts[1].trim() : "";
-            
-            if(!name) { name = id; id = ""; }
-
-            if(!classes[cls].students.find(s => s.name === name || (id && s.id === id))) {
-                classes[cls].students.push({ id: id, name: name, password: "" }); count++;
+            let name = parts[0].trim().replace(/\(\d+\)$/, '').trim();
+            let id = "";
+            if(parts.length > 1) id = parts[1].trim().toUpperCase();
+            let fullName = name;
+            if (id) {
+                if (name.match(/\d/)) fullName = `${name} (${parts[1].trim()})`; 
+                else if (id.match(/\d/)) fullName = `${id} (${name})`;
+            }
+            if(!classes[cls].students.find(s => s.name === fullName)) {
+                classes[cls].students.push({ name: fullName, password: "" }); count++;
             }
         });
         saveData(); document.getElementById('bulkStudents').value = ''; renderModalStudentList(); if(currentClass === cls) switchClass(cls); alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
@@ -869,7 +864,6 @@
             item.innerHTML = `
                 <div style="display:flex; flex-direction:column;">
                     <span style="font-weight:bold; color:#2c3e50;">${s.name}</span>
-                    <span style="font-size:12px; color:#7f8c8d;">ID: ${s.id || '-'}</span>
                     <span style="font-size:12px; color:#95a5a6;">${s.password ? '🔑 Pwd: '+s.password : '🔓 No Pwd'}</span>
                 </div>
                 <div style="display:flex; gap:5px;">
@@ -1230,13 +1224,7 @@
 
     function renderHistory() {
         const con = document.getElementById('historyContainer'); con.innerHTML = '';
-        
-        // SMART FILTER: Matches Exact Name OR if old records contain the name (e.g. "IUM123 (Ali)" contains "Ali")
-        const data = records.filter(r => {
-             const matchClass = r.class === currentClass;
-             const matchStudent = (r.student === currentStudent) || (r.student.includes(currentStudent));
-             return matchClass && matchStudent;
-        }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        const data = records.filter(r => r.class === currentClass && r.student === currentStudent).sort((a,b)=>new Date(b.date)-new Date(a.date));
         
         data.forEach(r => {
             if(historyFilter !== 'all' && r.type !== historyFilter && !(r.type==='daily' && (r[historyFilter]?.s || r[historyFilter]?.st))) return;
