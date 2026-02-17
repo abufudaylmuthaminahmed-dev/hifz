@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v15.0 (Restore Fixed)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v16.0 (Student View)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -75,10 +75,15 @@
         .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; font-size: 14px; }
         .login-tab-btn.active { border-color: var(--accent-color); color: var(--accent-color); }
 
+        /* --- STUDENT MODE RESTRICTIONS --- */
+        /* Hides everything a student shouldn't see/touch */
         body.student-mode .teacher-only { display: none !important; }
         body.student-mode .delete-card-btn { display: none !important; }
         body.student-mode .entry-form { display: none !important; }
-        body.student-mode .mushaf-panel { pointer-events: none; } 
+        body.student-mode .mushaf-panel { pointer-events: none; }
+        body.student-mode .class-control-area { display: none !important; } /* Hide class selector */
+        body.student-mode #studentListContainer { display: none !important; } /* Hide student list */
+        body.student-mode .btn-edit-record { display: none !important; } /* Hide Edit Button */
         
         /* --- SIDEBAR --- */
         .sidebar {
@@ -183,7 +188,7 @@
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (IUM123)" style="text-transform: uppercase; margin-bottom: 10px;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް" style="margin-bottom: 10px;">
                 <button id="btnStudentLogin" class="login-btn btn-student-login" onclick="handleStudentLogin()">ލޮގިން</button>
-                <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު ވަންނަނަމަ، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
+                <p style="font-size:12px; color:#666; margin-top:10px;">އައިޑީ ޖެހުމަށްފަހު ފުރަތަމަ ފަހަރަށް ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
             </div>
             <!-- Teacher Login -->
             <div id="login-form-teacher" style="display:none;">
@@ -192,7 +197,7 @@
                 <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v15.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v16.0</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -492,12 +497,25 @@
     let currentDots = { new: [], short: [], long: [], exam: [] };
     let selectedDate = new Date().toISOString().split('T')[0];
 
+    // Check Session
+    function checkSession() {
+        const session = JSON.parse(localStorage.getItem('hifz_session'));
+        if(session) {
+            if(session.type === 'teacher') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+            } else if (session.type === 'student') {
+                loginSuccess(session.class, session.student, 'student');
+            }
+        }
+    }
+
     // Load Data & Auto Migrate & Sanitize
     const dbRef = ref(db, 'hifz_data');
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         
-        // Always enable login buttons so user gets feedback
+        // Always enable login buttons
         document.getElementById('btnStudentLogin').disabled = false;
         document.getElementById('btnTeacherLogin').disabled = false;
 
@@ -505,14 +523,11 @@
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
             
-            // --- AUTO MIGRATION LOGIC (Separate ID from Name) ---
+            // --- AUTO MIGRATION LOGIC ---
             let needsSave = false;
             Object.keys(classes).forEach(cls => {
-                // Ensure students array exists
                 if(!classes[cls].students) classes[cls].students = [];
-                
                 classes[cls].students.forEach((stud, index) => {
-                    // String to Object
                     if (typeof stud === 'string') {
                         const idMatch = stud.match(/(IUM\d+)/i);
                         if (idMatch) {
@@ -526,7 +541,6 @@
                         }
                         needsSave = true;
                     } 
-                    // Object with mixed name
                     else if (typeof stud === 'object' && stud.name && !stud.id) {
                          const idMatch = stud.name.match(/(IUM\d+)/i);
                          if(idMatch) {
@@ -540,7 +554,6 @@
 
             if(needsSave) saveData();
             
-            // Populate login class select
             populateLoginClasses();
             
             // Check Session only after data is loaded
@@ -552,9 +565,12 @@
                     if(!currentClass && session.class && classes[session.class]) currentClass = session.class;
                     refreshClassDropdowns();
                 } else if (session.type === 'student') {
-                    // Verify student still exists
-                    if(classes[session.class] && classes[session.class].students.find(s => s.name === session.student)) {
-                        loginSuccess(session.class, session.student, 'student');
+                    // Re-verify student exists, check both ID and Name properties
+                    if(classes[session.class]) {
+                        const studentExists = classes[session.class].students.some(s => s.name === session.student);
+                        if(studentExists) {
+                            loginSuccess(session.class, session.student, 'student');
+                        }
                     }
                 }
             }
@@ -565,7 +581,6 @@
     });
 
     function saveData() {
-        // Return promise so we can wait for it
         return set(ref(db, 'hifz_data'), { classes: classes, records: records });
     }
 
@@ -619,7 +634,6 @@
 
         if(!clsName || !inputId) return alert("ކްލާސް އަދި އައިޑީ ޖައްސަވާ");
 
-        // Find student by ID field (new structure)
         const students = classes[clsName].students;
         const studentIdx = students.findIndex(s => s.id === inputId);
 
@@ -665,7 +679,10 @@
                 const sb = document.getElementById('sidebar');
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
-                let displayName = studentName.includes('(') ? studentName.match(/\(([^)]+)\)/)[1] : studentName;
+                
+                // Show clean name without ID
+                let displayName = studentName;
+                if(studentName.includes('(')) displayName = studentName.match(/\(([^)]+)\)/)[1];
                 document.querySelector('.mobile-header h3').innerText = displayName;
             }, 500); 
         } else {
@@ -762,7 +779,7 @@
         }
         document.getElementById('entryDate').value = selectedDate;
         
-        // Auto fill logic from last record
+        // Auto fill logic
         const studRecs = records.filter(r => r.class === currentClass && (r.student === name || r.student.includes(name)));
         if(studRecs.length > 0) {
             studRecs.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -830,19 +847,15 @@
         let count = 0;
         lines.forEach(line => {
             if(!line.trim()) return;
-            // Split by comma
-            let parts = line.split(',');
-            if(parts.length < 2) return; // Invalid format
+            let parts = line.split(/[\t,]+/); if(parts.length < 2 && line.includes('-')) parts = line.split('-');
             
             let id = parts[0].trim().toUpperCase();
-            let name = parts[1].trim();
+            let name = parts[1] ? parts[1].trim() : "";
             
-            // Check if already exists in this class
-            const exists = classes[cls].students.find(s => s.id === id);
-            
-            if(!exists) {
-                classes[cls].students.push({ id: id, name: name, password: "" }); 
-                count++;
+            if(!name) { name = id; id = ""; }
+
+            if(!classes[cls].students.find(s => s.name === name || (id && s.id === id))) {
+                classes[cls].students.push({ id: id, name: name, password: "" }); count++;
             }
         });
         saveData(); document.getElementById('bulkStudents').value = ''; renderModalStudentList(); if(currentClass === cls) switchClass(cls); alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
@@ -875,49 +888,9 @@
         const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({classes, records})); 
         a.download = "backup.json"; document.body.appendChild(a); a.click(); a.remove(); 
     }
-    
-    // RESTORE WITH FIXED RELOAD LOGIC
     window.restoreBackup = function() {
         const f = document.getElementById('restoreFile').files[0];
-        if(f) { 
-            const r = new FileReader(); 
-            r.onload = e => { 
-                const d = JSON.parse(e.target.result); 
-                
-                // DATA CLEANING: Ensure format {id, name}
-                if(d.classes) {
-                    Object.keys(d.classes).forEach(cls => {
-                         if(d.classes[cls].students) {
-                             d.classes[cls].students.forEach((s, i) => {
-                                 if(typeof s === 'string') {
-                                      // Extract ID
-                                      const match = s.match(/(IUM\d+)/i);
-                                      if(match) {
-                                          d.classes[cls].students[i] = {
-                                              id: match[0],
-                                              name: s.replace(match[0], '').replace(/[()]/g, '').trim(),
-                                              password: ""
-                                          };
-                                      } else {
-                                          d.classes[cls].students[i] = { id: "", name: s, password: "" };
-                                      }
-                                 }
-                             });
-                         }
-                    });
-                }
-                
-                classes = d.classes; 
-                records = d.records; 
-                
-                // WAIT FOR SAVE TO COMPLETE
-                saveData().then(() => {
-                    alert("Restore Complete. Page will reload.");
-                    location.reload();
-                });
-            }; 
-            r.readAsText(f); 
-        }
+        if(f) { const r = new FileReader(); r.onload = e => { const d = JSON.parse(e.target.result); classes = d.classes; records = d.records; saveData(); location.reload(); }; r.readAsText(f); }
     }
 
     // --- MUSHAF/RECORD ---
