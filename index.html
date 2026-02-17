@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v13.0 Fixed</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v14.0 (Data Recovery)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -178,6 +178,7 @@
             </div>
             <!-- Student Login -->
             <div id="login-form-student">
+                <select id="loginClassSelect" class="login-input" style="margin-bottom:10px;"><option value="">ކްލާސް ނަގާ...</option></select>
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (IUM123)" style="text-transform: uppercase; margin-bottom: 10px;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް" style="margin-bottom: 10px;">
                 <button id="btnStudentLogin" class="login-btn btn-student-login" onclick="handleStudentLogin()">ލޮގިން</button>
@@ -190,7 +191,7 @@
                 <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v13.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v14.0</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -490,18 +491,15 @@
     let currentDots = { new: [], short: [], long: [], exam: [] };
     let selectedDate = new Date().toISOString().split('T')[0];
 
-    // Check Session
-    function checkSession() {
-        const session = JSON.parse(localStorage.getItem('hifz_session'));
-        if(session) {
-            // Need to wait for data to load
-        }
-    }
-
-    // Load Data & Auto Migrate
+    // Load Data & Auto Migrate & Sanitize
     const dbRef = ref(db, 'hifz_data');
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
+        
+        // Always enable login buttons so user gets feedback
+        document.getElementById('btnStudentLogin').disabled = false;
+        document.getElementById('btnTeacherLogin').disabled = false;
+
         if (data) {
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
@@ -509,8 +507,11 @@
             // --- AUTO MIGRATION LOGIC (Separate ID from Name) ---
             let needsSave = false;
             Object.keys(classes).forEach(cls => {
+                // Ensure students array exists
+                if(!classes[cls].students) classes[cls].students = [];
+                
                 classes[cls].students.forEach((stud, index) => {
-                    // If still old format "IUM123 (Name)" string
+                    // String to Object
                     if (typeof stud === 'string') {
                         const idMatch = stud.match(/(IUM\d+)/i);
                         if (idMatch) {
@@ -520,12 +521,11 @@
                                 password: ""
                             };
                         } else {
-                            // No ID found, just keep name
                             classes[cls].students[index] = { id: "", name: stud, password: "" };
                         }
                         needsSave = true;
                     } 
-                    // If object but mixed name
+                    // Object with mixed name
                     else if (typeof stud === 'object' && stud.name && !stud.id) {
                          const idMatch = stud.name.match(/(IUM\d+)/i);
                          if(idMatch) {
@@ -539,20 +539,19 @@
 
             if(needsSave) saveData();
             
-            // Restore Session
-            const session = JSON.parse(localStorage.getItem('hifz_session'));
-            if(session) {
-                if(session.type === 'teacher') {
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('app-container').style.display = 'flex';
-                    if(!currentClass && session.class && classes[session.class]) currentClass = session.class;
-                    refreshClassDropdowns();
-                } else if (session.type === 'student') {
-                    // Verify student still exists
-                    if(classes[session.class] && classes[session.class].students.find(s => s.name === session.student)) {
-                        loginSuccess(session.class, session.student, 'student');
+            // Populate login class select
+            populateLoginClasses();
+            
+            // If logged in as teacher, refresh UI
+            if(document.getElementById('app-container').style.display !== 'none') {
+                if(!currentClass) {
+                    const session = JSON.parse(localStorage.getItem('hifz_session'));
+                    if(session && session.class && classes[session.class]) {
+                        currentClass = session.class;
                     }
                 }
+                refreshClassDropdowns();
+                if(currentStudent) renderHistory();
             }
 
         } else {
@@ -569,7 +568,18 @@
         populateJuzuSelect();
         document.getElementById('entryDate').value = selectedDate;
         loadMushaf(1);
+        
+        // Check session only after data might have loaded or set timeout
+        setTimeout(checkSession, 1000); 
     });
+    
+    function checkSession() {
+         const session = JSON.parse(localStorage.getItem('hifz_session'));
+         if(session && session.type === 'teacher') {
+             document.getElementById('login-screen').style.display = 'none';
+             document.getElementById('app-container').style.display = 'flex';
+         }
+    }
 
     // --- MOBILE SIDEBAR ---
     window.toggleSidebar = function() {
@@ -595,33 +605,39 @@
         }
     }
 
+    window.populateLoginClasses = function() {
+        const sel = document.getElementById('loginClassSelect');
+        sel.innerHTML = '<option value="">ކްލާސް ނަގާ...</option>';
+        Object.keys(classes).forEach(k => {
+            let opt = document.createElement('option');
+            opt.value = k; opt.innerText = k;
+            sel.appendChild(opt);
+        });
+    }
+
     window.handleStudentLogin = function() {
         if(Object.keys(classes).length === 0) return alert("ޑޭޓާ ލޯޑުވަނީ... މަޑުކޮށްލައްވާ");
 
+        const clsName = document.getElementById('loginClassSelect').value;
         const inputId = document.getElementById('loginStudentId').value.trim().toUpperCase();
         const pass = document.getElementById('studentPassword').value;
 
-        if(!inputId) return alert("އައިޑީ ޖައްސަވާ");
+        if(!clsName || !inputId) return alert("ކްލާސް އަދި އައިޑީ ޖައްސަވާ");
 
-        let foundClass = null; let foundStudentIdx = -1;
-        
-        // Find by ID directly
-        Object.keys(classes).forEach(cls => {
-            const students = classes[cls].students;
-            const idx = students.findIndex(s => s.id === inputId);
-            if(idx !== -1) { foundClass = cls; foundStudentIdx = idx; }
-        });
+        // Find student by ID field (new structure)
+        const students = classes[clsName].students;
+        const studentIdx = students.findIndex(s => s.id === inputId);
 
-        if(!foundClass) return alert("ތިޔަ އައިޑީ ނުފެނުނު");
+        if(studentIdx === -1) return alert("ތިޔަ އައިޑީ ނުފެނުނު");
 
-        const studentObj = classes[foundClass].students[foundStudentIdx];
+        const studentObj = students[studentIdx];
         
         if ((!studentObj.password || studentObj.password === "") && pass === "") {
-            tempLoginClass = foundClass; tempLoginStudentIdx = foundStudentIdx;
+            tempLoginClass = clsName; tempLoginStudentIdx = studentIdx;
             document.getElementById('passwordSetupModal').style.display = 'flex';
             return;
         }
-        if (pass === studentObj.password) loginSuccess(foundClass, studentObj.name, 'student');
+        if (pass === studentObj.password) loginSuccess(clsName, studentObj.name, 'student');
         else alert("ޕާސްވޯޑް ނުބައި");
     }
 
@@ -655,7 +671,7 @@
                 sb.classList.remove('active');
                 document.getElementById('sidebar-overlay').classList.remove('active');
                 document.querySelector('.mobile-header h3').innerText = studentName;
-            }, 100);
+            }, 500); // Slight delay to ensure list is rendered
         } else {
             document.body.classList.remove('student-mode');
             refreshClassDropdowns();
@@ -694,9 +710,17 @@
         const modalSel = document.getElementById('modalClassSelect');
         const deleteClassSel = document.getElementById('deleteClassSelect');
         [mainSel, modalSel, deleteClassSel].forEach(sel => sel.innerHTML = '');
+        
         const keys = Object.keys(classes);
         if(keys.length === 0) { classes = {"Default Class": { teacher: "", students: [] }}; keys.push("Default Class"); saveData(); }
-        keys.forEach(k => { [mainSel, modalSel, deleteClassSel].forEach(sel => { let opt = document.createElement('option'); opt.value = k; opt.innerText = k; sel.appendChild(opt); }); });
+        
+        keys.forEach(k => { 
+            [mainSel, modalSel, deleteClassSel].forEach(sel => { 
+                let opt = document.createElement('option'); 
+                opt.value = k; opt.innerText = k; 
+                sel.appendChild(opt); 
+            }); 
+        });
         
         const session = JSON.parse(localStorage.getItem('hifz_session'));
         if(session && session.class && classes[session.class]) { currentClass = session.class; } 
@@ -810,18 +834,19 @@
         let count = 0;
         lines.forEach(line => {
             if(!line.trim()) return;
-            let parts = line.split(/[\t,]+/); if(parts.length < 2 && line.includes('-')) parts = line.split('-');
+            // Split by comma
+            let parts = line.split(',');
+            if(parts.length < 2) return; // Invalid format
             
-            // Format ID, Name
             let id = parts[0].trim().toUpperCase();
-            let name = parts[1] ? parts[1].trim() : "";
+            let name = parts[1].trim();
             
-            if(!name) { // Maybe pasted just name?
-                 name = id; id = ""; 
-            }
-
-            if(!classes[cls].students.find(s => s.name === name || (id && s.id === id))) {
-                classes[cls].students.push({ id: id, name: name, password: "" }); count++;
+            // Check if already exists in this class
+            const exists = classes[cls].students.find(s => s.id === id);
+            
+            if(!exists) {
+                classes[cls].students.push({ id: id, name: name, password: "" }); 
+                count++;
             }
         });
         saveData(); document.getElementById('bulkStudents').value = ''; renderModalStudentList(); if(currentClass === cls) switchClass(cls); alert(count + " ކުދިން އިތުރުކުރެވިއްޖެ");
@@ -1223,7 +1248,7 @@
                     </div>`;
             } else {
                 card.className = 'history-card';
-                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div><span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
+                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div>${o.p ? '<div>ޞަފްޙާ: '+o.p+'</div>' : ''}<span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
                 card.innerHTML = `
                     <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
                     <div class="card-header"><span class="card-date">📅 ${r.date}</span><span class="card-teacher">${r.teacher}</span></div>
