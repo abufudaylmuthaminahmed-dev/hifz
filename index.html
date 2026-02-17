@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v9.1 Fixed</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v10.0 (Login & Edit Fix)</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -41,10 +41,9 @@
             font-family: var(--font-heading) !important;
         }
 
-        /* Force font on inputs for mobile */
         input, select, button, textarea {
             font-family: var(--font-body) !important;
-            font-size: 16px !important; /* Prevents zoom on iOS */
+            font-size: 16px !important;
         }
 
         /* --- LOGIN SCREEN --- */
@@ -61,17 +60,19 @@
         }
         .login-input {
             width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd;
-            border-radius: 8px; text-align: center;
+            border-radius: 8px; font-size: 16px; text-align: center;
         }
         .login-btn {
             width: 100%; padding: 14px; margin-top: 15px; border: none;
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            border-radius: 8px; font-size: 16px; cursor: pointer;
+            font-weight: bold; transition: 0.2s;
         }
+        .login-btn:disabled { background: #ccc; cursor: not-allowed; }
         .btn-teacher-login { background: #2c3e50; color: white; }
         .btn-student-login { background: #27ae60; color: white; }
         
         .login-tab { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
-        .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; }
+        .login-tab-btn { flex: 1; padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; font-size: 14px; }
         .login-tab-btn.active { border-color: var(--accent-color); color: var(--accent-color); }
 
         body.student-mode .teacher-only { display: none !important; }
@@ -86,10 +87,10 @@
             flex-shrink: 0; z-index: 20; transition: transform 0.3s ease;
         }
         .class-control-area { background-color: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
-        .class-select { width: 100%; padding: 10px; font-weight: bold; color: #2c3e50; border: 2px solid #3498db; border-radius: 5px; background-color: white; margin-bottom: 10px; cursor: pointer; }
-        .manage-btn { width: 100%; background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .class-select { width: 100%; padding: 10px; font-size: 14px; font-weight: bold; color: #2c3e50; border: 2px solid #3498db; border-radius: 5px; background-color: white; margin-bottom: 10px; cursor: pointer; }
+        .manage-btn { width: 100%; background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .student-list-container { flex: 1; overflow-y: auto; }
-        .student-btn { background: none; border: none; padding: 14px 10px; text-align: right; width: 100%; cursor: pointer; border-radius: 6px; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; transition: 0.2s; color: #2c3e50; }
+        .student-btn { background: none; border: none; padding: 14px 10px; text-align: right; width: 100%; cursor: pointer; font-size: 16px; border-radius: 6px; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; transition: 0.2s; color: #2c3e50; }
         .student-btn.active { background-color: var(--accent-color); color: white; font-weight: bold; padding-right: 15px; }
         
         /* --- MAIN CONTENT --- */
@@ -109,17 +110,17 @@
         .entry-form { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
         .form-group { flex: 1; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #dcdcdc; border-radius: 5px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #dcdcdc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
         .arabic-input { font-family: 'Amiri', serif !important; direction: rtl; }
         .section-box { padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 2px solid transparent; transition: 0.2s; }
         .section-new { background-color: #eafaf1; }
         .section-short { background-color: #ebf5fb; }
         .section-long { background-color: #fef9e7; }
         .section-box.active-section { border-color: var(--accent-color); box-shadow: 0 0 10px rgba(39, 174, 96, 0.15); background-color: white; border-left: 5px solid var(--accent-color); }
-        .radio-label { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .radio-label { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
         
         .mistake-wrapper { display: flex; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; height: 38px; }
-        .mistake-btn { width: 35px; border: none; background: #eee; cursor: pointer; font-weight: bold; }
+        .mistake-btn { width: 35px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-size: 16px;}
         .mistake-display { text-align: center; font-weight: bold; width: 40px; border: none; border-left: 1px solid #ddd; border-right: 1px solid #ddd; padding: 0;}
 
         /* --- HISTORY & MODAL --- */
@@ -136,7 +137,7 @@
         .modal-body { padding: 20px; overflow-y: auto; }
         .modal-student-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; border-radius: 8px; background: #f9f9f9; border: 1px solid #eee; }
         
-        .btn { padding: 10px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
+        .btn { padding: 10px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; font-size: 14px;}
         .btn-green { background: var(--accent-color); }
         .btn-blue { background: #3498db; }
         .btn-red { background: #e74c3c; }
@@ -180,17 +181,17 @@
             <div id="login-form-student">
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (މިސާލު: IUM123)" style="text-transform: uppercase; margin-bottom: 10px;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް" style="margin-bottom: 10px;">
-                <button class="login-btn btn-student-login" onclick="handleStudentLogin()">ލޮގިން</button>
+                <button id="btnStudentLogin" class="login-btn btn-student-login" onclick="handleStudentLogin()" disabled>ލޯޑުވަނީ...</button>
                 <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު ވަންނަނަމަ، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
             </div>
             <!-- Teacher Login -->
             <div id="login-form-teacher" style="display:none;">
                 <p style="font-size:14px; margin-bottom:15px;">މުދައްރިސުންގެ ޚާއްޞަ ޕާސްވޯޑް ޖައްސަވާ</p>
                 <input type="password" id="teacherPassword" class="login-input" placeholder="ޕާސްވޯޑް">
-                <button class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ޓީޗަރ ލޮގިން</button>
+                <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()" disabled>ލޯޑުވަނީ...</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v9.1</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v10.0</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -201,6 +202,19 @@
                 <label>އާ ޕާސްވޯޑް:</label><input type="password" id="newPass1" style="margin-bottom:10px;">
                 <label>ކަށަވަރުކުރޭ:</label><input type="password" id="newPass2" style="margin-bottom:20px;">
                 <button class="btn btn-green" style="width:100%; justify-content:center;" onclick="saveNewPassword()">ސޭވް & ލޮގިން</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT RECORD MODAL (NEW) -->
+    <div id="editRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0; color:var(--primary-color);">ރެކޯޑް އިޞްލާޙްކުރުން</h3>
+                <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="editModalBody">
+                <!-- Content injected by JS -->
             </div>
         </div>
     </div>
@@ -247,7 +261,7 @@
                 </div>
             </div>
 
-            <!-- ENTRY FORM -->
+            <!-- ENTRY FORM (NEW ENTRY ONLY) -->
             <div class="entry-form teacher-only">
                 <div class="form-row">
                     <div class="form-group"><label>ތާރީޚް</label><input type="date" id="entryDate" onchange="updateSelectedDate()"></div>
@@ -266,7 +280,10 @@
                     <div id="box-new" class="section-box section-new active-section">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <label style="color:#27ae60; font-size:16px;">އާ ފިލާވަޅު <span id="loader-new" style="display:none;" class="loader-spin"></span></label>
-                            <label class="radio-label"><input type="radio" name="activeSec" value="new" checked onchange="setActiveSection('new')"> <span>މިބައި ސޭވްކުރޭ</span></label>
+                            <label class="radio-label">
+                                <input type="radio" name="activeSec" value="new" checked onchange="setActiveSection('new')">
+                                <span>މިބައި ސޭވްކުރޭ</span>
+                            </label>
                         </div>
                         <div class="form-row">
                             <div style="flex:1"><input type="number" id="newPage" placeholder="ޞ: އޮޓޯ" onchange="autoLoadPage('new')" style="background:#fffde7; border-color:#f1c40f; text-align:center;"></div>
@@ -491,6 +508,13 @@
     const dbRef = ref(db, 'hifz_data');
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
+        
+        // Enable Buttons once data loads
+        document.getElementById('btnStudentLogin').disabled = false;
+        document.getElementById('btnStudentLogin').innerText = "ލޮގިން";
+        document.getElementById('btnTeacherLogin').disabled = false;
+        document.getElementById('btnTeacherLogin').innerText = "ލޮގިން";
+
         if (data) {
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
@@ -548,6 +572,7 @@
     window.handleStudentLogin = function() {
         const inputId = document.getElementById('loginStudentId').value.trim();
         const pass = document.getElementById('studentPassword').value;
+
         if(!inputId) return alert("އައިޑީ ޖައްސަވާ");
 
         let foundClass = null; let foundStudentIdx = -1;
@@ -733,6 +758,7 @@
         } catch(e){} finally { document.getElementById('loader-'+section).style.display='none'; }
     }
 
+    // --- UTILS ---
     window.openModal = function() { document.getElementById('classModal').style.display = 'flex'; document.getElementById('modalClassSelect').value = currentClass; renderModalStudentList(); }
     window.closeModal = function() { document.getElementById('classModal').style.display = 'none'; }
     window.switchTab = function(tabId) {
@@ -1001,53 +1027,148 @@
         alert("ސޭވް ކުރެވިއްޖެ");
     }
 
+    // --- NEW EDIT FUNCTIONALITY USING MODAL ---
     window.editRecord = function(id) {
         const r = records.find(rec => rec.id === id);
         if(!r) return;
         editingRecordId = id;
-        document.getElementById('entryDate').value = r.date;
-        document.getElementById('teacherName').value = r.teacher;
-        document.getElementById('lessonType').value = r.type;
-        toggleFormSection(r.type);
+        
+        // Build the edit form HTML inside the modal
+        const modalBody = document.getElementById('editModalBody');
+        let html = `
+            <div class="form-row"><label>ތާރީޚް</label><input type="date" id="editDate" value="${r.date}"></div>
+            <div class="form-row"><label>މުދައްރިސް</label><input type="text" id="editTeacher" value="${r.teacher}"></div>
+        `;
 
+        // Pre-fill dots for logic
         currentDots = { new: [], short: [], long: [], exam: [] };
 
         if(r.type === 'exam') {
-            document.getElementById('examJuzu').value = r.juzu;
-            document.getElementById('examPortion').value = r.portion || 'whole';
-            document.getElementById('examExaminer').value = r.examiner;
-            document.getElementById('examTeacherMistakes').value = r.mistakes.teacher;
-            document.getElementById('examSelfMistakes').value = r.mistakes.self;
-            document.getElementById('markMutha1').value = r.scores.mutha1;
-            document.getElementById('markMutha2').value = r.scores.mutha2;
-            document.getElementById('markTajweed').value = r.scores.tajweed;
-            document.getElementById('markFluency').value = r.scores.fluency;
-            document.getElementById('totalExamScore').innerText = r.scores.total;
+            html += `
+                <h4 style="margin:10px 0; border-bottom:1px solid #eee;">އިމްތިޙާން މަޢުލޫމާތު</h4>
+                <div class="form-row">
+                    <div style="flex:1"><label>ޖުޒުއު</label><select id="editJuzu">${getJuzuOptions(r.juzu)}</select></div>
+                    <div style="flex:1"><label>ބައި</label><select id="editPortion">
+                        <option value="whole" ${r.portion==='whole'?'selected':''}>މުޅި ޖުޒުއު</option>
+                        <option value="half" ${r.portion==='half'?'selected':''}>އެއްބައި</option>
+                        <option value="third" ${r.portion==='third'?'selected':''}>ތިންބައިކުޅަ އެއްބައި</option>
+                    </select></div>
+                </div>
+                <div class="form-row"><label>އެގްޒާމިނަރ</label><input type="text" id="editExaminer" value="${r.examiner}"></div>
+                <div class="form-row" style="background:#f9f9f9; padding:5px;">
+                    <div style="flex:1"><label>މުދައްރިސް ކުށް</label><input type="number" id="editTMistakes" value="${r.mistakes.teacher}"></div>
+                    <div style="flex:1"><label>އަމިއްލަ ކުށް</label><input type="number" id="editSMistakes" value="${r.mistakes.self}"></div>
+                </div>
+                <div class="form-row">
+                    <div style="flex:1"><label>މުތަޝާބިހް 1</label><input type="number" id="editM1" value="${r.scores.mutha1}"></div>
+                    <div style="flex:1"><label>މުތަޝާބިހް 2</label><input type="number" id="editM2" value="${r.scores.mutha2}"></div>
+                </div>
+                <div class="form-row">
+                    <div style="flex:1"><label>ތަޖްވީދު</label><input type="number" id="editTaj" value="${r.scores.tajweed}"></div>
+                    <div style="flex:1"><label>ފަރިތަކަން</label><input type="number" id="editFlu" value="${r.scores.fluency}"></div>
+                </div>
+            `;
             currentDots.exam = r.new?.dots || [];
         } else {
-            const loadSec = (sec, data) => {
-                if(!data || !data.s) return; 
-                setActiveSection(sec); document.querySelector(`input[name="activeSec"][value="${sec}"]`).checked = true;
-                
-                const sEl = document.getElementById(sec+'Surah');
-                for(let i=0; i<sEl.options.length; i++) { if(sEl.options[i].text.includes(data.s)) sEl.value = sEl.options[i].value; }
-                const esEl = document.getElementById(sec+'EndSurah');
-                for(let i=0; i<esEl.options.length; i++) { if(esEl.options[i].text.includes(data.es)) esEl.value = esEl.options[i].value; }
-                
-                document.getElementById(sec+'Start').value = data.st;
-                document.getElementById(sec+'End').value = data.en;
-                document.getElementById(sec+'Mistakes').value = data.m;
-                if(sec==='new') document.getElementById('newPage').value = data.p;
-                currentDots[sec] = data.dots || [];
+            // Daily Lesson Edit - Show all parts
+            const renderPart = (label, key, data) => {
+                if(!data || !data.s) return ''; // Only show active parts
+                currentDots[key] = data.dots || [];
+                return `
+                    <div style="background:#f0f8ff; padding:10px; margin-bottom:10px; border-radius:5px;">
+                        <h4 style="margin:0 0 5px 0;">${label}</h4>
+                        ${key==='new'?`<div class="form-row"><label>ޞަފްޙާ</label><input type="number" id="edit${key}Page" value="${data.p}"></div>`:''}
+                        <div class="form-row">
+                            <div style="flex:2"><select id="edit${key}Surah" class="arabic-input">${getSurahOptions(data.s)}</select></div>
+                            <div style="flex:1"><input type="number" id="edit${key}Start" value="${data.st}"></div>
+                        </div>
+                        <div class="form-row">
+                            <div style="flex:2"><select id="edit${key}EndSurah" class="arabic-input">${getSurahOptions(data.es)}</select></div>
+                            <div style="flex:1"><input type="number" id="edit${key}End" value="${data.en}"></div>
+                        </div>
+                        <div class="form-row"><label>ކުށް</label><input type="number" id="edit${key}Mistakes" value="${data.m}"></div>
+                    </div>
+                `;
             };
-            
-            // Auto fill all sections if data exists
-            if(r.new && r.new.s) loadSec('new', r.new);
-            if(r.short && r.short.s) loadSec('short', r.short);
-            if(r.long && r.long.s) loadSec('long', r.long);
+            html += renderPart('އާ ފިލާވަޅު', 'new', r.new);
+            html += renderPart('ކުރު މުރާޖަޢާ', 'short', r.short);
+            html += renderPart('ދިގު މުރާޖަޢާ', 'long', r.long);
         }
-        window.scrollTo(0,0);
-        alert("އެޑިޓްކުރަން ހުޅުވިއްޖެ");
+
+        html += `<button class="btn btn-green" style="width:100%; margin-top:10px;" onclick="saveEditedRecord('${r.id}', '${r.type}')">އަޕްޑޭޓް</button>`;
+        
+        modalBody.innerHTML = html;
+        document.getElementById('editRecordModal').style.display = 'flex';
+    }
+
+    window.closeEditModal = function() {
+        document.getElementById('editRecordModal').style.display = 'none';
+        editingRecordId = null;
+    }
+
+    window.saveEditedRecord = function(id, type) {
+        // Create updated record object
+        let updatedRec = records.find(r => r.id == id);
+        
+        updatedRec.date = document.getElementById('editDate').value;
+        updatedRec.teacher = document.getElementById('editTeacher').value;
+
+        if(type === 'exam') {
+            updatedRec.juzu = document.getElementById('editJuzu').value;
+            updatedRec.portion = document.getElementById('editPortion').value;
+            updatedRec.examiner = document.getElementById('editExaminer').value;
+            updatedRec.mistakes.teacher = document.getElementById('editTMistakes').value;
+            updatedRec.mistakes.self = document.getElementById('editSMistakes').value;
+            updatedRec.scores.mutha1 = document.getElementById('editM1').value;
+            updatedRec.scores.mutha2 = document.getElementById('editM2').value;
+            updatedRec.scores.tajweed = document.getElementById('editTaj').value;
+            updatedRec.scores.fluency = document.getElementById('editFlu').value;
+            
+            // Recalculate total
+            const hifz = Math.max(0, 80 - (parseInt(updatedRec.mistakes.teacher)*2) - (parseInt(updatedRec.mistakes.self)));
+            const total = hifz + parseFloat(updatedRec.scores.mutha1) + parseFloat(updatedRec.scores.mutha2) + parseFloat(updatedRec.scores.tajweed) + parseFloat(updatedRec.scores.fluency);
+            updatedRec.scores.total = total + "%";
+        } else {
+            const updatePart = (key) => {
+                if(document.getElementById(`edit${key}Surah`)) {
+                    updatedRec[key].s = getSurahName(document.getElementById(`edit${key}Surah`).value);
+                    updatedRec[key].es = getSurahName(document.getElementById(`edit${key}EndSurah`).value);
+                    updatedRec[key].st = document.getElementById(`edit${key}Start`).value;
+                    updatedRec[key].en = document.getElementById(`edit${key}End`).value;
+                    updatedRec[key].m = document.getElementById(`edit${key}Mistakes`).value;
+                    if(key === 'new') updatedRec[key].p = document.getElementById(`edit${key}Page`).value;
+                }
+            };
+            updatePart('new'); updatePart('short'); updatePart('long');
+        }
+
+        saveData();
+        renderHistory();
+        closeEditModal();
+        alert("ރެކޯޑް އަޕްޑޭޓް ކުރެވިއްޖެ");
+    }
+
+    // Helper to generate options for edit modal
+    function getSurahOptions(selectedName) {
+        let opts = '';
+        surahNames.forEach((s, i) => {
+            const val = i + 1;
+            const isSel = s === selectedName; // Check against Arabic name
+            opts += `<option value="${val}" ${isSel?'selected':''}>${val}. ${s}</option>`;
+        });
+        return opts;
+    }
+    
+    function getSurahName(val) {
+        return surahNames[val-1] || "";
+    }
+
+    function getJuzuOptions(selected) {
+        let opts = '';
+        for(let i=1; i<=30; i++) {
+            opts += `<option value="${i}" ${i==selected?'selected':''}>${i}</option>`;
+        }
+        return opts;
     }
 
     function renderHistory() {
