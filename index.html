@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v10.0 (Login & Edit Fix)</title>
+    <title>ޤުރްއާން ޙިފްޡް ޕްރޮގްރާމް - v10.1 Fixed</title>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -67,7 +67,7 @@
             border-radius: 8px; font-size: 16px; cursor: pointer;
             font-weight: bold; transition: 0.2s;
         }
-        .login-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .login-btn:active { transform: scale(0.98); }
         .btn-teacher-login { background: #2c3e50; color: white; }
         .btn-student-login { background: #27ae60; color: white; }
         
@@ -181,17 +181,17 @@
             <div id="login-form-student">
                 <input type="text" id="loginStudentId" class="login-input" placeholder="އައިޑީ (މިސާލު: IUM123)" style="text-transform: uppercase; margin-bottom: 10px;">
                 <input type="password" id="studentPassword" class="login-input" placeholder="ޕާސްވޯޑް" style="margin-bottom: 10px;">
-                <button id="btnStudentLogin" class="login-btn btn-student-login" onclick="handleStudentLogin()" disabled>ލޯޑުވަނީ...</button>
+                <button id="btnStudentLogin" class="login-btn btn-student-login" onclick="handleStudentLogin()">ލޮގިން</button>
                 <p style="font-size:12px; color:#666; margin-top:10px;">ފުރަތަމަ ފަހަރު ވަންނަނަމަ، އައިޑީ ޖެހުމަށްފަހު ޕާސްވޯޑް ހުސްކޮށް ބަހައްޓަވާ.</p>
             </div>
             <!-- Teacher Login -->
             <div id="login-form-teacher" style="display:none;">
                 <p style="font-size:14px; margin-bottom:15px;">މުދައްރިސުންގެ ޚާއްޞަ ޕާސްވޯޑް ޖައްސަވާ</p>
                 <input type="password" id="teacherPassword" class="login-input" placeholder="ޕާސްވޯޑް">
-                <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()" disabled>ލޯޑުވަނީ...</button>
+                <button id="btnTeacherLogin" class="login-btn btn-teacher-login" onclick="handleTeacherLogin()">ލޮގިން</button>
             </div>
         </div>
-        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v10.0</p>
+        <p style="margin-top:20px; opacity:0.7; font-size:12px; color:white;">© Quran Hifz Tracker v10.1</p>
     </div>
 
     <!-- PASSWORD MODAL -->
@@ -508,13 +508,6 @@
     const dbRef = ref(db, 'hifz_data');
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        
-        // Enable Buttons once data loads
-        document.getElementById('btnStudentLogin').disabled = false;
-        document.getElementById('btnStudentLogin').innerText = "ލޮގިން";
-        document.getElementById('btnTeacherLogin').disabled = false;
-        document.getElementById('btnTeacherLogin').innerText = "ލޮގިން";
-
         if (data) {
             classes = data.classes || { "Default Class": { teacher: "", students: [] } };
             records = data.records || [];
@@ -570,6 +563,9 @@
     }
 
     window.handleStudentLogin = function() {
+        // ALWAYS check data first
+        if (Object.keys(classes).length === 0) return alert("ޑޭޓާ ލޯޑުނުވޭ! އިންޓަނެޓް ޗެކްކޮށްލައްވާ.");
+
         const inputId = document.getElementById('loginStudentId').value.trim();
         const pass = document.getElementById('studentPassword').value;
 
@@ -1200,7 +1196,7 @@
                     </div>`;
             } else {
                 card.className = 'history-card';
-                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div>${o.p ? '<div>ޞަފްޙާ: '+o.p+'</div>' : ''}<span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
+                const sec = (lbl, o, c) => (!o || (!o.s && !o.st && o.m==0)) ? '' : `<div class="card-section ${c}"><span class="section-label">${lbl}</span><div class="surah-name">${o.s}${o.es&&o.es!==o.s?' - '+o.es:''}</div><div>އާޔަތް: ${o.st}-${o.en}</div><span class="mistake-badge ${o.m>0?'red':'green'}">${o.m} ކުށް</span></div>`;
                 card.innerHTML = `
                     <button class="delete-card-btn" onclick="delRec(${r.id})">&times;</button>
                     <div class="card-header"><span class="card-date">📅 ${r.date}</span><span class="card-teacher">${r.teacher}</span></div>
