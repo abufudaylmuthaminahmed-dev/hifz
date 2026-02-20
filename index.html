@@ -9,21 +9,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- FONTS --- */
+        /* --- ފޮންޓް ސެޓަޕް (UPDATED FOR MOBILE) --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
-        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
-        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
-
-        :root {
-            --primary: #2c3e50; --accent: #27ae60; --accent-rev: #e67e22; --mistake: #e74c3c;
-            --bg-light: #f4f6f8; --mushaf-paper: #fffcf2; --st-primary: #1e8449;
-            --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
-            --font-arabic: 'Amiri', serif;
+        /* Faruma Font Setup */
+        @font-face { 
+            font-family: 'Faruma'; 
+            src: url('fonts/faruma.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
         }
 
+        /* MV Waheed Font Setup */
+        @font-face { 
+            font-family: 'MV Waheed'; 
+            src: url('fonts/mvwaheed.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary: #2c3e50; 
+            --accent: #27ae60;
+            --accent-rev: #e67e22;
+            --mistake: #e74c3c;
+            --bg-light: #f4f6f8;
+            --mushaf-paper: #fffcf2;
+            --st-primary: #1e8449;
+            
+            /* Updated Font Priorities */
+            --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
+            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
+            --font-arabic: 'Amiri', serif;
+        }
         * { box-sizing: border-box; }
         body { font-family: var(--font-main); margin: 0; min-height: 100vh; color: #333; background-color: var(--bg-light); overflow-x: hidden; transition: background 0.3s; }
         
