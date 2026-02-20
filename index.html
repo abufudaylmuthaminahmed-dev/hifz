@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޙިފްޡް ޕްރޮގްރާމް - Final Fixed V28</title>
+    <title>ޙިފްޡް ޕްރޮގްރާމް - Full System</title>
     
-    <!-- SheetJS -->
+    <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -17,8 +17,14 @@
         @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
 
         :root {
-            --primary: #2c3e50; --accent: #27ae60; --accent-rev: #e67e22; --mistake: #e74c3c;
-            --bg-light: #f4f6f8; --mushaf-paper: #fffcf2; --st-primary: #1e8449;
+            --primary: #2c3e50; 
+            --accent: #27ae60;
+            --accent-rev: #e67e22;
+            --mistake: #e74c3c;
+            --bg-light: #f4f6f8;
+            --mushaf-paper: #fffcf2;
+            --st-primary: #1e8449; /* Student Theme Color */
+            
             --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
             --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
             --font-arabic: 'Amiri', serif;
@@ -35,9 +41,18 @@
         .container { width: 100%; padding: 20px; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.3s ease; }
 
         /* HEADER */
-        .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .app-header {
+            background: white; height: 65px; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
         .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
-        .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
+        .icon-btn {
+            background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; 
+            font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; color: #333;
+        }
         .logout-btn { background: #fee2e2; color: #b91c1c; }
 
         /* LOGIN */
@@ -49,7 +64,7 @@
         .form-input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 10px; font-family: var(--font-main); font-size: 16px; margin-bottom: 15px; text-align: right; outline: none; transition: 0.3s; }
         .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: var(--font-heading); font-size: 18px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        /* UI ELEMENTS */
+        /* DASHBOARD GRID */
         .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         .action-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; cursor: pointer; transition: 0.2s; }
         .action-card:hover { transform: translateY(-5px); border-color: var(--accent); }
@@ -58,13 +73,16 @@
         .big-btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; }
 
+        /* MENU GRID (5 Buttons) */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
         @media (min-width: 600px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
         .menu-btn { background: white; padding: 25px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; transition: 0.2s; }
+        .menu-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
         .menu-icon { font-size: 35px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
         /* HISTORY CARD */
         .hist-card { background: white; width: 100%; margin-bottom: 15px; border-radius: 15px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; cursor: pointer; transition:0.2s; }
+        .hist-card:active { transform: scale(0.98); }
         .hist-header { padding: 12px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .hist-title { font-weight: bold; font-size: 18px; color: var(--primary); }
         .hist-body { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -72,26 +90,29 @@
         .hist-label { font-size: 13px; color: #7f8c8d; display: block; margin-bottom: 5px; }
         .hist-val { font-size: 16px; font-weight: bold; color: #333; }
         .hist-footer { padding: 12px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 18px; font-weight: bold; color: var(--accent); }
+        
+        /* CARD COLORS */
+        .hist-card.type-new_lesson { border-right: 5px solid var(--accent); }
+        .hist-card.type-short_rev { border-right: 5px solid var(--accent-rev); }
+        .hist-card.type-long_rev { border-right: 5px solid #8e44ad; }
+        .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
+        .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
-        /* PAGE TOOLBAR */
-        .page-toolbar { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .add-record-btn { background: var(--accent); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; }
-        .add-record-btn:hover { transform: scale(1.1); }
-
-        /* LAYOUTS */
+        /* RECORDER & EXAM LAYOUT */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
         .sidebar-panel { width: 400px; background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.05); }
         .main-panel { flex-grow: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; align-items: center; }
 
         /* MUSHAF */
-        .mushaf-top-bar { background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 800px; margin: 0 auto 15px auto; direction: rtl; }
         .mushaf-page { width: 100%; max-width: 800px; background: white; padding: 40px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); min-height: 90%; direction: rtl; text-align: center; border-radius: 8px; margin: 0 auto; }
         .quran-text { font-family: var(--font-arabic); font-size: 28px; line-height: 2.4; text-align: justify; text-align-last: center; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: sans-serif; font-size: 20px; }
         .word { cursor: pointer; border-radius: 4px; padding: 2px 1px; transition: background 0.1s; }
+        .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
+        .mushaf-top-bar { background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 800px; margin: 0 auto 15px auto; direction: rtl; }
 
-        /* EXAM & RECORDER */
+        /* EXAM ELEMENTS */
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
         .big-score { font-size: 40px; font-weight: bold; }
         .score-control { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 10px; }
@@ -99,6 +120,7 @@
         .btn-minus { background: #ffcdd2; color: #c62828; } .btn-plus { background: #c8e6c9; color: #2e7d32; }
         .stopwatch-box { font-family: monospace; font-size: 32px; text-align: center; color: #e67e22; font-weight: bold; background: #fffbf0; padding: 10px; border-radius: 10px; border: 1px solid #ffeeba; margin-bottom: 15px; }
         
+        /* RECORDER SPECIFIC */
         .form-sec { border: 1px solid #eee; padding: 10px; border-radius: 8px; position: relative; margin-top: 10px; }
         .sec-title { position: absolute; top: -10px; right: 10px; background: white; padding: 0 5px; font-size: 12px; font-weight: bold; color: #777; }
         .rec-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: var(--font-main); text-align: right; margin-bottom: 5px; }
@@ -120,7 +142,7 @@
 </head>
 <body>
 
-    <!-- LOGIN -->
+    <!-- 1. LOGIN -->
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
             <h1 class="login-title">ޙިފްޡް ޕްރޮގްރާމް</h1>
@@ -134,7 +156,9 @@
             </div>
             <div id="student-login-form" class="hidden">
                 <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު">
-                <div id="stuPassField" class="hidden" style="margin-top:10px;"><input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް"></div>
+                <div id="stuPassField" class="hidden" style="margin-top:10px;">
+                    <input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
+                </div>
                 <button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
             </div>
         </div>
@@ -145,19 +169,32 @@
         
         <!-- TEACHER DASHBOARD -->
         <div id="teacher-dashboard" class="container hidden">
-            <div class="app-header"><div class="header-title">މުދައްރިސް ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
+            <div class="app-header">
+                <div class="header-title">މުދައްރިސް ޕެނަލް</div>
+                <button class="icon-btn logout-btn" onclick="window.logout()">⏻</button>
+            </div>
             <div class="grid-layout">
-                <div class="action-card" onclick="window.openPage('management-page')"><h3>ކްލާސް މެނޭޖްމަންޓް</h3></div>
-                <div class="action-card" onclick="window.openGradingClassList()"><h3>ފިލާވަޅު ނެގުން</h3></div>
+                <div class="action-card" onclick="window.openPage('management-page')">
+                    <span style="font-size:50px;">⚙️</span>
+                    <h3>ކްލާސް މެނޭޖްމަންޓް</h3>
+                </div>
+                <div class="action-card" onclick="window.openGradingClassList()">
+                    <span style="font-size:50px;">📚</span>
+                    <h3>ފިލާވަޅު ނެގުން</h3>
+                </div>
             </div>
         </div>
 
-        <!-- MANAGEMENT -->
+        <!-- MANAGEMENT PAGES -->
         <div id="management-page" class="container hidden">
             <div class="app-header"><div class="header-title">ކްލާސް މެނޭޖްމަންޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px; text-align:right;">
                 <h4>އާ ކްލާހެއް ހެދުން</h4>
-                <div style="display:flex; gap:10px;"><input type="text" id="newClassName" class="form-input" placeholder="ނަން"><input type="text" id="newTeacherName" class="form-input" placeholder="އުސްތާޛް"><button class="btn-primary" style="width:auto;" onclick="window.createClass()">ހަދާ</button></div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="newClassName" class="form-input" placeholder="ކްލާހުގެ ނަން" style="margin:0;">
+                    <input type="text" id="newTeacherName" class="form-input" placeholder="އުސްތާޛް" style="margin:0;">
+                    <button class="btn-primary" style="width:auto;" onclick="window.createClass()">ހަދާ</button>
+                </div>
             </div>
             <h4 style="margin-top:20px;">ހެދިފައިވާ ކްލާސްތައް</h4>
             <div id="manageClassList"></div>
@@ -168,7 +205,10 @@
             <div class="grid-layout">
                 <div class="action-card">
                     <button class="big-btn" onclick="window.openAddStudentModal()"><span>➕</span> ދަރިވަރުން އިތުރުކުރޭ</button>
-                    <div style="display:flex; gap:10px;"><button class="big-btn btn-orange" onclick="window.downloadTemplate()"><span>📥</span> ޓެމްޕްލޭޓް</button><label class="big-btn btn-green" style="font-size:14px; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label></div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="big-btn btn-orange" onclick="window.downloadTemplate()"><span>📥</span> ޓެމްޕްލޭޓް</button>
+                        <label class="big-btn btn-green" style="font-size:14px; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
+                    </div>
                 </div>
             </div>
             <h4 style="margin-top:20px;">ދަރިވަރުންގެ ލިސްޓް</h4>
@@ -190,17 +230,20 @@
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><strong>އާ ފިލާވަޅު</strong></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><strong>ކުރު މުރާޖަޢާ</strong></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('long_rev')"><span class="menu-icon" style="color:#8e44ad;">📅</span><strong>ދިގު މުރާޖަޢާ</strong></div>
-                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')"><span class="menu-icon" style="color:#2980b9;">📝</span><strong>ޖުޒުއު އިމްތިޙާން</strong></div>
+                <div class="menu-btn" onclick="window.openJuzExamSetup()"><span class="menu-icon" style="color:#2980b9;">📝</span><strong>ޖުޒުއު އިމްތިޙާން</strong></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('final_exam')"><span class="menu-icon" style="color:#c0392b;">🎓</span><strong>ފަހު އިމްތިޙާން</strong></div>
             </div>
         </div>
 
-        <!-- CATEGORY PAGE -->
+        <!-- CATEGORY HISTORY PAGE -->
         <div id="category-page" class="container hidden">
-            <div class="app-header"><div class="header-title" id="catPageTitle">Title</div><button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button></div>
-            <div class="page-toolbar">
+            <div class="app-header">
+                <div class="header-title" id="catPageTitle">Title</div>
+                <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+            </div>
+            <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
-                <button id="addRecordBtn" class="add-record-btn" onclick="window.handleAddButtonClick()">➕</button>
+                <button id="addRecordBtn" class="big-btn" style="width:auto; padding:10px 20px; margin:0; border-radius:50px; background:var(--accent);" onclick="window.handleAddButtonClick()">➕ އާ ރެކޯޑް</button>
             </div>
             <div id="categoryHistoryList"></div>
         </div>
@@ -208,7 +251,10 @@
         <!-- UNIVERSAL RECORDER -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
-                <div style="display:flex; align-items:center; gap:10px;"><button class="icon-btn" onclick="window.closeRecorder()">⬅</button><span class="header-title" id="recorderTitle">ރެކޯޑް</span></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="icon-btn" onclick="window.closeRecorder()">⬅</button>
+                    <span class="header-title" id="recorderTitle">ރެކޯޑް</span>
+                </div>
                 <span id="viewModeBadge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:4px; font-size:12px; display:none;">View Mode</span>
             </div>
             <div class="layout-split">
@@ -216,13 +262,13 @@
                     <div style="margin-bottom:15px;"><label class="form-label">ތާރީޚް</label><input type="date" id="recDate" class="rec-input" style="text-align:center;"></div>
                     <div class="form-sec" style="border-top:3px solid var(--accent);">
                         <span class="sec-title">ފަށާ ހިސާބު</span>
-                        <label>ޞަފްޙާ</label><input type="number" id="startPage" class="rec-input" placeholder="Page" onchange="window.loadSmartPage()">
-                        <div style="display:flex; gap:5px;"><input type="text" id="startInfo" class="rec-input" readonly style="background:#f9f9f9;flex:1;"></div>
+                        <label>ޞަފްޙާ</label><input type="number" id="startPage" class="rec-input" placeholder="Page (1-604)" onchange="window.loadSmartPage()">
+                        <div style="display:flex; gap:5px;"><div style="flex:1"><label>ސޫރަތް</label><select id="startSurah" class="rec-input"></select></div><div style="width:60px"><label>އާޔަތް</label><select id="startAyah" class="rec-input"></select></div></div>
                     </div>
                     <div class="form-sec" style="border-top:3px solid #e74c3c;">
                         <span class="sec-title">ނިމޭ ހިސާބު</span>
                         <label>ޞަފްޙާ</label><input type="number" id="endPage" class="rec-input" placeholder="Page">
-                        <div style="display:flex; gap:5px;"><input type="text" id="endInfo" class="rec-input" readonly style="background:#f9f9f9;flex:1;"></div>
+                        <div style="display:flex; gap:5px;"><div style="flex:1"><label>ސޫރަތް</label><select id="endSurah" class="rec-input"></select></div><div style="width:60px"><label>އާޔަތް</label><select id="endAyah" class="rec-input"></select></div></div>
                     </div>
                     <div style="background:#fff5f5; padding:15px; border-radius:8px; text-align:center; margin-top:auto; border:1px solid #ffcccc;">
                         <span style="font-size:14px; color:red;">ކުށުގެ ޢަދަދު</span><strong id="mistakeCountDisplay" style="font-size:32px; color:red; display:block;">0</strong>
@@ -323,7 +369,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -342,6 +388,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // GLOBALS
+        const SURAH_NAMES_AR = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
+        
         let classesData = [];
         let currentClassIdx = -1, currentStudentIdx = -1;
         let currentUserType = 'teacher';
@@ -351,6 +400,7 @@
         let currentMistakes = [];
         let isViewMode = false;
 
+        // LOAD DATA
         const dbRef = ref(db, 'hifz_system_v1');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
@@ -427,7 +477,16 @@
         window.renderStudentList = () => {
             const div = document.getElementById('studentManageList'); div.innerHTML='';
             const students = classesData[currentClassIdx].students || [];
-            students.forEach(s => div.innerHTML += `<div class="list-item"><div><strong>${s.name}</strong> <small>${s.id}</small></div></div>`);
+            if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
+            
+            students.forEach(s => {
+                let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
+                div.innerHTML += `
+                    <div class="list-item">
+                        <div><strong>${s.name}</strong> <small>(${s.id})</small></div>
+                        <small style="color:${s.password?'green':'red'}">${pass}</small>
+                    </div>`;
+            });
         };
         window.openAddStudentModal = () => { document.getElementById('addStudentModal').style.display='flex'; };
         window.confirmAddStudent = () => {
@@ -483,12 +542,26 @@
             records.slice().reverse().forEach(rec => {
                 let html = '';
                 if(rec.type === 'juz_exam') {
-                    let status = rec.status === 'partial' ? '<span style="color:orange;">Part 1</span>' : '<span style="color:green;">Completed</span>';
-                    html = `<div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'><div class="hist-header"><span class="hist-title">Juz ${rec.juz}</span>${status}</div><div class="hist-body"><div class="hist-item"><span class="hist-label">Date</span><span class="hist-val">${rec.date}</span></div><div class="hist-item"><span class="hist-label">Marks</span><span class="hist-val">${rec.score}%</span></div></div></div>`;
+                    let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>';
+                    html = `
+                        <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
+                            <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
+                            <div class="hist-body">
+                                <div class="hist-item"><span class="hist-label">ތާރީޚް</span><span class="hist-val">${rec.date}</span></div>
+                                <div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div>
+                                <div class="hist-item"><span class="hist-label">އުސްތާޛް ކުށް</span><span class="hist-val">${rec.details.teacherMistakes}</span></div>
+                                <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
+                            </div>
+                            <div class="hist-footer">${rec.score}%</div>
+                        </div>`;
                 } else if(rec.type === 'final_exam') {
                     html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div></div>`;
                 } else {
-                    html = `<div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'><div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span style="font-size:12px;">${rec.date}</span></div><div class="hist-footer" style="color:var(--mistake);">Mistakes: ${rec.mistakesCount}</div></div>`;
+                    html = `
+                        <div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'>
+                            <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-badge" style="background:var(--primary)">${rec.date}</span></div>
+                            <div class="hist-footer" style="color:var(--mistake);">Mistakes: ${rec.mistakesCount}</div>
+                        </div>`;
                 }
                 list.innerHTML += html;
             });
@@ -502,19 +575,17 @@
             document.getElementById('viewModeBadge').style.display = 'none';
             document.getElementById('startPage').value = '';
             document.getElementById('endPage').value = '';
-            document.getElementById('startInfo').value = ''; document.getElementById('endInfo').value = '';
             document.getElementById('mistakeCountDisplay').innerText = 0;
             document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>';
             
-            // Auto fill: Get last page
+            // Auto fill: Get last page + 1
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             if(s.history) {
                 const recs = s.history.filter(r => r.type === type);
                 if(recs.length > 0) {
-                    const last = recs[recs.length-1];
-                    const nextP = parseInt(last.endPage || last.page) + 1;
-                    if(nextP <= 604) {
-                        document.getElementById('startPage').value = nextP;
+                    const lastP = parseInt(recs[recs.length-1].endPage || recs[recs.length-1].page);
+                    if(lastP < 604) {
+                        document.getElementById('startPage').value = lastP + 1;
                         window.loadSmartPage();
                     }
                 }
@@ -535,8 +606,9 @@
             if(!isViewMode && data.data.ayahs.length > 0) {
                 const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
                 document.getElementById('endPage').value = page;
-                document.getElementById('startInfo').value = `${first.surah.name}:${first.numberInSurah}`;
-                document.getElementById('endInfo').value = `${last.surah.name}:${last.numberInSurah}`;
+                document.getElementById('startSurah').value = first.surah.number;
+                document.getElementById('endSurah').value = last.surah.number;
+                window.updateAyahSelect('startAyah', first.numberInSurah); window.updateAyahSelect('endAyah', last.numberInSurah);
             }
         };
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
@@ -563,10 +635,18 @@
         window.saveRecord = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             if(!s.history) s.history = [];
+            
+            // Capture Text Details
+            const sSurah = document.getElementById('startSurah').options[0]?.text || "-";
+            const sAyah = document.getElementById('startAyah').value;
+            const eSurah = document.getElementById('endSurah').options[0]?.text || "-";
+            const eAyah = document.getElementById('endAyah').value;
+
             s.history.push({
                 type: currentSessionType, date: document.getElementById('recDate').value,
                 page: document.getElementById('startPage').value, endPage: document.getElementById('endPage').value,
-                startInfo: document.getElementById('startInfo').value, endInfo: document.getElementById('endInfo').value,
+                startDetails: { surah: sSurah, ayah: sAyah, page: document.getElementById('startPage').value },
+                endDetails: { surah: eSurah, ayah: eAyah, page: document.getElementById('endPage').value },
                 mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes
             });
             updateFirebase(); window.closeRecorder();
@@ -579,14 +659,11 @@
             document.getElementById('recDate').value = rec.date;
             document.getElementById('startPage').value = rec.page;
             document.getElementById('endPage').value = rec.endPage;
-            document.getElementById('startInfo').value = rec.startInfo || '';
-            document.getElementById('endInfo').value = rec.endInfo || '';
             document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
             document.getElementById('recorder-page').classList.remove('hidden');
             window.loadSmartPage(true);
         };
         window.viewJuzRecord = (rec) => {
-            // Re-open Exam UI in View Mode
             document.getElementById('juzExamTitle').innerText = "View Exam";
             document.getElementById('juz-exam-page').classList.remove('hidden');
             document.getElementById('liveScore').innerText = rec.score + "%";
@@ -594,11 +671,8 @@
             document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00";
             document.getElementById('countTeacher').innerText = rec.details.teacherMistakes;
             document.getElementById('countSelf').innerText = rec.details.selfMistakes;
-            
-            // Load exam page logic is complex for view, simplified here:
             isViewMode = true;
             examState.mistakesList = rec.mistakeDetails || [];
-            // Load first page of that juz to show potential mistakes
             let startP = ((rec.juz-1)*20)+2; 
             window.loadExamPage(startP);
         };
@@ -642,7 +716,6 @@
             examState.currentPage = newPage; window.loadExamPage(newPage);
         };
         window.clickExamWord = (id) => {
-            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) {
                 el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id);
@@ -692,14 +765,14 @@
             
             if(examState.mode === 'part1') {
                 s.juzExams[examState.juz].part1 = score;
-                s.history.push({type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), juz:examState.juz, score:score, duration:duration, details:{teacherMistakes:examState.mistakesTeacher, selfMistakes:examState.mistakesSelf}, mistakeDetails: examState.mistakesList});
+                s.history.push({type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), juz:examState.juz, score:score, duration:duration, details:{teacherMistakes:examState.mistakesTeacher, selfMistakes:examState.mistakesSelf, mistakeDetails: examState.mistakesList}});
             } else {
                 let p1 = s.juzExams[examState.juz].part1 || 0;
                 let final = (examState.mode === 'full') ? score : (p1 + score) / 2;
-                s.history.push({type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), juz:examState.juz, score:final, duration:duration, details:{teacherMistakes:examState.mistakesTeacher, selfMistakes:examState.mistakesSelf}, mistakeDetails: examState.mistakesList});
+                s.history.push({type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), juz:examState.juz, score:final, duration:duration, details:{teacherMistakes:examState.mistakesTeacher, selfMistakes:examState.mistakesSelf, mistakeDetails: examState.mistakesList}});
             }
-            updateFirebase(); window.closeJuzExam(); window.openStudentMenu(currentStudentIdx);
-        };
+            updateFirebase(); window.closeJuzExam();
+        }
 
         // FINAL EXAM
         window.openFinalExam = () => {
@@ -752,6 +825,13 @@
             s.history.push({type:'final_exam', date:new Date().toLocaleDateString(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)});
             updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx);
         };
+
+        // HELPERS
+        function populateSurahSelects() {
+            const s1 = document.getElementById('startSurah'), s2 = document.getElementById('endSurah');
+            if(s1 && s2) { s1.innerHTML=''; s2.innerHTML=''; SURAH_NAMES_AR.forEach((n,i) => { s1.add(new Option(n, i+1)); s2.add(new Option(n, i+1)); }); }
+        }
+        window.updateAyahSelect = (id, val) => { document.getElementById(id).innerHTML = `<option value="${val}">${val}</option>`; }
     </script>
 </body>
 </html>
