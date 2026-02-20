@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޙިފްޡް ޕްރޮގްރާމް - V33 (Fixed)</title>
+    <title>ޙިފްޡް ޕްރޮގްރާމް - Final Fixed V33</title>
     
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -65,12 +65,6 @@
         .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; }
         .card-sub { font-size: 13px; color: #7f8c8d; }
 
-        /* Class Action Buttons (Edit/Delete) */
-        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
-        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
-        .btn-del-cls { background: #fee2e2; color: #c0392b; }
-
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
@@ -80,6 +74,7 @@
 
         /* HISTORY CARD */
         .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
+        .hist-card:active { transform: scale(0.99); }
         .hist-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); }
         .hist-date { font-family: sans-serif; font-size: 14px; color: #555; background: #e0e0e0; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
@@ -90,7 +85,8 @@
         .hist-label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 2px; }
         .hist-val { font-size: 16px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
         .hist-footer { padding: 15px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 20px; font-weight: bold; color: var(--accent); position: relative; }
-        
+        .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; }
+
         .btn-edit-hist, .btn-delete-hist { 
             position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -106,10 +102,10 @@
         .mushaf-top-bar { background: white; padding: 8px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 10px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 900px; margin: 0 auto 10px auto; direction: rtl; flex-shrink: 0; }
         .mushaf-page { width: 100%; max-width: 900px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 80%; flex-grow: 1; direction: rtl; text-align: center; border-radius: 8px; margin: 0 auto; overflow-y: auto; }
         .quran-text { font-family: var(--font-arabic); font-size: 26px; line-height: 2.2; text-align: justify; text-align-last: center; }
-        .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: sans-serif; font-size: 20px; }
         .word { cursor: pointer; border-radius: 4px; padding: 2px 1px; transition: background 0.1s; }
         .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
+        .ayah-marker { color: #d4ac6e; font-weight: bold; }
         .mushaf-nav { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 900px; padding: 5px; flex-shrink: 0; }
         .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
 
@@ -117,7 +113,7 @@
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
         .big-score { font-size: 40px; font-weight: bold; }
         .score-control { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 10px; }
-        .ctrl-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .ctrl-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-minus { background: #ffcdd2; color: #c62828; } .btn-plus { background: #c8e6c9; color: #2e7d32; }
         .stopwatch-box { font-family: monospace; font-size: 32px; text-align: center; color: #e67e22; font-weight: bold; background: #fffbf0; padding: 10px; border-radius: 10px; border: 1px solid #ffeeba; margin-bottom: 15px; }
         
@@ -136,6 +132,7 @@
             .layout-split { flex-direction: column; }
             .sidebar-panel { width: 100%; height: auto; max-height: 50vh; order: 1; border-bottom: 2px solid #ddd; }
             .main-panel { order: 2; height: 50vh; }
+            .grid-container { grid-template-columns: 1fr; }
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -207,9 +204,9 @@
             <div class="grid-container">
                 <div class="action-card">
                     <button class="big-btn" onclick="window.openAddStudentModal()"><span>➕</span> ދަރިވަރުން އިތުރުކުރޭ</button>
-                    <div style="display:flex; justify-content:center; gap:10px;">
-                        <button class="big-btn btn-orange" onclick="window.downloadTemplate()" style="width:auto;">📥 ޓެމްޕްލޭޓް</button>
-                        <label class="big-btn btn-green" style="width:auto; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
+                    <div style="display:flex; gap:10px; justify-content:center;">
+                        <button class="big-btn btn-orange" onclick="window.downloadTemplate()"><span>📥</span> ޓެމްޕްލޭޓް</button>
+                        <label class="big-btn btn-green" style="font-size:14px; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
                     </div>
                 </div>
             </div>
@@ -381,7 +378,6 @@
     </div>
 
     <!-- FIREBASE & LOGIC -->
-    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -402,10 +398,9 @@
 
         // GLOBALS
         const SURAH_NAMES_AR = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
-        
-        // Ayah Counts for each Surah (Index 0 to 113)
+        // Ayah Counts (Simple)
         const AYAH_COUNTS = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
-
+        
         let classesData = [];
         let currentClassIdx = -1, currentStudentIdx = -1;
         let currentUserType = 'teacher';
@@ -469,7 +464,7 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('studentDashName').innerText = currentStudentObj.name;
-            window.renderHistory(currentStudentObj, 'studentDashHistory', null);
+            // No direct history render here, waiting for menu click
             window.openPage('student-dashboard');
         };
         window.logout = () => location.reload();
@@ -502,27 +497,32 @@
         window.editClass = (i) => {
             let name = prompt("New Name:", classesData[i].name);
             let teach = prompt("New Teacher:", classesData[i].teacher);
-            if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); alert("ކްލާސް އަޕްޑޭޓް ކުރެވިއްޖެ"); }
+            if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); }
         };
         window.deleteClass = (i) => {
-            if(confirm("މި ކްލާސް ފޮހެލަން ބޭނުންވޭތަ؟")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); alert("ކްލާސް ފޮހެލެވިއްޖެ"); }
+            if(confirm("Delete Class?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); }
         };
         window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
         window.renderStudentList = () => {
             const div = document.getElementById('studentManageList'); div.innerHTML='';
             const students = classesData[currentClassIdx].students || [];
-            if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
-            
-            students.forEach(s => {
-                let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
+            if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students.</p>";
+            students.forEach((s, idx) => {
                 div.innerHTML += `
-                    <div class="card-btn" style="min-height:120px;">
-                        <h4 class="card-title">${s.name}</h4>
-                        <span class="card-sub">${s.id}</span>
-                        <small style="color:${s.password?'green':'red'}">${pass}</small>
+                    <div class="card-btn" style="min-height:120px; position:relative;">
+                        <h4 class="card-title">${s.name}</h4><span class="card-sub">${s.id}</span>
+                        <div style="position:absolute; bottom:10px; right:10px;">
+                            <button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
+                        </div>
                     </div>`;
             });
         };
+        window.deleteStudent = (idx) => {
+            if(confirm("Delete Student?")) {
+                classesData[currentClassIdx].students.splice(idx, 1);
+                updateFirebase(); window.renderStudentList();
+            }
+        }
         window.openAddStudentModal = () => { 
             ['m_module','m_id','m_name','m_juz_count','m_remarks'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('addStudentModal').style.display='flex'; 
@@ -534,12 +534,9 @@
             if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
             classesData[currentClassIdx].students.push({
                 name: name, id: id,
-                module: document.getElementById('m_module').value,
-                level: document.getElementById('m_level').value,
-                direction: document.getElementById('m_direction').value,
-                juzCount: document.getElementById('m_juz_count').value,
-                remarks: document.getElementById('m_remarks').value,
-                history: [], juzExams: {}
+                module: document.getElementById('m_module').value, level: document.getElementById('m_level').value,
+                direction: document.getElementById('m_direction').value, juzCount: document.getElementById('m_juz_count').value,
+                remarks: document.getElementById('m_remarks').value, history: [], juzExams: {}
             });
             updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList();
         };
@@ -582,7 +579,7 @@
             const list = document.getElementById(listId); list.innerHTML = '';
             if(!student.history) student.history = [];
             const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">ރެކޯޑެއް ނެތް</p>';
+            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">No Records</p>';
             
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec);
@@ -591,19 +588,16 @@
                 let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
 
                 if(rec.type === 'juz_exam') {
-                    let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>';
+                    let status = rec.status === 'partial' ? '<span style="color:orange">Part 1</span>' : '<span style="color:green">Completed</span>';
                     html = `
                         <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
                             <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">ތާރީޚް</span><span class="hist-val">${rec.date}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div>
-                                    <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details.teacherMistakes}</span></div>
-                                    <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details.tajweed}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details.fluency}</span></div>
-                                    <div class="hist-item"><span class="hist-label">މުތަޝާބިހް</span><span class="hist-val">${rec.details.mutashabihMarks}</span></div>
+                                    <div class="hist-item"><span class="hist-label">Date</span><span class="hist-val">${rec.date}</span></div>
+                                    <div class="hist-item"><span class="hist-label">Time</span><span class="hist-val">${rec.duration}</span></div>
+                                    <div class="hist-item"><span class="hist-label">Teacher Mistake</span><span class="hist-val" style="color:red">${rec.details.teacherMistakes}</span></div>
+                                    <div class="hist-item"><span class="hist-label">Self Mistake</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer exam-score">${rec.score}%</div>
@@ -619,11 +613,11 @@
                             <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-date">${rec.date}</span></div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
+                                    <div class="hist-item"><span class="hist-label">Start</span><span class="hist-val">${sInfo}</span></div>
+                                    <div class="hist-item"><span class="hist-label">End</span><span class="hist-val">${eInfo} (Pg ${rec.endPage})</span></div>
                                 </div>
                             </div>
-                            <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount}</div>
+                            <div class="hist-footer" style="color:var(--mistake);">Mistakes: ${rec.mistakesCount}</div>
                             ${deleteBtn} ${editBtn}
                         </div>`;
                 }
@@ -632,20 +626,18 @@
         };
 
         window.deleteHistoryRecord = (index) => {
-            if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) {
+            if(confirm("Delete?")) {
                 const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
                 s.history.splice(index, 1);
                 updateFirebase();
                 window.renderHistory(s, currentUserType==='student'?'studentDashHistory':'categoryHistoryList', currentSessionType);
             }
         }
-
         window.editRecord = (index, type) => {
             const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx];
             const rec = student.history[index];
             isViewMode = false; editingRecordIndex = index;
-            
-            if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') {
+            if(type !== 'juz_exam' && type !== 'final_exam') {
                 currentMistakes = rec.mistakeDetails || [];
                 currentSessionType = rec.type;
                 document.getElementById('recorderTitle').innerText = "Edit Record";
@@ -653,19 +645,22 @@
                 document.getElementById('recSaveBtn').style.display = 'block';
                 document.getElementById('recDate').value = rec.date;
                 document.getElementById('startPage').value = rec.page;
-                // Load page to trigger API and then set values
-                window.loadSmartPage(true).then(() => {
-                    document.getElementById('endPage').value = rec.endPage;
-                    document.getElementById('startSurah').value = SURAH_NAMES_AR.indexOf(rec.startDetails.surah) + 1;
-                    document.getElementById('endSurah').value = SURAH_NAMES_AR.indexOf(rec.endDetails.surah) + 1;
-                    
-                    // Manually populate and set ayah options since API overwrites them initially
-                    updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah);
-                    updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah);
-                });
-
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
                 document.getElementById('recorder-page').classList.remove('hidden');
+                
+                // Fetch page and then set details
+                fetch(`https://api.alquran.cloud/v1/page/${rec.page}/quran-uthmani`)
+                .then(r=>r.json()).then(d => {
+                     window.renderMushafText(d.data.ayahs, 'mushafContent', currentMistakes, false);
+                     document.getElementById('endPage').value = rec.endPage;
+                     // Manually set dropdowns (simple approximation for demo)
+                     if(rec.startDetails) {
+                        document.getElementById('startSurah').innerHTML = `<option>${rec.startDetails.surah}</option>`;
+                        document.getElementById('startAyah').innerHTML = `<option>${rec.startDetails.ayah}</option>`;
+                        document.getElementById('endSurah').innerHTML = `<option>${rec.endDetails.surah}</option>`;
+                        document.getElementById('endAyah').innerHTML = `<option>${rec.endDetails.ayah}</option>`;
+                     }
+                });
             }
         }
 
@@ -680,7 +675,7 @@
             document.getElementById('recDate').valueAsDate = new Date();
             document.getElementById('mistakeCountDisplay').innerText = 0;
             document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>';
-            populateSurahSelects(); // Ensure lists are populated
+            populateSurahSelects(); // Populate lists
             
             // Auto fill
             const s = classesData[currentClassIdx].students[currentStudentIdx];
@@ -711,54 +706,22 @@
             if(!isViewMode && editingRecordIndex === -1 && data.data.ayahs.length > 0) {
                 const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
                 document.getElementById('endPage').value = page;
-                
-                // Set Surah
                 document.getElementById('startSurah').value = first.surah.number;
                 document.getElementById('endSurah').value = last.surah.number;
-
-                // Update Ayah Lists based on Surah
-                updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah);
-                updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
+                window.updateAyahSelect('startAyah', first.surah.number-1, first.numberInSurah); 
+                window.updateAyahSelect('endAyah', last.surah.number-1, last.numberInSurah);
             }
         };
-        
-        // Navigation Logic Fix
         window.changeRecPage = (dir) => {
-            // Get Current END Page (User is reading/reciting, moving forward from End Page)
-            let currentEndPage = parseInt(document.getElementById('endPage').value);
-            // If End page is empty (first load), use Start Page
-            if (!currentEndPage) currentEndPage = parseInt(document.getElementById('startPage').value);
-            
-            let newPage = currentEndPage + dir;
-            if(newPage < 1 || newPage > 604) return;
-            
-            // Only update End Page and Mushaf, keep Start Page same
-            document.getElementById('endPage').value = newPage;
-            
-            // Fetch Mushaf for new page
-            fetch(`https://api.alquran.cloud/v1/page/${newPage}/quran-uthmani`)
-                .then(r => r.json())
-                .then(data => {
-                    window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
-                    
-                    // Auto-update End Surah/Ayah to the end of this new page
-                    if(!isViewMode && data.data.ayahs.length > 0) {
-                        const last = data.data.ayahs[data.data.ayahs.length-1];
-                        document.getElementById('endSurah').value = last.surah.number;
-                        updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
-                    }
-                });
+            let p = parseInt(document.getElementById('startPage').value) + dir;
+            if(p>0 && p<=604) { document.getElementById('startPage').value=p; window.loadSmartPage(); }
         }
-
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
             let html = '';
+            // Header
             const f = ayahs[0];
             const headerTarget = isExam ? 'mushafTopBar' : 'recMushafTopBar';
-            const juzTarget = isExam ? 'mushafJuzInfo' : 'recMushafJuz';
-            const surahTarget = isExam ? 'mushafSurahInfo' : 'recMushafSurah';
-            
-            if(document.getElementById(juzTarget)) document.getElementById(juzTarget).innerText = `Juz ${f.juz}`;
-            if(document.getElementById(surahTarget)) document.getElementById(surahTarget).innerText = `سورة ${f.surah.name}`;
+            document.getElementById(headerTarget).innerHTML = `<span>Juz ${f.juz}</span><span>سورة ${f.surah.name}</span>`;
 
             ayahs.forEach(a => {
                 const words = a.text.split(' ');
@@ -773,6 +736,7 @@
             document.getElementById(target).innerHTML = html;
         };
         window.clickRecWord = (id) => {
+            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x=>x!==id); }
             else { el.classList.add('mistake'); currentMistakes.push(id); }
@@ -784,7 +748,6 @@
             
             const ssIdx = document.getElementById('startSurah').selectedIndex;
             const esIdx = document.getElementById('endSurah').selectedIndex;
-            
             const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value };
             const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value };
 
@@ -797,9 +760,7 @@
 
             if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } 
             else { s.history.push(record); }
-            updateFirebase(); 
-            alert("ސޭވް ކުރެވިއްޖެ");
-            window.closeRecorder();
+            updateFirebase(); window.closeRecorder();
         };
         window.viewLessonRecord = (rec) => {
             isViewMode = true; currentMistakes = rec.mistakeDetails || [];
@@ -821,14 +782,12 @@
             document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00";
             document.getElementById('countTeacher').innerText = rec.details.teacherMistakes;
             document.getElementById('countSelf').innerText = rec.details.selfMistakes;
-            document.getElementById('scoreTajweed').value = rec.details.tajweed;
-            document.getElementById('scoreFluency').value = rec.details.fluency;
             isViewMode = true; examState.mistakesList = rec.mistakeDetails || [];
             let startP = ((rec.juz-1)*20)+2; 
             window.loadExamPage(startP);
         };
 
-        // JUZ EXAM
+        // JUZ EXAM & FINAL EXAM (Same logic as before)
         window.openJuzExamSetup = () => { 
             const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = '';
             for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i));
@@ -855,8 +814,6 @@
             document.getElementById('currentPageDisplay').innerText = `Page ${page}`;
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
             const data = await res.json();
-            const first = data.data.ayahs[0];
-            document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`;
             window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true);
         };
         window.changeExamPage = (dir) => {
@@ -865,6 +822,7 @@
             examState.currentPage = newPage; window.loadExamPage(newPage);
         };
         window.clickExamWord = (id) => {
+            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) {
                 el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id);
@@ -912,12 +870,20 @@
             let duration = document.getElementById('stopwatchDisplay').innerText;
             if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={};
             
+            let details = {
+                teacherMistakes: examState.mistakesTeacher,
+                selfMistakes: examState.mistakesSelf,
+                tajweed: document.getElementById('scoreTajweed').value,
+                fluency: document.getElementById('scoreFluency').value,
+                mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value) + parseFloat(document.getElementById('q2_score').value)) : 0
+            };
+
             if(examState.mode === 'part1') {
                 s.juzExams[examState.juz].part1 = score;
                 s.history.push({
                     type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:score, duration:duration, 
-                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
+                    details: details, mistakeDetails: examState.mistakesList
                 });
             } else {
                 let p1 = s.juzExams[examState.juz].part1 || 0;
@@ -925,15 +891,11 @@
                 s.history.push({
                     type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:final, duration:duration, 
-                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
+                    details: details, mistakeDetails: examState.mistakesList
                 });
             }
-            updateFirebase(); 
-            alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!");
-            window.closeJuzExam(); window.openStudentMenu(currentStudentIdx);
+            updateFirebase(); window.closeJuzExam(); window.openStudentMenu(currentStudentIdx);
         };
-
-        // FINAL EXAM
         window.openFinalExam = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 };
@@ -982,7 +944,7 @@
             updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx);
         };
 
-        // UI HELPERS
+        // HELPERS
         function populateSurahSelects() {
             const s1 = document.getElementById('startSurah'), s2 = document.getElementById('endSurah');
             if(s1 && s2) { 
@@ -991,13 +953,11 @@
                     s1.add(new Option(n, i+1)); 
                     s2.add(new Option(n, i+1)); 
                 }); 
-                // Add event listeners to populate Ayahs when Surah changes
-                s1.onchange = function() { updateAyahOptions('startAyah', this.value - 1); };
-                s2.onchange = function() { updateAyahOptions('endAyah', this.value - 1); };
+                s1.onchange = function() { window.updateAyahOptions('startAyah', this.value - 1); };
+                s2.onchange = function() { window.updateAyahOptions('endAyah', this.value - 1); };
             }
         }
-        
-        function updateAyahOptions(selectId, surahIndex, selectedValue) {
+        window.updateAyahOptions = (selectId, surahIndex, selectedValue) => {
             const select = document.getElementById(selectId);
             select.innerHTML = '';
             const total = AYAH_COUNTS[surahIndex];
@@ -1007,18 +967,8 @@
             if(selectedValue && selectedValue <= total) select.value = selectedValue;
             else select.value = 1;
         }
-
-        window.updateAyahSelect = (id, val) => {
-            // Helper for initial load - just set the value if it exists, or create if not
-            // In smart load, we might need to fully populate to allow changes
-            // Here we just set the single value for visual correctness as per API return
-            const sel = document.getElementById(id);
-            // Check if options exist, if not (or if only 1 dummy), try to populate fully if we know surah
-            // For now, simple set:
-             // Find the surah index
-             let sId = id === 'startAyah' ? 'startSurah' : 'endSurah';
-             let sIdx = document.getElementById(sId).value - 1;
-             updateAyahOptions(id, sIdx, val);
+        window.updateAyahSelect = (id, surahIdx, val) => {
+            window.updateAyahOptions(id, surahIdx-1, val);
         }
     </script>
 </body>
