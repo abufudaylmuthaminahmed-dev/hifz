@@ -1,1 +1,5 @@
-
+/ (Root folder)
+├── index.html
+└── fonts/
+    ├── faruma.ttf
+    └── mvwaheed.ttf
