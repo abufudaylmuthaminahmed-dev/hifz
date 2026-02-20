@@ -49,59 +49,67 @@
         .form-input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 10px; font-family: var(--font-main); font-size: 16px; margin-bottom: 15px; text-align: right; outline: none; transition: 0.3s; }
         .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: var(--font-heading); font-size: 18px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        /* UI ELEMENTS */
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .action-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; cursor: pointer; transition: 0.2s; }
-        .action-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .list-item { background: white; padding: 18px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-right: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        
-        .big-btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* GRID SYSTEM (For Classes, Students, Menu) */
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-top: 20px; 
+            justify-content: center;
+        }
+
+        /* CARDS (Used for Menu, Classes, Students) */
+        .card-btn { 
+            background: white; padding: 25px; border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; 
+            border: 1px solid #eee; cursor: pointer; transition: 0.2s; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px;
+            min-height: 160px;
+        }
+        .card-btn:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .card-icon { font-size: 40px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; }
+        .card-sub { font-size: 13px; color: #7f8c8d; }
+
+        /* DASHBOARD CENTER BUTTONS */
+        .dashboard-center {
+            display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;
+        }
+        .dashboard-center .card-btn { width: 250px; }
+
+        /* BUTTONS */
+        .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
+        .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; }
 
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        @media (min-width: 600px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
-        .menu-btn { background: white; padding: 25px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; transition: 0.2s; }
-        .menu-icon { font-size: 35px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        /* HISTORY LIST */
+        .hist-card { background: white; width: 100%; margin-bottom: 15px; border-radius: 15px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; cursor: pointer; transition:0.2s; }
+        .hist-card:active { transform: scale(0.98); }
+        .hist-header { padding: 12px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .hist-body { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .hist-item { text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #f0f0f0; }
+        .hist-label { font-size: 13px; color: #7f8c8d; display: block; margin-bottom: 5px; }
+        .hist-val { font-size: 16px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
+        .hist-footer { padding: 12px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 18px; font-weight: bold; color: var(--accent); }
+        
+        .hist-card.type-new_lesson { border-right: 5px solid var(--accent); }
+        .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
 
-        /* DETAILED HISTORY CARD (UPDATED) */
-        .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; }
-        .hist-card:active { transform: scale(0.99); }
-        
-        .hist-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); }
-        .hist-date { font-family: sans-serif; font-size: 14px; color: #555; background: #e0e0e0; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
-        
-        .hist-body { padding: 20px; }
-        .hist-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
-        .hist-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .hist-label { font-size: 14px; color: #7f8c8d; font-weight: bold; }
-        .hist-val { font-size: 18px; font-weight: bold; color: #333; font-family: var(--font-arabic); text-align: left; }
-        
-        /* Two column layout for start/end details */
-        .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .hist-box { background: #fcfcfc; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        
-        .hist-footer { padding: 15px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 20px; font-weight: bold; color: var(--accent); }
-        .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; }
-
-        /* LAYOUTS */
+        /* RECORDER & EXAM LAYOUT */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
         .sidebar-panel { width: 400px; background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.05); }
-        .main-panel { flex-grow: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; overflow-y: auto; padding: 10px; align-items: center; }
+        .main-panel { flex-grow: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; align-items: center; }
 
-        /* MUSHAF (Fit to Screen) */
-        .mushaf-top-bar { background: white; padding: 8px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 10px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 900px; margin: 0 auto 10px auto; direction: rtl; flex-shrink: 0; }
-        .mushaf-page { width: 100%; max-width: 900px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 80%; flex-grow: 1; direction: rtl; text-align: center; border-radius: 8px; margin: 0 auto; overflow-y: auto; }
-        .quran-text { font-family: var(--font-arabic); font-size: 26px; line-height: 2.2; text-align: justify; text-align-last: center; }
-        .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: sans-serif; font-size: 20px; }
+        /* MUSHAF */
+        .mushaf-top-bar { background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 800px; margin: 0 auto 15px auto; direction: rtl; }
+        .mushaf-page { width: 100%; max-width: 800px; background: white; padding: 40px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); min-height: 90%; direction: rtl; text-align: center; border-radius: 8px; margin: 0 auto; }
+        .quran-text { font-family: var(--font-arabic); font-size: 28px; line-height: 2.4; text-align: justify; text-align-last: center; }
         .word { cursor: pointer; border-radius: 4px; padding: 2px 1px; transition: background 0.1s; }
         .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
-        
-        .mushaf-nav { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 900px; padding: 5px; flex-shrink: 0; }
-        .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .ayah-marker { color: #d4ac6e; font-weight: bold; }
 
-        /* EXAM & RECORDER */
+        /* EXAM ELEMENTS */
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
         .big-score { font-size: 40px; font-weight: bold; }
         .score-control { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 10px; }
@@ -124,13 +132,14 @@
             .layout-split { flex-direction: column; }
             .sidebar-panel { width: 100%; height: auto; max-height: 50vh; order: 1; border-bottom: 2px solid #ddd; }
             .main-panel { order: 2; height: 50vh; }
+            .grid-container { grid-template-columns: 1fr; }
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN -->
+    <!-- LOGIN -->
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
             <h1 class="login-title">ޙިފްޡް ޕްރޮގްރާމް</h1>
@@ -139,12 +148,14 @@
                 <button class="tab-btn" onclick="window.switchLogin('student')">ދަރިވަރު</button>
             </div>
             <div id="teacher-login-form">
-                <input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް (1234)">
+                <input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
                 <button class="btn-primary" onclick="window.loginTeacher()">ލޮގިން</button>
             </div>
             <div id="student-login-form" class="hidden">
                 <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު">
-                <div id="stuPassField" class="hidden" style="margin-top:10px;"><input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް"></div>
+                <div id="stuPassField" class="hidden" style="margin-top:10px;">
+                    <input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
+                </div>
                 <button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
             </div>
         </div>
@@ -155,57 +166,75 @@
         
         <!-- TEACHER DASHBOARD -->
         <div id="teacher-dashboard" class="container hidden">
-            <div class="app-header"><div class="header-title">މުދައްރިސް ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
-            <div class="grid-layout">
-                <div class="action-card" onclick="window.openPage('management-page')"><h3>ކްލާސް މެނޭޖްމަންޓް</h3></div>
-                <div class="action-card" onclick="window.openGradingClassList()"><h3>ފިލާވަޅު ނެގުން</h3></div>
+            <div class="app-header">
+                <div class="header-title">މުދައްރިސް ޕެނަލް</div>
+                <button class="icon-btn logout-btn" onclick="window.logout()">⏻</button>
+            </div>
+            <div class="dashboard-center">
+                <div class="card-btn" onclick="window.openPage('management-page')">
+                    <span class="card-icon">⚙️</span>
+                    <h3 class="card-title">ކްލާސް މެނޭޖްމަންޓް</h3>
+                    <span class="card-sub">ކްލާސް ހެދުން / ދަރިވަރުން</span>
+                </div>
+                <div class="card-btn" onclick="window.openGradingClassList()">
+                    <span class="card-icon">📚</span>
+                    <h3 class="card-title">ފިލާވަޅު ނެގުން</h3>
+                    <span class="card-sub">ރެކޯޑް ކުރުން / ބެލުން</span>
+                </div>
             </div>
         </div>
 
         <!-- MANAGEMENT PAGES -->
         <div id="management-page" class="container hidden">
             <div class="app-header"><div class="header-title">ކްލާސް މެނޭޖްމަންޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
-            <div class="action-card" style="margin-top:20px; text-align:right;">
+            <div style="background:white; padding:20px; border-radius:15px; margin-top:20px; text-align:center;">
                 <h4>އާ ކްލާހެއް ހެދުން</h4>
-                <div style="display:flex; gap:10px;"><input type="text" id="newClassName" class="form-input" placeholder="ނަން"><input type="text" id="newTeacherName" class="form-input" placeholder="އުސްތާޛް"><button class="btn-primary" style="width:auto;" onclick="window.createClass()">ހަދާ</button></div>
+                <div style="display:flex; gap:10px; justify-content:center; max-width:600px; margin:0 auto;">
+                    <input type="text" id="newClassName" class="form-input" placeholder="ކްލާހުގެ ނަން" style="margin:0;">
+                    <input type="text" id="newTeacherName" class="form-input" placeholder="އުސްތާޛް" style="margin:0;">
+                    <button class="btn-primary" style="width:auto;" onclick="window.createClass()">ހަދާ</button>
+                </div>
             </div>
             <h4 style="margin-top:20px;">ހެދިފައިވާ ކްލާސްތައް</h4>
-            <div id="manageClassList"></div>
+            <div id="manageClassList" class="grid-container"></div>
         </div>
 
         <div id="class-details-page" class="container hidden">
             <div class="app-header"><div class="header-title" id="manageHeaderName">Class</div><button class="icon-btn" onclick="window.openPage('management-page')">⬅</button></div>
-            <div class="grid-layout">
-                <div class="action-card">
-                    <button class="big-btn" onclick="window.openAddStudentModal()"><span>➕</span> ދަރިވަރުން އިތުރުކުރޭ</button>
-                    <div style="display:flex; gap:10px;"><button class="big-btn btn-orange" onclick="window.downloadTemplate()"><span>📥</span> ޓެމްޕްލޭޓް</button><label class="big-btn btn-green" style="font-size:14px; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label></div>
+            <div style="text-align:center; margin:20px 0;">
+                <button class="big-btn" onclick="window.openAddStudentModal()"><span>➕</span> ދަރިވަރުން އިތުރުކުރޭ</button>
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button class="big-btn btn-orange" onclick="window.downloadTemplate()" style="width:auto;">📥 ޓެމްޕްލޭޓް</button>
+                    <label class="big-btn btn-green" style="width:auto; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
                 </div>
             </div>
             <h4 style="margin-top:20px;">ދަރިވަރުންގެ ލިސްޓް</h4>
-            <div id="studentManageList"></div>
+            <div id="studentManageList" class="grid-container"></div>
         </div>
 
         <!-- GRADING FLOW -->
         <div id="grading-class-page" class="container hidden">
             <div class="app-header"><div class="header-title">ފިލާވަޅު ނެގުން</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
-            <div id="gradingClassList"></div>
+            <div id="gradingClassList" class="grid-container"></div>
         </div>
         <div id="grading-student-page" class="container hidden">
             <div class="app-header"><div class="header-title">Students</div><button class="icon-btn" onclick="window.openPage('grading-class-page')">⬅</button></div>
-            <div id="gradingStudentList"></div>
+            <div id="gradingStudentList" class="grid-container"></div>
         </div>
+        
+        <!-- TEACHER STUDENT MENU -->
         <div id="grading-menu-page" class="container hidden">
             <div class="app-header"><div class="header-title" id="gradingStudentName">Student</div><button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button></div>
-            <div class="menu-grid">
-                <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><strong>އާ ފިލާވަޅު</strong></div>
-                <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><strong>ކުރު މުރާޖަޢާ</strong></div>
-                <div class="menu-btn" onclick="window.openCategoryPage('long_rev')"><span class="menu-icon" style="color:#8e44ad;">📅</span><strong>ދިގު މުރާޖަޢާ</strong></div>
-                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')"><span class="menu-icon" style="color:#2980b9;">📝</span><strong>ޖުޒުއު އިމްތިޙާން</strong></div>
-                <div class="menu-btn" onclick="window.openCategoryPage('final_exam')"><span class="menu-icon" style="color:#c0392b;">🎓</span><strong>ފަހު އިމްތިޙާން</strong></div>
+            <div class="grid-container">
+                <div class="card-btn" onclick="window.openCategoryPage('new_lesson')"><span class="card-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('short_rev')"><span class="card-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('long_rev')"><span class="card-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('juz_exam')"><span class="card-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('final_exam')"><span class="card-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
             </div>
         </div>
 
-        <!-- CATEGORY PAGE (HISTORY LIST) -->
+        <!-- CATEGORY HISTORY PAGE -->
         <div id="category-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="catPageTitle">Title</div>
@@ -218,7 +247,7 @@
             <div id="categoryHistoryList"></div>
         </div>
 
-        <!-- UNIVERSAL RECORDER -->
+        <!-- UNIVERSAL RECORDER & VIEWER -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -230,19 +259,16 @@
             <div class="layout-split">
                 <div class="sidebar-panel">
                     <div style="margin-bottom:15px;"><label class="form-label">ތާރީޚް</label><input type="date" id="recDate" class="rec-input" style="text-align:center;"></div>
-                    
                     <div class="form-sec" style="border-top:3px solid var(--accent);">
                         <span class="sec-title">ފަށާ ހިސާބު</span>
                         <label>ޞަފްޙާ</label><input type="number" id="startPage" class="rec-input" placeholder="Page (1-604)" onchange="window.loadSmartPage()">
                         <div style="display:flex; gap:5px;"><div style="flex:1"><label>ސޫރަތް</label><select id="startSurah" class="rec-input"></select></div><div style="width:60px"><label>އާޔަތް</label><select id="startAyah" class="rec-input"></select></div></div>
                     </div>
-                    
                     <div class="form-sec" style="border-top:3px solid #e74c3c;">
                         <span class="sec-title">ނިމޭ ހިސާބު</span>
                         <label>ޞަފްޙާ</label><input type="number" id="endPage" class="rec-input" placeholder="Page">
                         <div style="display:flex; gap:5px;"><div style="flex:1"><label>ސޫރަތް</label><select id="endSurah" class="rec-input"></select></div><div style="width:60px"><label>އާޔަތް</label><select id="endAyah" class="rec-input"></select></div></div>
                     </div>
-                    
                     <div style="background:#fff5f5; padding:15px; border-radius:8px; text-align:center; margin-top:auto; border:1px solid #ffcccc;">
                         <span style="font-size:14px; color:red;">ކުށުގެ ޢަދަދު</span><strong id="mistakeCountDisplay" style="font-size:32px; color:red; display:block;">0</strong>
                     </div>
@@ -312,8 +338,14 @@
         <div id="student-dashboard" class="container hidden">
             <div class="app-header"><div class="header-title">ދަރިވަރު ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div style="background:white; padding:30px; border-radius:15px; text-align:center; margin-bottom:20px;"><h2 style="color:var(--st-primary);">މަރުޙަބާ!</h2><h3 id="studentDashName"></h3></div>
-            <h4 style="color:var(--st-primary);">ކިޔަވާފައިވާ ބައިތައް</h4>
-            <div id="studentDashHistory"></div>
+            
+            <div class="grid-container">
+                <div class="card-btn" onclick="window.openCategoryPage('new_lesson')"><span class="card-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('short_rev')"><span class="card-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('long_rev')"><span class="card-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('juz_exam')"><span class="card-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
+                <div class="card-btn" onclick="window.openCategoryPage('final_exam')"><span class="card-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
+            </div>
         </div>
 
     </div>
@@ -346,7 +378,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -376,6 +408,7 @@
         let examState = {}, finalExamState = {};
         let currentMistakes = [];
         let isViewMode = false;
+        let editingRecordIndex = -1;
         let currentRecPage = 1;
 
         // LOAD DATA
@@ -430,7 +463,6 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('studentDashName').innerText = currentStudentObj.name;
-            window.renderHistory(currentStudentObj, 'studentDashHistory', null);
             window.openPage('student-dashboard');
         };
         window.logout = () => location.reload();
@@ -449,7 +481,7 @@
         };
         window.renderManageClassList = () => {
             const div = document.getElementById('manageClassList'); div.innerHTML='';
-            if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="list-item" onclick="window.openClass(${i})"><strong>${c.name}</strong><small>${c.teacher||''}</small></div>`);
+            if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})"><span class="card-icon">📚</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span></div>`);
         };
         window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
         window.renderStudentList = () => {
@@ -460,8 +492,9 @@
             students.forEach(s => {
                 let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
                 div.innerHTML += `
-                    <div class="list-item">
-                        <div><strong>${s.name}</strong> <small>(${s.id})</small></div>
+                    <div class="card-btn" style="min-height:120px;">
+                        <h4 class="card-title">${s.name}</h4>
+                        <span class="card-sub">${s.id}</span>
                         <small style="color:${s.password?'green':'red'}">${pass}</small>
                     </div>`;
             });
@@ -482,14 +515,14 @@
         // --- GRADING ---
         window.openGradingClassList = () => {
             const div = document.getElementById('gradingClassList'); div.innerHTML='';
-            if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="list-item" onclick="window.openGradingStudentList(${i})"><strong>${c.name}</strong></div>`);
+            if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`);
             window.openPage('grading-class-page');
         };
         window.openGradingStudentList = (i) => {
             currentClassIdx = i;
             const div = document.getElementById('gradingStudentList'); div.innerHTML='';
             const students = classesData[i].students || [];
-            students.forEach((s, idx) => div.innerHTML += `<div class="list-item" onclick="window.openStudentMenu(${idx})">${s.name}</div>`);
+            students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`);
             window.openPage('grading-student-page');
         };
         window.openStudentMenu = (i) => {
@@ -516,55 +549,75 @@
             const list = document.getElementById(listId); list.innerHTML = '';
             if(!student.history) student.history = [];
             const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">No Records</p>';
+            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">ރެކޯޑެއް ނެތް</p>';
             
-            records.slice().reverse().forEach(rec => {
+            // Render latest first, keep index for editing
+            for(let i=records.length-1; i>=0; i--) {
+                const rec = records[i];
+                const realIndex = student.history.indexOf(rec);
                 let html = '';
+                
                 if(rec.type === 'juz_exam') {
                     let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>';
                     html = `
-                        <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
+                        <div class="hist-card type-juz_exam" onclick='window.editRecord(${realIndex}, "juz_exam")'>
                             <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
                             <div class="hist-body">
                                 <div class="hist-item"><span class="hist-label">ތާރީޚް</span><span class="hist-val">${rec.date}</span></div>
                                 <div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div>
                                 <div class="hist-item"><span class="hist-label">އުސްތާޛް ކުށް</span><span class="hist-val">${rec.details.teacherMistakes}</span></div>
                                 <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
-                                <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details.tajweed}/10</span></div>
-                                <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details.fluency}/5</span></div>
-                                <div class="hist-item"><span class="hist-label">މުތަޝާބިހް</span><span class="hist-val">${rec.details.mutashabihMarks}/5</span></div>
                             </div>
-                            <div class="hist-footer exam-score">${rec.score}%</div>
+                            <div class="hist-footer">${rec.score}%</div>
                         </div>`;
                 } else if(rec.type === 'final_exam') {
-                    html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div></div>`;
+                    html = `<div class="hist-card type-final_exam" onclick='window.editRecord(${realIndex}, "final_exam")'><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div></div>`;
                 } else {
-                    // Detailed History
-                    let surahStart = rec.startDetails ? rec.startDetails.surah : (rec.startSurahName || '-');
-                    let ayahStart = rec.startDetails ? rec.startDetails.ayah : (rec.startAyah || '-');
-                    let surahEnd = rec.endDetails ? rec.endDetails.surah : (rec.endSurahName || '-');
-                    let ayahEnd = rec.endDetails ? rec.endDetails.ayah : (rec.endAyah || '-');
-
+                    const startInfo = rec.startDetails ? `${rec.startDetails.surah}:${rec.startDetails.ayah}` : '-';
+                    const endInfo = rec.endDetails ? `${rec.endDetails.surah}:${rec.endDetails.ayah}` : '-';
                     html = `
-                        <div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'>
+                        <div class="hist-card type-${rec.type}" onclick='window.editRecord(${realIndex}, "lesson")'>
                             <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-date">${rec.date}</span></div>
                             <div class="hist-body">
-                                <div class="hist-grid">
-                                    <div class="hist-box"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${surahStart} : ${ayahStart}</span></div>
-                                    <div class="hist-box"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${surahEnd} : ${ayahEnd} (ޞ ${rec.endPage})</span></div>
-                                </div>
+                                <div class="hist-item"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${startInfo} (ޞ ${rec.page})</span></div>
+                                <div class="hist-item"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${endInfo} (ޞ ${rec.endPage})</span></div>
                             </div>
-                            <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount}</div>
+                            <div class="hist-footer" style="color:var(--mistake);">ކުށުގެ ޢަދަދު: ${rec.mistakesCount}</div>
                         </div>`;
                 }
                 list.innerHTML += html;
-            });
+            }
         };
+
+        window.editRecord = (index, type) => {
+            const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx];
+            const rec = student.history[index];
+            isViewMode = false; editingRecordIndex = index;
+            
+            if(type === 'lesson') {
+                currentMistakes = rec.mistakeDetails || [];
+                currentSessionType = rec.type;
+                document.getElementById('recorderTitle').innerText = "Edit Record";
+                document.getElementById('recSaveBtn').innerText = "Update";
+                document.getElementById('recSaveBtn').style.display = 'block';
+                document.getElementById('recDate').value = rec.date;
+                document.getElementById('startPage').value = rec.page;
+                document.getElementById('endPage').value = rec.endPage;
+                document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
+                document.getElementById('recorder-page').classList.remove('hidden');
+                window.loadSmartPage(true);
+            } else if (type === 'juz_exam') {
+                // Simplified edit for juz exam - re-open exam panel with saved data
+                alert("Editing Juz Exam not fully implemented in this demo.");
+            }
+        }
 
         // RECORDER
         window.openRecorder = (type) => {
-            currentSessionType = type; isViewMode = false; currentMistakes = [];
-            document.getElementById('recorderTitle').innerText = (type==='new_lesson'?'އާ ފިލާވަޅު':'މުރާޖަޢާ');
+            editingRecordIndex = -1; isViewMode = false; currentMistakes = [];
+            currentSessionType = type;
+            document.getElementById('recorderTitle').innerText = "ރެކޯޑް";
+            document.getElementById('recSaveBtn').innerText = "Save";
             document.getElementById('recSaveBtn').style.display = 'block';
             document.getElementById('viewModeBadge').style.display = 'none';
             document.getElementById('recDate').valueAsDate = new Date();
@@ -594,36 +647,20 @@
         window.loadSmartPage = async (applyHighlights=false) => {
             const page = document.getElementById('startPage').value;
             if(!page) return;
-            currentRecPage = parseInt(page);
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
             const data = await res.json();
             window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
-            if(!isViewMode && data.data.ayahs.length > 0) {
+            if(!isViewMode && editingRecordIndex === -1 && data.data.ayahs.length > 0) {
                 const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
                 document.getElementById('endPage').value = page;
-                
-                populateSurahSelects(); // Ensure lists
                 document.getElementById('startSurah').value = first.surah.number;
                 document.getElementById('endSurah').value = last.surah.number;
                 window.updateAyahSelect('startAyah', first.numberInSurah); window.updateAyahSelect('endAyah', last.numberInSurah);
             }
         };
-        window.changeRecPage = (dir) => {
-            let newPage = currentRecPage + dir;
-            if(newPage < 1 || newPage > 604) return;
-            currentRecPage = newPage;
-            // Fetch only mushaf display for view mode, or handle logic for recording
-            // For recording, usually we stick to one page entry, but if they want to scroll:
-            fetch(`https://api.alquran.cloud/v1/page/${newPage}/quran-uthmani`)
-                .then(r=>r.json()).then(d => {
-                     window.renderMushafText(d.data.ayahs, 'mushafContent', currentMistakes, false);
-                     document.getElementById('recPageDisplay').innerText = `Page ${newPage}`;
-                });
-        };
-
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
             let html = '';
-            // Update Header Info
+            // Update Header
             const f = ayahs[0];
             const headerTarget = isExam ? 'mushafTopBar' : 'recMushafTopBar';
             const juzTarget = isExam ? 'mushafJuzInfo' : 'recMushafJuz';
@@ -645,7 +682,6 @@
             document.getElementById(target).innerHTML = html;
         };
         window.clickRecWord = (id) => {
-            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x=>x!==id); }
             else { el.classList.add('mistake'); currentMistakes.push(id); }
@@ -655,36 +691,30 @@
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             if(!s.history) s.history = [];
             
-            // Get Text Details
             const ssIdx = document.getElementById('startSurah').selectedIndex;
             const esIdx = document.getElementById('endSurah').selectedIndex;
             
             const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value };
             const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value };
 
-            s.history.push({
+            const record = {
                 type: currentSessionType, date: document.getElementById('recDate').value,
                 page: document.getElementById('startPage').value, endPage: document.getElementById('endPage').value,
                 startDetails: startObj, endDetails: endObj,
                 mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes
-            });
+            };
+
+            if(editingRecordIndex > -1) {
+                s.history[editingRecordIndex] = record;
+            } else {
+                s.history.push(record);
+            }
             updateFirebase(); window.closeRecorder();
         };
-        window.viewLessonRecord = (rec) => {
-            isViewMode = true; currentMistakes = rec.mistakeDetails || [];
-            document.getElementById('recorderTitle').innerText = "View Record";
-            document.getElementById('recSaveBtn').style.display = 'none';
-            document.getElementById('viewModeBadge').style.display = 'block';
-            document.getElementById('recDate').value = rec.date;
-            document.getElementById('startPage').value = rec.page;
-            document.getElementById('endPage').value = rec.endPage;
-            document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
-            document.getElementById('recorder-page').classList.remove('hidden');
-            window.loadSmartPage(true);
-        };
-        window.viewJuzRecord = (rec) => {
-            alert(`Juz ${rec.juz} Exam\nScore: ${rec.score}%\nMistakes: ${rec.mistakesCount}\nDuration: ${rec.duration}`);
-        };
+        window.changeRecPage = (dir) => {
+            let p = parseInt(document.getElementById('startPage').value) + dir;
+            if(p>0 && p<=604) { document.getElementById('startPage').value=p; window.loadSmartPage(); }
+        }
 
         // JUZ EXAM
         window.openJuzExamSetup = () => { 
@@ -704,7 +734,6 @@
             document.getElementById('liveScore').innerText = "100%";
             document.getElementById('countTeacher').innerText = "0"; document.getElementById('countSelf').innerText = "0";
             document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block';
-            document.getElementById('stopwatchDisplay').innerText = "00:00:00";
             
             window.loadExamPage(startPage);
             document.getElementById('juz-exam-page').classList.remove('hidden');
@@ -714,6 +743,8 @@
             document.getElementById('currentPageDisplay').innerText = `Page ${page}`;
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
             const data = await res.json();
+            const first = data.data.ayahs[0];
+            document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`;
             window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true);
         };
         window.changeExamPage = (dir) => {
@@ -767,22 +798,14 @@
             const score = window.calcScore();
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             let duration = document.getElementById('stopwatchDisplay').innerText;
-            
-            // Get breakdown values
-            let tMistakes = examState.mistakesTeacher;
-            let sMistakes = examState.mistakesSelf;
-            let tajweed = document.getElementById('scoreTajweed').value;
-            let fluency = document.getElementById('scoreFluency').value;
-            let mMarks = (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value) + parseFloat(document.getElementById('q2_score').value)) : 0;
-
             if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={};
-
+            
             if(examState.mode === 'part1') {
                 s.juzExams[examState.juz].part1 = score;
                 s.history.push({
                     type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:score, duration:duration, 
-                    details:{ teacherMistakes: tMistakes, selfMistakes: sMistakes, tajweed: tajweed, fluency: fluency, mutashabihMarks: mMarks }
+                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
                 });
             } else {
                 let p1 = s.juzExams[examState.juz].part1 || 0;
@@ -790,7 +813,7 @@
                 s.history.push({
                     type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:final, duration:duration, 
-                    details:{ teacherMistakes: tMistakes, selfMistakes: sMistakes, tajweed: tajweed, fluency: fluency, mutashabihMarks: mMarks }
+                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
                 });
             }
             updateFirebase(); window.closeJuzExam(); window.openStudentMenu(currentStudentIdx);
