@@ -3,86 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ޙިފްޡް ޕްރޮގްރާމް - Final Fixed V33</title>
+    <title>ޙިފްޡް ޕްރޮގްރާމް - Final V34 (Student Edit & Progress)</title>
     
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- ފޮންޓް ސެޓަޕް (FIXED FOR ROOT DIRECTORY) --- */
+        /* --- FONTS --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
-        /* Faruma Font Setup */
-        @font-face { 
-            font-family: 'Faruma'; 
-            /* ފައިލް އިން ތަން ބަދަލުކުރީ: fonts/ ކަނޑާލީ */
-            src: url('faruma.ttf') format('truetype'); 
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* MV Waheed Font Setup */
-        @font-face { 
-            font-family: 'MV Waheed'; 
-            /* ފައިލް އިން ތަން ބަދަލުކުރީ: fonts/ ކަނޑާލީ */
-            src: url('mvwaheed.ttf') format('truetype'); 
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
+        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
+        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
 
         :root {
-            --primary: #2c3e50; 
-            --accent: #27ae60;
-            --accent-rev: #e67e22;
-            --mistake: #e74c3c;
-            --bg-light: #f4f6f8;
-            --mushaf-paper: #fffcf2;
-            --st-primary: #1e8449;
-            
-            /* Updated Font Priorities */
+            --primary: #2c3e50; --accent: #27ae60; --accent-rev: #e67e22; --mistake: #e74c3c;
+            --bg-light: #f4f6f8; --mushaf-paper: #fffcf2; --st-primary: #1e8449;
             --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
+            --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
             --font-arabic: 'Amiri', serif;
         }
-        /* --- ފޮންޓް ސެޓަޕް (UPDATED FOR MOBILE) --- */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
-        /* Faruma Font Setup */
-        @font-face { 
-            font-family: 'Faruma'; 
-            src: url('fonts/faruma.ttf') format('truetype'); 
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* MV Waheed Font Setup */
-        @font-face { 
-            font-family: 'MV Waheed'; 
-            src: url('fonts/mvwaheed.ttf') format('truetype'); 
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        :root {
-            --primary: #2c3e50; 
-            --accent: #27ae60;
-            --accent-rev: #e67e22;
-            --mistake: #e74c3c;
-            --bg-light: #f4f6f8;
-            --mushaf-paper: #fffcf2;
-            --st-primary: #1e8449;
-            
-            /* Updated Font Priorities */
-            --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
-            --font-arabic: 'Amiri', serif;
-        }
         * { box-sizing: border-box; }
         body { font-family: var(--font-main); margin: 0; min-height: 100vh; color: #333; background-color: var(--bg-light); overflow-x: hidden; transition: background 0.3s; }
         
@@ -124,9 +65,11 @@
         .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; }
         .card-sub { font-size: 13px; color: #7f8c8d; }
 
+        /* DASHBOARD CENTER */
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
+        /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
         .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
@@ -146,18 +89,23 @@
         .hist-footer { padding: 15px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 20px; font-weight: bold; color: var(--accent); position: relative; }
         .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; }
 
-        .btn-edit-hist, .btn-delete-hist { 
-            position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        /* ACTION BUTTONS (Edit/Delete) */
+        .btn-action-sm { 
+            width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
-        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
+        .btn-del { background: #fee2e2; color: #c0392b; }
+        .btn-edit { background: #e3f2fd; color: #2980b9; }
+        
+        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
+        .hist-actions { position: absolute; bottom: 10px; left: 10px; display: flex; gap: 8px; z-index: 5; }
 
-        /* MUSHAF & LAYOUT */
+        /* LAYOUTS */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
         .sidebar-panel { width: 400px; background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.05); }
         .main-panel { flex-grow: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; align-items: center; }
 
+        /* MUSHAF */
         .mushaf-top-bar { background: white; padding: 8px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 10px; font-family: var(--font-arabic); font-size: 18px; color: var(--primary); display: flex; justify-content: space-between; width: 100%; max-width: 900px; margin: 0 auto 10px auto; direction: rtl; flex-shrink: 0; }
         .mushaf-page { width: 100%; max-width: 900px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 80%; flex-grow: 1; direction: rtl; text-align: center; border-radius: 8px; margin: 0 auto; overflow-y: auto; }
         .quran-text { font-family: var(--font-arabic); font-size: 26px; line-height: 2.2; text-align: justify; text-align-last: center; }
@@ -240,6 +188,12 @@
                     <h3 class="card-title">ފިލާވަޅު ނެގުން</h3>
                     <span class="card-sub">ރެކޯޑް ކުރުން / ބެލުން</span>
                 </div>
+                <!-- NEW PROGRESS CARD -->
+                <div class="card-btn" onclick="alert('Coming Soon')">
+                    <span class="card-icon">📈</span>
+                    <h3 class="card-title">ޕްރޮގްރެސް</h3>
+                    <span class="card-sub">ރިޕޯޓްތައް</span>
+                </div>
             </div>
         </div>
 
@@ -264,8 +218,8 @@
                 <div class="action-card">
                     <button class="big-btn" onclick="window.openAddStudentModal()"><span>➕</span> ދަރިވަރުން އިތުރުކުރޭ</button>
                     <div style="display:flex; gap:10px; justify-content:center;">
-                        <button class="big-btn btn-orange" onclick="window.downloadTemplate()"><span>📥</span> ޓެމްޕްލޭޓް</button>
-                        <label class="big-btn btn-green" style="font-size:14px; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
+                        <button class="big-btn btn-orange" onclick="window.downloadTemplate()" style="width:auto;">📥 ޓެމްޕްލޭޓް</button>
+                        <label class="big-btn btn-green" style="width:auto; margin:0; cursor:pointer;">📂 އަޕްލޯޑް<input type="file" hidden onchange="window.handleExcelUpload(this)"></label>
                     </div>
                 </div>
             </div>
@@ -284,12 +238,12 @@
         </div>
         <div id="grading-menu-page" class="container hidden">
             <div class="app-header"><div class="header-title" id="gradingStudentName">Student</div><button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button></div>
-            <div class="grid-container">
-                <div class="card-btn" onclick="window.openCategoryPage('new_lesson')"><span class="card-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
-                <div class="card-btn" onclick="window.openCategoryPage('short_rev')"><span class="card-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
-                <div class="card-btn" onclick="window.openCategoryPage('long_rev')"><span class="card-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
-                <div class="card-btn" onclick="window.openCategoryPage('juz_exam')"><span class="card-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
-                <div class="card-btn" onclick="window.openCategoryPage('final_exam')"><span class="card-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
+            <div class="menu-grid">
+                <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('long_rev')"><span class="menu-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')"><span class="menu-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('final_exam')"><span class="menu-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
             </div>
         </div>
 
@@ -412,21 +366,27 @@
     <div id="createPassModal" class="modal">
         <div class="modal-content" style="text-align:center;"><h3 style="color:var(--primary);">ޕާސްވޯޑް ހައްދަވާ</h3><input type="password" id="newStuPass" class="form-input" placeholder="އާ ޕާސްވޯޑް"><button class="big-btn" onclick="window.saveNewPassword()">ސޭވް & ލޮގިން</button></div>
     </div>
+    
+    <!-- ADD/EDIT STUDENT MODAL -->
     <div id="addStudentModal" class="modal">
         <div class="modal-content">
-            <h3>ދަރިވަރަކު އިތުރުކުރުން</h3>
+            <h3 style="margin-bottom:20px; color:var(--primary);">ދަރިވަރަކު އިތުރުކުރުން/އެޑިޓްކުރުން</h3>
             <div class="form-grid">
                 <div class="full-span"><label class="form-label">ކޯސް މޮޑިއުލް</label><input type="text" id="m_module" class="form-input"></div>
                 <div><label class="form-label">އައިޑީ</label><input type="text" id="m_id" class="form-input"></div>
                 <div><label class="form-label">ނަން</label><input type="text" id="m_name" class="form-input"></div>
-                <div><label class="form-label">ލެވެލް</label><select id="m_level" class="form-input"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+                <div><label class="form-label">ލެވެލް</label><select id="m_level" class="form-input"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
                 <div><label class="form-label">ކިޔަވާ ގޮތް</label><select id="m_direction" class="form-input"><option value="top_down">މަތިން ތިރިއަށް</option><option value="bottom_up">ތިރިން މަތިއަށް</option></select></div>
                 <div class="full-span"><label class="form-label">ދަސްވެފައިވާ ޖުޒުއު</label><input type="text" id="m_juz_count" class="form-input"></div>
                 <div class="full-span"><label class="form-label">އިތުރު މަޢުލޫމާތު</label><input type="text" id="m_remarks" class="form-input"></div>
             </div>
-            <div style="display:flex; gap:10px; margin-top:20px;"><button class="big-btn" onclick="window.confirmAddStudent()">ސޭވް</button><button class="big-btn btn-orange" onclick="document.getElementById('addStudentModal').style.display='none'">ކެންސަލް</button></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button id="btnSaveStudent" class="big-btn" onclick="window.confirmAddStudent()">ސޭވް</button>
+                <button class="big-btn btn-orange" onclick="document.getElementById('addStudentModal').style.display='none'">ކެންސަލް</button>
+            </div>
         </div>
     </div>
+    
     <div id="juzSetupModal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <h3>ޖުޒުއު އިމްތިޙާން</h3>
@@ -457,8 +417,6 @@
 
         // GLOBALS
         const SURAH_NAMES_AR = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
-        // Ayah Counts (Simple)
-        const AYAH_COUNTS = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
         
         let classesData = [];
         let currentClassIdx = -1, currentStudentIdx = -1;
@@ -469,6 +427,7 @@
         let currentMistakes = [];
         let isViewMode = false;
         let editingRecordIndex = -1;
+        let editingStudentIndex = -1; // New for Student Edit
         let currentRecPage = 1;
 
         // LOAD DATA
@@ -523,7 +482,6 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('studentDashName').innerText = currentStudentObj.name;
-            // No direct history render here, waiting for menu click
             window.openPage('student-dashboard');
         };
         window.logout = () => location.reload();
@@ -542,63 +500,89 @@
         };
         window.renderManageClassList = () => {
             const div = document.getElementById('manageClassList'); div.innerHTML='';
-            if(classesData) classesData.forEach((c, i) => {
-                div.innerHTML += `
-                <div class="card-btn" onclick="window.openClass(${i})" style="position:relative;">
-                    <span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span>
-                    <div class="class-actions">
-                        <button class="cls-act-btn btn-edit-cls" onclick="event.stopPropagation(); window.editClass(${i})">✏️</button>
-                        <button class="cls-act-btn btn-del-cls" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button>
-                    </div>
-                </div>`;
-            });
-        };
-        window.editClass = (i) => {
-            let name = prompt("New Name:", classesData[i].name);
-            let teach = prompt("New Teacher:", classesData[i].teacher);
-            if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); }
-        };
-        window.deleteClass = (i) => {
-            if(confirm("Delete Class?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); }
+            if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span></div>`);
         };
         window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
+        
         window.renderStudentList = () => {
             const div = document.getElementById('studentManageList'); div.innerHTML='';
             const students = classesData[currentClassIdx].students || [];
-            if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students.</p>";
+            if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
+            
             students.forEach((s, idx) => {
+                let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
                 div.innerHTML += `
                     <div class="card-btn" style="min-height:120px; position:relative;">
-                        <h4 class="card-title">${s.name}</h4><span class="card-sub">${s.id}</span>
-                        <div style="position:absolute; bottom:10px; right:10px;">
-                            <button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
+                        <h4 class="card-title">${s.name}</h4>
+                        <span class="card-sub">${s.id}</span>
+                        <small style="color:${s.password?'green':'red'}">${pass}</small>
+                        <div class="student-actions">
+                            <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button>
+                            <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
                         </div>
                     </div>`;
             });
         };
+
+        // STUDENT EDITING
+        window.openAddStudentModal = () => { 
+            editingStudentIndex = -1;
+            ['m_module','m_id','m_name','m_juz_count','m_remarks'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('btnSaveStudent').innerText = "ސޭވް";
+            document.getElementById('addStudentModal').style.display='flex'; 
+        }
+        window.openEditStudentModal = (idx) => {
+            editingStudentIndex = idx;
+            const s = classesData[currentClassIdx].students[idx];
+            document.getElementById('m_module').value = s.module || '';
+            document.getElementById('m_id').value = s.id;
+            document.getElementById('m_name').value = s.name;
+            document.getElementById('m_level').value = s.level || '1';
+            document.getElementById('m_direction').value = s.direction || 'top_down';
+            document.getElementById('m_juz_count').value = s.juzCount || '';
+            document.getElementById('m_remarks').value = s.remarks || '';
+            document.getElementById('btnSaveStudent').innerText = "އަޕްޑޭޓް";
+            document.getElementById('addStudentModal').style.display='flex';
+        }
+        
+        window.confirmAddStudent = () => {
+            const name = document.getElementById('m_name').value;
+            const id = document.getElementById('m_id').value;
+            if(!name || !id) return alert("Name & ID Required");
+
+            const studentObj = {
+                name: name, id: id,
+                module: document.getElementById('m_module').value,
+                level: document.getElementById('m_level').value,
+                direction: document.getElementById('m_direction').value,
+                juzCount: document.getElementById('m_juz_count').value,
+                remarks: document.getElementById('m_remarks').value,
+            };
+
+            if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
+
+            if(editingStudentIndex > -1) {
+                // Preserve history and password when editing
+                studentObj.history = classesData[currentClassIdx].students[editingStudentIndex].history;
+                studentObj.juzExams = classesData[currentClassIdx].students[editingStudentIndex].juzExams;
+                studentObj.password = classesData[currentClassIdx].students[editingStudentIndex].password;
+                classesData[currentClassIdx].students[editingStudentIndex] = studentObj;
+            } else {
+                studentObj.history = [];
+                studentObj.juzExams = {};
+                classesData[currentClassIdx].students.push(studentObj);
+            }
+
+            updateFirebase(); 
+            document.getElementById('addStudentModal').style.display='none'; 
+            window.renderStudentList();
+        }
         window.deleteStudent = (idx) => {
             if(confirm("Delete Student?")) {
                 classesData[currentClassIdx].students.splice(idx, 1);
                 updateFirebase(); window.renderStudentList();
             }
         }
-        window.openAddStudentModal = () => { 
-            ['m_module','m_id','m_name','m_juz_count','m_remarks'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('addStudentModal').style.display='flex'; 
-        }
-        window.confirmAddStudent = () => {
-            const name = document.getElementById('m_name').value;
-            const id = document.getElementById('m_id').value;
-            if(!name || !id) return alert("Name & ID Required");
-            if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
-            classesData[currentClassIdx].students.push({
-                name: name, id: id,
-                module: document.getElementById('m_module').value, level: document.getElementById('m_level').value,
-                direction: document.getElementById('m_direction').value, juzCount: document.getElementById('m_juz_count').value,
-                remarks: document.getElementById('m_remarks').value, history: [], juzExams: {}
-            });
-            updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList();
-        };
         window.downloadTemplate = () => {}; window.handleExcelUpload = () => {};
 
         // --- GRADING ---
@@ -606,19 +590,20 @@
             const div = document.getElementById('gradingClassList'); div.innerHTML='';
             if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`);
             window.openPage('grading-class-page');
-        };
+        }
         window.openGradingStudentList = (i) => {
             currentClassIdx = i;
             const div = document.getElementById('gradingStudentList'); div.innerHTML='';
             const students = classesData[i].students || [];
             students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`);
             window.openPage('grading-student-page');
-        };
+        }
         window.openStudentMenu = (i) => {
             currentStudentIdx = i;
             document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name;
             window.openPage('grading-menu-page');
-        };
+        }
+
         window.openCategoryPage = (type) => {
             currentSessionType = type;
             let title = type === 'juz_exam' ? "ޖުޒުއު އިމްތިޙާން" : (type === 'new_lesson' ? "އާ ފިލާވަޅު" : (type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ"));
@@ -627,43 +612,50 @@
             window.renderHistory(s, 'categoryHistoryList', type);
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'block';
             window.openPage('category-page');
-        };
+        }
         window.handleAddButtonClick = () => {
             if(currentSessionType==='juz_exam') window.openJuzExamSetup();
             else if(currentSessionType==='final_exam') window.openFinalExam();
             else window.openRecorder(currentSessionType);
-        };
+        }
 
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); list.innerHTML = '';
             if(!student.history) student.history = [];
             const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">No Records</p>';
+            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">ރެކޯޑެއް ނެތް</p>';
             
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec);
                 let html = '';
-                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : '';
-                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
+                // Only show actions for teachers
+                let actions = currentUserType === 'teacher' ? 
+                    `<div class="hist-actions">
+                        <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>
+                        <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>
+                    </div>` : '';
 
                 if(rec.type === 'juz_exam') {
-                    let status = rec.status === 'partial' ? '<span style="color:orange">Part 1</span>' : '<span style="color:green">Completed</span>';
+                    let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>';
                     html = `
                         <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
                             <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">Date</span><span class="hist-val">${rec.date}</span></div>
-                                    <div class="hist-item"><span class="hist-label">Time</span><span class="hist-val">${rec.duration}</span></div>
-                                    <div class="hist-item"><span class="hist-label">Teacher Mistake</span><span class="hist-val" style="color:red">${rec.details.teacherMistakes}</span></div>
-                                    <div class="hist-item"><span class="hist-label">Self Mistake</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
+                                    <div class="hist-item"><span class="hist-label">ތާރީޚް</span><span class="hist-val">${rec.date}</span></div>
+                                    <div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div>
+                                    <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details.teacherMistakes}</span></div>
+                                    <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
+                                    <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details.tajweed}</span></div>
+                                    <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details.fluency}</span></div>
+                                    <div class="hist-item"><span class="hist-label">މުތަޝާބިހް</span><span class="hist-val">${rec.details.mutashabihMarks}</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer exam-score">${rec.score}%</div>
-                            ${deleteBtn}
+                            ${actions}
                         </div>`;
                 } else if(rec.type === 'final_exam') {
-                    html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div>${deleteBtn}</div>`;
+                    html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div>${actions}</div>`;
                 } else {
                     const sInfo = rec.startDetails ? `${rec.startDetails.surah}:${rec.startDetails.ayah}` : '-';
                     const eInfo = rec.endDetails ? `${rec.endDetails.surah}:${rec.endDetails.ayah}` : '-';
@@ -672,12 +664,12 @@
                             <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-date">${rec.date}</span></div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">Start</span><span class="hist-val">${sInfo}</span></div>
-                                    <div class="hist-item"><span class="hist-label">End</span><span class="hist-val">${eInfo} (Pg ${rec.endPage})</span></div>
+                                    <div class="hist-item"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
+                                    <div class="hist-item"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
                                 </div>
                             </div>
-                            <div class="hist-footer" style="color:var(--mistake);">Mistakes: ${rec.mistakesCount}</div>
-                            ${deleteBtn} ${editBtn}
+                            <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount}</div>
+                            ${actions}
                         </div>`;
                 }
                 list.innerHTML += html;
@@ -685,18 +677,20 @@
         };
 
         window.deleteHistoryRecord = (index) => {
-            if(confirm("Delete?")) {
+            if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) {
                 const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
                 s.history.splice(index, 1);
                 updateFirebase();
                 window.renderHistory(s, currentUserType==='student'?'studentDashHistory':'categoryHistoryList', currentSessionType);
             }
         }
+
         window.editRecord = (index, type) => {
             const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx];
             const rec = student.history[index];
             isViewMode = false; editingRecordIndex = index;
-            if(type !== 'juz_exam' && type !== 'final_exam') {
+            
+            if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') {
                 currentMistakes = rec.mistakeDetails || [];
                 currentSessionType = rec.type;
                 document.getElementById('recorderTitle').innerText = "Edit Record";
@@ -704,22 +698,19 @@
                 document.getElementById('recSaveBtn').style.display = 'block';
                 document.getElementById('recDate').value = rec.date;
                 document.getElementById('startPage').value = rec.page;
+                // Load page to trigger API and then set values
+                window.loadSmartPage(true).then(() => {
+                    document.getElementById('endPage').value = rec.endPage;
+                    document.getElementById('startSurah').value = SURAH_NAMES_AR.indexOf(rec.startDetails.surah) + 1;
+                    document.getElementById('endSurah').value = SURAH_NAMES_AR.indexOf(rec.endDetails.surah) + 1;
+                    
+                    // Manually populate and set ayah options since API overwrites them initially
+                    updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah);
+                    updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah);
+                });
+
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
                 document.getElementById('recorder-page').classList.remove('hidden');
-                
-                // Fetch page and then set details
-                fetch(`https://api.alquran.cloud/v1/page/${rec.page}/quran-uthmani`)
-                .then(r=>r.json()).then(d => {
-                     window.renderMushafText(d.data.ayahs, 'mushafContent', currentMistakes, false);
-                     document.getElementById('endPage').value = rec.endPage;
-                     // Manually set dropdowns (simple approximation for demo)
-                     if(rec.startDetails) {
-                        document.getElementById('startSurah').innerHTML = `<option>${rec.startDetails.surah}</option>`;
-                        document.getElementById('startAyah').innerHTML = `<option>${rec.startDetails.ayah}</option>`;
-                        document.getElementById('endSurah').innerHTML = `<option>${rec.endDetails.surah}</option>`;
-                        document.getElementById('endAyah').innerHTML = `<option>${rec.endDetails.ayah}</option>`;
-                     }
-                });
             }
         }
 
@@ -734,7 +725,7 @@
             document.getElementById('recDate').valueAsDate = new Date();
             document.getElementById('mistakeCountDisplay').innerText = 0;
             document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>';
-            populateSurahSelects(); // Populate lists
+            populateSurahSelects(); // Ensure lists are populated
             
             // Auto fill
             const s = classesData[currentClassIdx].students[currentStudentIdx];
@@ -767,20 +758,25 @@
                 document.getElementById('endPage').value = page;
                 document.getElementById('startSurah').value = first.surah.number;
                 document.getElementById('endSurah').value = last.surah.number;
-                window.updateAyahSelect('startAyah', first.surah.number-1, first.numberInSurah); 
-                window.updateAyahSelect('endAyah', last.surah.number-1, last.numberInSurah);
+                window.updateAyahSelect('startAyah', first.numberInSurah); window.updateAyahSelect('endAyah', last.numberInSurah);
             }
         };
+        
         window.changeRecPage = (dir) => {
             let p = parseInt(document.getElementById('startPage').value) + dir;
             if(p>0 && p<=604) { document.getElementById('startPage').value=p; window.loadSmartPage(); }
         }
+
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
             let html = '';
-            // Header
+            // Update Header
             const f = ayahs[0];
             const headerTarget = isExam ? 'mushafTopBar' : 'recMushafTopBar';
-            document.getElementById(headerTarget).innerHTML = `<span>Juz ${f.juz}</span><span>سورة ${f.surah.name}</span>`;
+            const juzTarget = isExam ? 'mushafJuzInfo' : 'recMushafJuz';
+            const surahTarget = isExam ? 'mushafSurahInfo' : 'recMushafSurah';
+            
+            if(document.getElementById(juzTarget)) document.getElementById(juzTarget).innerText = `Juz ${f.juz}`;
+            if(document.getElementById(surahTarget)) document.getElementById(surahTarget).innerText = `سورة ${f.surah.name}`;
 
             ayahs.forEach(a => {
                 const words = a.text.split(' ');
@@ -807,6 +803,7 @@
             
             const ssIdx = document.getElementById('startSurah').selectedIndex;
             const esIdx = document.getElementById('endSurah').selectedIndex;
+            
             const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value };
             const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value };
 
@@ -819,7 +816,9 @@
 
             if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } 
             else { s.history.push(record); }
-            updateFirebase(); window.closeRecorder();
+            updateFirebase(); 
+            alert("ސޭވް ކުރެވިއްޖެ");
+            window.closeRecorder();
         };
         window.viewLessonRecord = (rec) => {
             isViewMode = true; currentMistakes = rec.mistakeDetails || [];
@@ -841,12 +840,14 @@
             document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00";
             document.getElementById('countTeacher').innerText = rec.details.teacherMistakes;
             document.getElementById('countSelf').innerText = rec.details.selfMistakes;
+            document.getElementById('scoreTajweed').value = rec.details.tajweed;
+            document.getElementById('scoreFluency').value = rec.details.fluency;
             isViewMode = true; examState.mistakesList = rec.mistakeDetails || [];
             let startP = ((rec.juz-1)*20)+2; 
             window.loadExamPage(startP);
         };
 
-        // JUZ EXAM & FINAL EXAM (Same logic as before)
+        // JUZ EXAM
         window.openJuzExamSetup = () => { 
             const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = '';
             for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i));
@@ -873,6 +874,8 @@
             document.getElementById('currentPageDisplay').innerText = `Page ${page}`;
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
             const data = await res.json();
+            const first = data.data.ayahs[0];
+            document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`;
             window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true);
         };
         window.changeExamPage = (dir) => {
@@ -955,6 +958,8 @@
             }
             updateFirebase(); window.closeJuzExam(); window.openStudentMenu(currentStudentIdx);
         };
+
+        // FINAL EXAM
         window.openFinalExam = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 };
@@ -1016,6 +1021,10 @@
                 s2.onchange = function() { window.updateAyahOptions('endAyah', this.value - 1); };
             }
         }
+        
+        // Ayah Counts
+        const AYAH_COUNTS = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
+
         window.updateAyahOptions = (selectId, surahIndex, selectedValue) => {
             const select = document.getElementById(selectId);
             select.innerHTML = '';
@@ -1026,8 +1035,10 @@
             if(selectedValue && selectedValue <= total) select.value = selectedValue;
             else select.value = 1;
         }
-        window.updateAyahSelect = (id, surahIdx, val) => {
-            window.updateAyahOptions(id, surahIdx-1, val);
+        window.updateAyahSelect = (id, val) => {
+             let sId = id === 'startAyah' ? 'startSurah' : 'endSurah';
+             let sIdx = document.getElementById(sId).value - 1;
+             window.updateAyahOptions(id, sIdx, val);
         }
     </script>
 </body>
