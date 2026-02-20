@@ -9,6 +9,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
+        /* --- ފޮންޓް ސެޓަޕް (FIXED FOR ROOT DIRECTORY) --- */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+
+        /* Faruma Font Setup */
+        @font-face { 
+            font-family: 'Faruma'; 
+            /* ފައިލް އިން ތަން ބަދަލުކުރީ: fonts/ ކަނޑާލީ */
+            src: url('faruma.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* MV Waheed Font Setup */
+        @font-face { 
+            font-family: 'MV Waheed'; 
+            /* ފައިލް އިން ތަން ބަދަލުކުރީ: fonts/ ކަނޑާލީ */
+            src: url('mvwaheed.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary: #2c3e50; 
+            --accent: #27ae60;
+            --accent-rev: #e67e22;
+            --mistake: #e74c3c;
+            --bg-light: #f4f6f8;
+            --mushaf-paper: #fffcf2;
+            --st-primary: #1e8449;
+            
+            /* Updated Font Priorities */
+            --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
+            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
+            --font-arabic: 'Amiri', serif;
+        }
         /* --- ފޮންޓް ސެޓަޕް (UPDATED FOR MOBILE) --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
