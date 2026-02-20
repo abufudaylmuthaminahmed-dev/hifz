@@ -381,6 +381,7 @@
     </div>
 
     <!-- FIREBASE & LOGIC -->
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -402,6 +403,9 @@
         // GLOBALS
         const SURAH_NAMES_AR = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
         
+        // Ayah Counts for each Surah (Index 0 to 113)
+        const AYAH_COUNTS = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
+
         let classesData = [];
         let currentClassIdx = -1, currentStudentIdx = -1;
         let currentUserType = 'teacher';
@@ -465,6 +469,7 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('studentDashName').innerText = currentStudentObj.name;
+            window.renderHistory(currentStudentObj, 'studentDashHistory', null);
             window.openPage('student-dashboard');
         };
         window.logout = () => location.reload();
@@ -479,8 +484,7 @@
         // --- MGMT ---
         window.createClass = () => {
             let name = document.getElementById('newClassName').value;
-            let teacher = document.getElementById('newTeacherName').value;
-            if(name) { classesData.push({name:name, teacher: teacher, students:[]}); updateFirebase(); window.renderManageClassList(); }
+            if(name) { classesData.push({name:name, students:[]}); updateFirebase(); window.renderManageClassList(); }
         };
         window.renderManageClassList = () => {
             const div = document.getElementById('manageClassList'); div.innerHTML='';
@@ -508,6 +512,7 @@
             const div = document.getElementById('studentManageList'); div.innerHTML='';
             const students = classesData[currentClassIdx].students || [];
             if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
+            
             students.forEach(s => {
                 let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
                 div.innerHTML += `
@@ -648,10 +653,19 @@
                 document.getElementById('recSaveBtn').style.display = 'block';
                 document.getElementById('recDate').value = rec.date;
                 document.getElementById('startPage').value = rec.page;
-                document.getElementById('endPage').value = rec.endPage;
+                // Load page to trigger API and then set values
+                window.loadSmartPage(true).then(() => {
+                    document.getElementById('endPage').value = rec.endPage;
+                    document.getElementById('startSurah').value = SURAH_NAMES_AR.indexOf(rec.startDetails.surah) + 1;
+                    document.getElementById('endSurah').value = SURAH_NAMES_AR.indexOf(rec.endDetails.surah) + 1;
+                    
+                    // Manually populate and set ayah options since API overwrites them initially
+                    updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah);
+                    updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah);
+                });
+
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
                 document.getElementById('recorder-page').classList.remove('hidden');
-                window.loadSmartPage(true);
             }
         }
 
@@ -666,7 +680,7 @@
             document.getElementById('recDate').valueAsDate = new Date();
             document.getElementById('mistakeCountDisplay').innerText = 0;
             document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>';
-            populateSurahSelects(); // Call this to ensure dropdowns are populated!
+            populateSurahSelects(); // Ensure lists are populated
             
             // Auto fill
             const s = classesData[currentClassIdx].students[currentStudentIdx];
@@ -697,15 +711,43 @@
             if(!isViewMode && editingRecordIndex === -1 && data.data.ayahs.length > 0) {
                 const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
                 document.getElementById('endPage').value = page;
+                
+                // Set Surah
                 document.getElementById('startSurah').value = first.surah.number;
                 document.getElementById('endSurah').value = last.surah.number;
-                window.updateAyahSelect('startAyah', first.numberInSurah); window.updateAyahSelect('endAyah', last.numberInSurah);
+
+                // Update Ayah Lists based on Surah
+                updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah);
+                updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
             }
         };
         
+        // Navigation Logic Fix
         window.changeRecPage = (dir) => {
-            let p = parseInt(document.getElementById('startPage').value) + dir;
-            if(p>0 && p<=604) { document.getElementById('startPage').value=p; window.loadSmartPage(); }
+            // Get Current END Page (User is reading/reciting, moving forward from End Page)
+            let currentEndPage = parseInt(document.getElementById('endPage').value);
+            // If End page is empty (first load), use Start Page
+            if (!currentEndPage) currentEndPage = parseInt(document.getElementById('startPage').value);
+            
+            let newPage = currentEndPage + dir;
+            if(newPage < 1 || newPage > 604) return;
+            
+            // Only update End Page and Mushaf, keep Start Page same
+            document.getElementById('endPage').value = newPage;
+            
+            // Fetch Mushaf for new page
+            fetch(`https://api.alquran.cloud/v1/page/${newPage}/quran-uthmani`)
+                .then(r => r.json())
+                .then(data => {
+                    window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
+                    
+                    // Auto-update End Surah/Ayah to the end of this new page
+                    if(!isViewMode && data.data.ayahs.length > 0) {
+                        const last = data.data.ayahs[data.data.ayahs.length-1];
+                        document.getElementById('endSurah').value = last.surah.number;
+                        updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
+                    }
+                });
         }
 
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
@@ -731,7 +773,6 @@
             document.getElementById(target).innerHTML = html;
         };
         window.clickRecWord = (id) => {
-            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x=>x!==id); }
             else { el.classList.add('mistake'); currentMistakes.push(id); }
@@ -743,6 +784,7 @@
             
             const ssIdx = document.getElementById('startSurah').selectedIndex;
             const esIdx = document.getElementById('endSurah').selectedIndex;
+            
             const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value };
             const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value };
 
@@ -756,7 +798,7 @@
             if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } 
             else { s.history.push(record); }
             updateFirebase(); 
-            alert("މަޢުލޫމާތު ސޭވް ކުރެވިއްޖެ!");
+            alert("ސޭވް ކުރެވިއްޖެ");
             window.closeRecorder();
         };
         window.viewLessonRecord = (rec) => {
@@ -823,7 +865,6 @@
             examState.currentPage = newPage; window.loadExamPage(newPage);
         };
         window.clickExamWord = (id) => {
-            if(isViewMode) return;
             const el = document.getElementById(id);
             if(el.classList.contains('mistake')) {
                 el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id);
@@ -871,20 +912,12 @@
             let duration = document.getElementById('stopwatchDisplay').innerText;
             if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={};
             
-            let details = {
-                teacherMistakes: examState.mistakesTeacher,
-                selfMistakes: examState.mistakesSelf,
-                tajweed: document.getElementById('scoreTajweed').value,
-                fluency: document.getElementById('scoreFluency').value,
-                mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value) + parseFloat(document.getElementById('q2_score').value)) : 0
-            };
-
             if(examState.mode === 'part1') {
                 s.juzExams[examState.juz].part1 = score;
                 s.history.push({
                     type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:score, duration:duration, 
-                    details: details, mistakeDetails: examState.mistakesList
+                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
                 });
             } else {
                 let p1 = s.juzExams[examState.juz].part1 || 0;
@@ -892,7 +925,7 @@
                 s.history.push({
                     type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), 
                     juz:examState.juz, score:final, duration:duration, 
-                    details: details, mistakeDetails: examState.mistakesList
+                    details:{ teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: 0 }
                 });
             }
             updateFirebase(); 
@@ -946,17 +979,47 @@
             const score = window.calcFinalScore();
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             s.history.push({type:'final_exam', date:new Date().toLocaleDateString(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)});
-            updateFirebase(); 
-            alert("ފައިނަލް އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!");
-            window.closeFinalExam(); window.openStudentMenu(currentStudentIdx);
+            updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx);
         };
 
-        // HELPERS
+        // UI HELPERS
         function populateSurahSelects() {
             const s1 = document.getElementById('startSurah'), s2 = document.getElementById('endSurah');
-            if(s1 && s2) { s1.innerHTML=''; s2.innerHTML=''; SURAH_NAMES_AR.forEach((n,i) => { s1.add(new Option(n, i+1)); s2.add(new Option(n, i+1)); }); }
+            if(s1 && s2) { 
+                s1.innerHTML=''; s2.innerHTML=''; 
+                SURAH_NAMES_AR.forEach((n,i) => { 
+                    s1.add(new Option(n, i+1)); 
+                    s2.add(new Option(n, i+1)); 
+                }); 
+                // Add event listeners to populate Ayahs when Surah changes
+                s1.onchange = function() { updateAyahOptions('startAyah', this.value - 1); };
+                s2.onchange = function() { updateAyahOptions('endAyah', this.value - 1); };
+            }
         }
-        window.updateAyahSelect = (id, val) => { document.getElementById(id).innerHTML = `<option value="${val}">${val}</option>`; }
+        
+        function updateAyahOptions(selectId, surahIndex, selectedValue) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '';
+            const total = AYAH_COUNTS[surahIndex];
+            for(let i=1; i<=total; i++) {
+                select.add(new Option(i, i));
+            }
+            if(selectedValue && selectedValue <= total) select.value = selectedValue;
+            else select.value = 1;
+        }
+
+        window.updateAyahSelect = (id, val) => {
+            // Helper for initial load - just set the value if it exists, or create if not
+            // In smart load, we might need to fully populate to allow changes
+            // Here we just set the single value for visual correctness as per API return
+            const sel = document.getElementById(id);
+            // Check if options exist, if not (or if only 1 dummy), try to populate fully if we know surah
+            // For now, simple set:
+             // Find the surah index
+             let sId = id === 'startAyah' ? 'startSurah' : 'endSurah';
+             let sIdx = document.getElementById(sId).value - 1;
+             updateAyahOptions(id, sIdx, val);
+        }
     </script>
 </body>
 </html>
