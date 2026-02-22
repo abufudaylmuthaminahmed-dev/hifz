@@ -9,25 +9,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- FONTS --- */
+        /* --- ފޮންޓް ސެޓަޕް (FIXED FOR MOBILE) --- */
+        
+        /* 1. ފަރުމާ ފޮންޓް ލޯޑުކުރުން */
+        @font-face { 
+            font-family: 'Faruma'; 
+            src: url('faruma.ttf') format('truetype'); 
+            font-weight: normal; 
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* 2. އެމްވީ ވަހީދު ފޮންޓް ލޯޑުކުރުން */
+        @font-face { 
+            font-family: 'MV Waheed'; 
+            src: url('mvwaheed.ttf') format('truetype'); 
+            font-weight: normal; 
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* 3. ގޫގުލް ފޮންޓް (ބެކަޕް އަށް) */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
-
-        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
-        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
 
         :root {
-            --primary: #2c3e50; --accent: #27ae60; --accent-rev: #e67e22; --mistake: #e74c3c;
-            --bg-light: #f4f6f8; --mushaf-paper: #fffcf2; --st-primary: #1e8449;
+            --primary: #2c3e50; 
+            --accent: #27ae60;
+            --accent-rev: #e67e22;
+            --mistake: #e74c3c;
+            --bg-light: #f4f6f8;
+            --mushaf-paper: #fffcf2;
+            --st-primary: #1e8449;
+            
+            /* މައިގަނޑު ފޮންޓްތައް ކަނޑައެޅުން */
             --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
+            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
             --font-arabic: 'Amiri', serif;
         }
 
         * { box-sizing: border-box; }
-        body { font-family: var(--font-main); margin: 0; min-height: 100vh; color: #333; background-color: var(--bg-light); overflow-x: hidden; transition: background 0.3s; }
         
+        body { 
+            font-family: var(--font-main) !important; /* އާދައިގެ ލިޔުންތަކަށް ފަރުމާ */
+            margin: 0; 
+            min-height: 100vh; 
+            color: #333; 
+            background-color: var(--bg-light); 
+            overflow-x: hidden; 
+            transition: background 0.3s; 
+        }
+        
+        /* ހެޑިންގް ތަކަށް އެމްވީ ވަހީދު */
+        h1, h2, h3, h4, h5, h6, 
+        .header-title, 
+        .card-title, 
+        .login-title,
+        .hist-title,
+        .sec-head {
+            font-family: var(--font-heading) !important;
+        }
+
+        /* --- އެހެނިހެން ސްޓައިލްތައް --- */
         body.student-mode { background-color: #eafaf1; }
         body.student-mode .app-header { border-bottom: 3px solid var(--st-primary); }
         body.student-mode .header-title { color: var(--st-primary); }
@@ -37,16 +80,16 @@
 
         /* HEADER */
         .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
+        .header-title { font-size: 24px; color: var(--primary); }
         .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
         .logout-btn { background: #fee2e2; color: #b91c1c; }
 
         /* LOGIN */
         .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100vh; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; }
-        .login-card { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
+        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
         
         .logo-container { margin-bottom: 30px; }
-        .logo-arabic { font-family: 'Amiri', 'Reem Kufi', serif; font-size: 80px; color: var(--primary); line-height: 1.1; margin-bottom: 5px; text-shadow: 2px 2px 0px #eee; font-weight: 700; }
+        .logo-arabic { font-family: 'Amiri', serif; font-size: 80px; color: var(--primary); line-height: 1.1; margin-bottom: 5px; text-shadow: 2px 2px 0px #eee; font-weight: 700; }
         .logo-eng { font-family: sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 10px; }
         .logo-dv { font-family: var(--font-heading); font-size: 22px; color: #7f8c8d; margin-top: 5px; }
 
@@ -56,34 +99,28 @@
         .form-input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 10px; font-family: var(--font-main); font-size: 16px; margin-bottom: 15px; text-align: right; outline: none; transition: 0.3s; }
         .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: var(--font-heading); font-size: 18px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        /* GRID & CARDS */
+        /* GRID SYSTEM */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; justify-content: center; }
-        .card-btn { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 160px; position: relative; }
+        
+        /* CARDS */
+        .card-btn { 
+            background: white; padding: 25px; border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; 
+            border: 1px solid #eee; cursor: pointer; transition: 0.2s; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            min-height: 160px; position: relative;
+        }
         .card-btn:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
         .card-icon { font-size: 40px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; }
+        .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; font-family: var(--font-heading) !important; }
         .card-sub { font-size: 13px; color: #7f8c8d; }
+
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
-        /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
         .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
-        
-        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
-        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
-        .btn-edit { background: #e3f2fd; color: #2980b9; position: static; }
-        .btn-del { background: #fee2e2; color: #c0392b; position: static; }
-        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
-        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
-        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
-        .btn-del-cls { background: #fee2e2; color: #c0392b; }
-
-        /* ACTION CARD */
-        .action-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
 
         /* MENU GRID */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
@@ -96,7 +133,7 @@
         .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
         .hist-card:active { transform: scale(0.99); }
         .hist-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); }
+        .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); font-family: var(--font-heading); }
         .hist-date { font-family: sans-serif; font-size: 14px; color: #555; background: #e0e0e0; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
         .hist-body { padding: 20px; }
         .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -110,15 +147,23 @@
         .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
         .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
-        /* PROGRESS REPORT */
-        .prog-card { background: white; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
-        .prog-header { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .prog-name { font-weight: bold; font-size: 16px; color: var(--primary); }
-        .prog-total { background: var(--accent); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .prog-body { padding: 15px; display: flex; justify-content: space-between; gap: 10px; }
-        .prog-section { flex: 1; text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; }
-        .prog-lbl { font-size: 11px; color: #777; display: block; margin-bottom: 5px; }
-        .prog-val { font-size: 14px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
+        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { 
+            position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
+        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
+
+        .btn-edit { background: #e3f2fd; color: #2980b9; position: static; }
+        .btn-del { background: #fee2e2; color: #c0392b; position: static; }
+        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
+        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
+        .btn-del-cls { background: #fee2e2; color: #c0392b; }
+
+        /* ACTION CARD */
+        .action-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
 
         /* LAYOUTS & MUSHAF */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
@@ -132,10 +177,8 @@
         .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; }
-        
         .mushaf-nav { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 900px; padding: 5px; flex-shrink: 0; }
-        .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-main); }
-        .nav-btn:hover { background: #2c3e50; }
+        .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-main) !important; }
 
         /* EXAM & RECORDER */
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
