@@ -9,62 +9,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- ފޮންޓް ސެޓަޕް (FIXED) --- */
-        
-        /* 1. ގޫގުލް ފޮންޓްސް (ބެކަޕް އަދި ޢަރަބި ބަޔަށް) */
+        /* --- FONTS --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
 
-        /* 2. ފަރުމާ ފޮންޓް (ލޯކަލް ފައިލް) */
-        @font-face { 
-            font-family: 'Faruma'; 
-            src: url('faruma.ttf') format('truetype'); 
-            font-weight: normal; 
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* 3. އެމްވީ ވަހީދު ފޮންޓް (ލޯކަލް ފައިލް) */
-        @font-face { 
-            font-family: 'MV Waheed'; 
-            src: url('mvwaheed.ttf') format('truetype'); 
-            font-weight: normal; 
-            font-style: normal;
-            font-display: swap;
-        }
+        /* LOCAL FONTS (MUST BE IN ROOT FOLDER) */
+        @font-face { font-family: 'Faruma'; src: url('faruma.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
+        @font-face { font-family: 'MV Waheed'; src: url('mvwaheed.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
 
         :root {
             --primary: #2c3e50; 
-            --accent: #27ae60; 
-            --accent-rev: #e67e22; 
+            --accent: #27ae60;
+            --accent-rev: #e67e22;
             --mistake: #e74c3c;
-            --bg-light: #f4f6f8; 
-            --mushaf-paper: #fffcf2; 
+            --bg-light: #f4f6f8;
+            --mushaf-paper: #fffcf2;
             --st-primary: #1e8449;
-
-            /* ފޮންޓް ތަރުތީބު: ފުރަތަމަ ފަރުމާ/ވަހީދު، ނެތްނަމަ ނޯޓޯ ސާންސް */
+            
             --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Faruma', 'Noto Sans Thaana', sans-serif; 
+            --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
             --font-arabic: 'Amiri', serif;
         }
 
         * { box-sizing: border-box; }
-        
-        body { 
-            font-family: var(--font-main); 
-            margin: 0; 
-            min-height: 100vh; 
-            color: #333; 
-            background-color: var(--bg-light); 
-            overflow-x: hidden; 
-            transition: background 0.3s; 
-        }
-
-        /* ހެޑިންގްތަކަށް ވަހީދު ފޮންޓް */
-        h1, h2, h3, h4, h5, h6, .header-title, .card-title, .login-title, .hist-title, .sec-head {
-            font-family: var(--font-heading) !important;
-        }
+        body { font-family: var(--font-main); margin: 0; min-height: 100vh; color: #333; background-color: var(--bg-light); overflow-x: hidden; transition: background 0.3s; }
         
         body.student-mode { background-color: #eafaf1; }
         body.student-mode .app-header { border-bottom: 3px solid var(--st-primary); }
@@ -75,11 +44,11 @@
 
         /* HEADER */
         .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .header-title { font-size: 24px; color: var(--primary); }
+        .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
         .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
         .logout-btn { background: #fee2e2; color: #b91c1c; }
 
-        /* LOGIN STYLE */
+        /* LOGIN */
         .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100vh; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; }
         .login-card { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
         
@@ -105,25 +74,9 @@
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
-        /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
         .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
-
-        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
-        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
-
-        .btn-edit { background: #e3f2fd; color: #2980b9; position: static; }
-        .btn-del { background: #fee2e2; color: #c0392b; position: static; }
-        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
-        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
-        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
-        .btn-del-cls { background: #fee2e2; color: #c0392b; }
-
-        /* ACTION CARD */
-        .action-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
 
         /* MENU GRID */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
@@ -150,15 +103,28 @@
         .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
         .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
-        /* PROGRESS REPORT */
-        .prog-card { background: white; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
-        .prog-header { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .prog-name { font-weight: bold; font-size: 16px; color: var(--primary); }
-        .prog-total { background: var(--accent); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .prog-body { padding: 15px; display: flex; justify-content: space-between; gap: 10px; }
-        .prog-section { flex: 1; text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; }
-        .prog-lbl { font-size: 11px; color: #777; display: block; margin-bottom: 5px; }
-        .prog-val { font-size: 14px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
+        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
+        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
+        .btn-edit { background: #e3f2fd; color: #2980b9; position: static; }
+        .btn-del { background: #fee2e2; color: #c0392b; position: static; }
+        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
+        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
+        .btn-del-cls { background: #fee2e2; color: #c0392b; }
+
+        /* ACTION CARD */
+        .action-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
+
+        /* PROGRESS STYLE */
+        .prog-summary-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; border-top: 5px solid var(--st-primary); }
+        .prog-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .prog-table th { text-align: right; padding: 10px; color: #777; font-size: 14px; background: #eee; border-radius: 5px; }
+        .prog-table td { background: white; padding: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; vertical-align: top; }
+        .prog-detail { font-size: 13px; color: #555; display: block; margin-top: 2px; font-family: var(--font-arabic); }
+        .prog-val { font-weight: bold; color: var(--primary); font-size: 15px; }
+        .total-badge { background: var(--accent); color: white; padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 14px; }
 
         /* LAYOUTS & MUSHAF */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
@@ -172,8 +138,10 @@
         .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; }
+        
+        /* FIXED MUSHAF NAV BUTTONS */
         .mushaf-nav { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 900px; padding: 5px; flex-shrink: 0; }
-        .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-main); }
+        .nav-btn { background: #34495e; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 24px; font-weight: bold; font-family: var(--font-main) !important; }
 
         /* EXAM & RECORDER */
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
@@ -257,7 +225,7 @@
                     <h3 class="card-title">ޕްރޮގްރެސް</h3>
                     <span class="card-sub">ރިޕޯޓްތައް</span>
                 </div>
-                <!-- Admin Only: Teacher Management -->
+                <!-- Admin Only -->
                 <div id="admin-panel-btn" class="card-btn hidden" onclick="window.openTeacherManagement()">
                     <span class="card-icon">👤</span>
                     <h3 class="card-title">މުދައްރިސުން</h3>
@@ -266,37 +234,44 @@
             </div>
         </div>
 
-        <!-- TEACHER MANAGEMENT PAGE (Admin Only) -->
+        <!-- TEACHER MANAGEMENT -->
         <div id="teacher-mgmt-page" class="container hidden">
-            <div class="app-header"><div class="header-title">މުދައްރިސުންގެ މަޢުލޫމާތު</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
+            <div class="app-header"><div class="header-title">މުދައްރިސުން</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px;">
-                <h4>މުދައްރިސް އިތުރުކުރުން</h4>
+                <h4>އިތުރުކުރުން</h4>
                 <div style="display:flex; gap:10px; max-width:600px; margin:0 auto;">
-                    <input type="text" id="newTeachName" class="form-input" placeholder="ނަން" style="margin:0; flex:1;">
-                    <input type="text" id="newTeachUser" class="form-input" placeholder="ޔޫސަރ ނޭމް" style="margin:0; flex:1;">
-                    <input type="text" id="newTeachPass" class="form-input" placeholder="ޕާސްވޯޑް" style="margin:0; flex:1;">
+                    <input type="text" id="newTeachName" class="form-input" placeholder="ނަން">
+                    <input type="text" id="newTeachUser" class="form-input" placeholder="ޔޫސަރ">
+                    <input type="text" id="newTeachPass" class="form-input" placeholder="ޕާސްވޯޑް">
                     <button class="big-btn" style="width:auto;" onclick="window.createTeacher()">އިތުރުކުރޭ</button>
                 </div>
             </div>
-            <h4 style="margin-top:20px;">މުދައްރިސުންގެ ލިސްޓް</h4>
+            <h4 style="margin-top:20px;">ލިސްޓް</h4>
             <div id="teacherList" class="grid-container"></div>
         </div>
 
-        <!-- PROGRESS REPORT PAGE -->
+        <!-- PROGRESS REPORT PAGE (SEMESTER BASED) -->
         <div id="progress-page" class="container hidden">
             <div class="app-header"><div class="header-title">ޕްރޮގްރެސް ރިޕޯޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
-            <div class="action-card" style="margin-top:20px;">
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-                    <div><label class="form-label">ކްލާސް</label><select id="progClassSelect" class="form-input"></select></div>
-                    <div><label class="form-label">ފެށޭ ތާރީޚް</label><input type="date" id="progStartDate" class="form-input"></div>
-                    <div><label class="form-label">ނިމޭ ތާރީޚް</label><input type="date" id="progEndDate" class="form-input"></div>
+            
+            <div class="action-card" style="margin-top:20px; border-top: 5px solid var(--accent-rev);">
+                <h4>އާ ސެމިސްޓަރ ހެދުން</h4>
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                    <input type="text" id="semName" class="form-input" placeholder="ސެމިސްޓަރ ނަން">
+                    <input type="date" id="semStart" class="form-input">
+                    <input type="date" id="semEnd" class="form-input">
                 </div>
-                <button class="big-btn" onclick="window.generateProgressReport()">ރިޕޯޓް ހަދާ</button>
+                <button class="big-btn" onclick="window.createSemester()">ސެމިސްޓަރ ހަދާ</button>
             </div>
+
+            <h4 style="margin-top:20px;">ސެމިސްޓަރތައް</h4>
+            <div id="semesterList" class="grid-container"></div>
+            
+            <!-- Hidden Results Container -->
             <div id="progressResults" style="margin-top:20px;"></div>
         </div>
 
-        <!-- MANAGEMENT PAGES (CLASS) -->
+        <!-- MANAGEMENT PAGES -->
         <div id="management-page" class="container hidden">
             <div class="app-header"><div class="header-title">ކްލާސް މެނޭޖްމަންޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px; text-align:right;">
@@ -390,9 +365,9 @@
                     <div class="mushaf-top-bar" id="recMushafTopBar"><span id="recMushafJuz">Juz</span><span id="recMushafSurah">Surah</span></div>
                     <div class="mushaf-page"><div id="mushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p></div></div>
                     <div class="mushaf-nav">
-                        <button class="nav-btn" onclick="window.changeRecPage(-1)">➡ ކުރިއަށް</button>
+                        <button class="nav-btn" onclick="window.changeRecPage(-1)">➡</button>
                         <span id="recPageDisplay">Page</span>
-                        <button class="nav-btn" onclick="window.changeRecPage(1)">ފަހަތަށް ⬅</button>
+                        <button class="nav-btn" onclick="window.changeRecPage(1)">⬅</button>
                     </div>
                 </div>
             </div>
@@ -426,7 +401,7 @@
                 <div class="main-panel">
                     <div class="mushaf-top-bar" id="mushafTopBar"><span id="mushafJuzInfo"></span><span id="mushafSurahInfo"></span></div>
                     <div class="mushaf-page"><div id="examMushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">...</p></div></div>
-                    <div class="mushaf-nav"><button class="nav-btn" onclick="window.changeExamPage(1)">➡ ކުރިއަށް</button><span id="currentPageDisplay">Page</span><button class="nav-btn" onclick="window.changeExamPage(-1)">ފަހަތަށް ⬅</button></div>
+                    <div class="mushaf-nav"><button class="nav-btn" onclick="window.changeExamPage(1)">➡</button><span id="currentPageDisplay">Page</span><button class="nav-btn" onclick="window.changeExamPage(-1)">⬅</button></div>
                 </div>
             </div>
         </div>
@@ -454,6 +429,13 @@
         <div id="student-dashboard" class="container hidden">
             <div class="app-header"><div class="header-title">ދަރިވަރު ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div style="background:white; padding:30px; border-radius:15px; text-align:center; margin-bottom:20px;"><h2 style="color:var(--st-primary);">މަރުޙަބާ!</h2><h3 id="studentDashName"></h3></div>
+            
+            <div class="prog-summary-card">
+                <h3 style="color:var(--st-primary); margin:0;">މި ސެމިސްޓަރގެ ޕްރޮގްރެސް</h3>
+                <div style="font-size:40px; font-weight:bold; color:#333; margin-top:10px;" id="studentTotalPages">0</div>
+                <span style="font-size:14px; color:#777;">ޖުމްލަ ކިޔާދެވުނު ޞަފްޙާ</span>
+            </div>
+
             <div class="grid-container">
                 <div class="card-btn" onclick="window.openCategoryPage('new_lesson')"><span class="card-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="card-btn" onclick="window.openCategoryPage('short_rev')"><span class="card-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
@@ -521,11 +503,11 @@
         // GLOBALS
         const SURAH_NAMES_AR = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
         
-        // Ayah Counts
         const AYAH_COUNTS = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
 
         let classesData = [];
         let hifzUsers = [];
+        let semesters = [];
         let currentClassIdx = -1, currentStudentIdx = -1;
         let currentUserType = 'teacher';
         let currentUserRole = 'teacher';
@@ -544,6 +526,7 @@
             const data = snapshot.val();
             classesData = data && data.classes ? data.classes : [];
             hifzUsers = data && data.users ? data.users : [];
+            semesters = data && data.semesters ? data.semesters : [];
             
             if(hifzUsers.length === 0) {
                 hifzUsers.push({username:'admin', password:'1234', role:'admin', name:'Administrator'});
@@ -552,10 +535,11 @@
 
             if(document.getElementById('management-page').classList.contains('hidden') === false) window.renderManageClassList();
             if(document.getElementById('teacher-mgmt-page').classList.contains('hidden') === false) window.renderTeacherList();
+            if(document.getElementById('progress-page').classList.contains('hidden') === false) window.renderSemesterList();
         });
 
         function updateFirebase() { 
-            set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers }); 
+            set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); 
         }
 
         // --- GLOBAL FUNCTIONS ---
@@ -566,15 +550,11 @@
         };
         
         window.loginTeacher = () => {
-            const u = document.getElementById('teacherPassInput').value; // Using password as simple login for now based on request, or full login
-            // For simple password based login as per original code structure, assuming 'admin' user or similar
-            // If strictly using username/password:
-            const user = hifzUsers.find(user => user.password === u); // Simplified for demo as per prev request
-            // OR if using the input fields created in V36:
-            const usernameInput = document.getElementById('teacherUsername') ? document.getElementById('teacherUsername').value : 'admin';
+            const u = document.getElementById('teacherUsername').value;
+            const p = document.getElementById('teacherPassInput').value;
             
-            // Fallback to simple password check if username field is hidden or not used
-            if(u === '1234') { 
+            // Allow admin login for setup
+            if(p === '1234' && (u === 'admin' || u === '')) {
                  currentUserType = 'teacher'; currentUserRole = 'admin';
                  document.body.classList.remove('student-mode');
                  document.getElementById('login-screen').classList.add('hidden');
@@ -584,10 +564,11 @@
                  return;
             }
 
-            const validUser = hifzUsers.find(user => user.username === usernameInput && user.password === u);
-            if(validUser) {
+            const user = hifzUsers.find(user => user.username === u && user.password === p);
+            
+            if(user) {
                 currentUserType = 'teacher';
-                currentUserRole = validUser.role;
+                currentUserRole = user.role;
                 document.body.classList.remove('student-mode');
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
@@ -595,7 +576,7 @@
                 else document.getElementById('admin-panel-btn').classList.add('hidden');
                 window.openPage('teacher-dashboard');
             } else {
-                alert('Password Error');
+                alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ');
             }
         };
 
@@ -626,6 +607,10 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('studentDashName').innerText = currentStudentObj.name;
+            
+            // Calculate Progress for Student
+            window.calculateStudentProgress(currentStudentObj);
+
             window.openPage('student-dashboard');
         };
         window.logout = () => location.reload();
@@ -641,6 +626,7 @@
                 p.classList.remove('hidden');
                 if(id === 'management-page') window.renderManageClassList();
                 if(id === 'teacher-mgmt-page') window.renderTeacherList();
+                if(id === 'progress-page') window.renderSemesterList();
             }
         };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
@@ -661,7 +647,7 @@
             const div = document.getElementById('teacherList'); div.innerHTML='';
             hifzUsers.forEach((u, i) => {
                 if(u.role !== 'admin') {
-                    div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><button class="btn-delete-hist" onclick="window.deleteTeacher(${i})" style="bottom:10px; right:10px;">🗑</button></div>`;
+                    div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username} | Pass: ${u.password}</span><button class="btn-delete-hist" onclick="window.deleteTeacher(${i})" style="bottom:10px; right:10px;">🗑</button></div>`;
                 }
             });
         };
@@ -840,53 +826,113 @@
             else window.openRecorder(currentSessionType);
         }
 
-        // --- PROGRESS ---
+        // --- NEW SEMESTER & PROGRESS ---
         window.openProgressPage = () => {
-            const select = document.getElementById('progClassSelect');
-            select.innerHTML = '';
-            if(classesData) classesData.forEach((c, i) => select.add(new Option(c.name, i)));
+            window.renderSemesterList();
             window.openPage('progress-page');
         }
-        
-        window.generateProgressReport = () => {
-            const classIdx = document.getElementById('progClassSelect').value;
-            const startDate = new Date(document.getElementById('progStartDate').value);
-            const endDate = new Date(document.getElementById('progEndDate').value);
-            
-            if(!classIdx || isNaN(startDate) || isNaN(endDate)) return alert("Select Class and Dates");
-            
-            const resultsDiv = document.getElementById('progressResults');
-            resultsDiv.innerHTML = '';
-            
-            const students = classesData[classIdx].students || [];
-            
-            students.forEach(s => {
-                const records = (s.history || []).filter(r => r.type === 'new_lesson');
-                const validRecords = records.filter(r => {
-                    const d = new Date(r.date);
-                    return d >= startDate && d <= endDate;
-                }).sort((a,b) => new Date(a.date) - new Date(b.date));
-                
-                if(validRecords.length > 0) {
-                    const first = validRecords[0];
-                    const last = validRecords[validRecords.length-1];
-                    const totalPages = validRecords.length; 
-                    
-                    const startInfo = first.startDetails ? `${first.startDetails.surah}:${first.startDetails.ayah}` : '-';
-                    const endInfo = last.endDetails ? `${last.endDetails.surah}:${last.endDetails.ayah}` : '-';
-                    
-                    resultsDiv.innerHTML += `
-                    <div class="prog-card">
-                        <div class="prog-header"><span class="prog-name">${s.name}</span> <span class="prog-total">${totalPages} Pages</span></div>
-                        <div class="prog-body">
-                            <div class="prog-section"><span class="prog-lbl">Started</span><span class="prog-val">${startInfo} (Pg ${first.page})</span></div>
-                            <div class="prog-section"><span class="prog-lbl">Ended</span><span class="prog-val">${endInfo} (Pg ${last.endPage})</span></div>
-                        </div>
-                    </div>`;
-                } else {
-                     resultsDiv.innerHTML += `<div class="prog-card" style="padding:15px; text-align:center; color:#999;">${s.name}: No records</div>`;
-                }
+
+        window.createSemester = () => {
+            const name = document.getElementById('semName').value;
+            const start = document.getElementById('semStart').value;
+            const end = document.getElementById('semEnd').value;
+            if(name && start && end) {
+                semesters.push({ name: name, startDate: start, endDate: end });
+                updateFirebase();
+                window.renderSemesterList();
+                document.getElementById('semName').value = '';
+                document.getElementById('semStart').value = '';
+                document.getElementById('semEnd').value = '';
+            } else {
+                alert("Please fill all fields");
+            }
+        }
+
+        window.renderSemesterList = () => {
+            const list = document.getElementById('semesterList');
+            list.innerHTML = '';
+            semesters.forEach((sem, i) => {
+                list.innerHTML += `
+                <div class="card-btn" onclick="window.viewSemesterReport(${i})">
+                    <span class="card-icon">📅</span>
+                    <h4 class="card-title">${sem.name}</h4>
+                    <span class="card-sub">${sem.startDate} - ${sem.endDate}</span>
+                    <div style="position:absolute; bottom:10px; right:10px;">
+                        <button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteSemester(${i})">🗑</button>
+                    </div>
+                </div>`;
             });
+        }
+        
+        window.deleteSemester = (i) => {
+             if(confirm("Delete Semester?")) { semesters.splice(i, 1); updateFirebase(); window.renderSemesterList(); }
+        }
+
+        window.viewSemesterReport = (semIdx) => {
+            const sem = semesters[semIdx];
+            const startDate = new Date(sem.startDate);
+            const endDate = new Date(sem.endDate);
+            const resultsDiv = document.getElementById('progressResults');
+            resultsDiv.innerHTML = `<h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">${sem.name} Report</h3>`;
+
+            // Loop all classes
+            classesData.forEach(c => {
+                let classHtml = `<div style="margin-bottom:30px;"><h4 style="border-bottom:2px solid var(--accent); padding-bottom:5px;">${c.name}</h4>`;
+                
+                c.students.forEach(s => {
+                     const records = (s.history || []).filter(r => r.type === 'new_lesson');
+                     const validRecords = records.filter(r => {
+                        const d = new Date(r.date);
+                        return d >= startDate && d <= endDate;
+                     }).sort((a,b) => new Date(a.date) - new Date(b.date));
+                     
+                     if(validRecords.length > 0) {
+                        const first = validRecords[0];
+                        const last = validRecords[validRecords.length-1];
+                        // Total Pages (Simple Count for now, logic can be enhanced)
+                        const totalPages = validRecords.length; 
+                        
+                        const startInfo = first.startDetails ? `${first.startDetails.surah}:${first.startDetails.ayah}` : '-';
+                        const endInfo = last.endDetails ? `${last.endDetails.surah}:${last.endDetails.ayah}` : '-';
+
+                        classHtml += `
+                        <div class="prog-card">
+                            <div class="prog-header"><span class="prog-name">${s.name}</span> <span class="prog-total">${totalPages} Pages</span></div>
+                            <div class="prog-body">
+                                <div class="prog-section"><span class="prog-lbl">Started</span><span class="prog-val">${startInfo} (Pg ${first.page})</span></div>
+                                <div class="prog-section"><span class="prog-lbl">Ended</span><span class="prog-val">${endInfo} (Pg ${last.endPage})</span></div>
+                            </div>
+                        </div>`;
+                     }
+                });
+                
+                classHtml += `</div>`;
+                resultsDiv.innerHTML += classHtml;
+            });
+            
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Student Dashboard Progress
+        window.calculateStudentProgress = (student) => {
+            if(!semesters.length) {
+                document.getElementById('studentTotalPages').innerText = "0";
+                return;
+            }
+            
+            // Get latest semester
+            const latestSem = semesters[semesters.length - 1];
+            const startDate = new Date(latestSem.startDate);
+            const endDate = new Date(latestSem.endDate);
+            
+            const records = (student.history || []).filter(r => r.type === 'new_lesson');
+            const validRecords = records.filter(r => {
+                const d = new Date(r.date);
+                return d >= startDate && d <= endDate;
+            });
+            
+            document.getElementById('studentTotalPages').innerText = validRecords.length;
         }
 
         window.renderHistory = (student, listId, filterType) => {
@@ -930,8 +976,8 @@
                             <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-date">${rec.date}</span></div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
+                                    <div class="hist-box"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
+                                    <div class="hist-box"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount}</div>
@@ -971,8 +1017,8 @@
                     document.getElementById('endSurah').value = SURAH_NAMES_AR.indexOf(rec.endDetails.surah) + 1;
                     
                     // Manually populate and set ayah options since API overwrites them initially
-                    window.updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah);
-                    window.updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah);
+                    updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah);
+                    updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah);
                 });
 
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
@@ -1088,6 +1134,7 @@
             
             const ssIdx = document.getElementById('startSurah').selectedIndex;
             const esIdx = document.getElementById('endSurah').selectedIndex;
+            
             const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value };
             const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value };
 
