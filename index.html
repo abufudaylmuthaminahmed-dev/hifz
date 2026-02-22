@@ -14,9 +14,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
 
-        /* LOCAL FONTS */
-        @font-face { font-family: 'Faruma'; src: url('faruma.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
-        @font-face { font-family: 'MV Waheed'; src: url('mvwaheed.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
+        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
+        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
 
         :root {
             --primary: #2c3e50; 
@@ -73,6 +72,7 @@
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
+        /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
         .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
@@ -89,6 +89,7 @@
 
         /* HISTORY CARD */
         .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
+        .hist-card:active { transform: scale(0.99); }
         .hist-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); }
         .hist-date { font-family: sans-serif; font-size: 14px; color: #555; background: #e0e0e0; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
@@ -104,19 +105,22 @@
         .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
         .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
-        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-edit-hist, .btn-delete-hist, .btn-action-sm { 
+            position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
         .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
         .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
+        
+        /* Reset Password Button */
+        .btn-reset-pass { 
+            background: #fff3cd; color: #856404; width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
 
-        .btn-edit { background: #e3f2fd; color: #2980b9; position: static; }
-        .btn-del { background: #fee2e2; color: #c0392b; position: static; }
         .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
-        .class-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
-        .cls-act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .btn-edit-cls { background: #e3f2fd; color: #2980b9; }
-        .btn-del-cls { background: #fee2e2; color: #c0392b; }
 
-        /* PROGRESS REPORT STYLE */
+        /* PROGRESS REPORT */
         .prog-card { background: white; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
         .prog-header { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .prog-name { font-weight: bold; font-size: 16px; color: var(--primary); }
@@ -125,7 +129,6 @@
         .prog-section { flex: 1; text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; }
         .prog-lbl { font-size: 11px; color: #777; display: block; margin-bottom: 5px; }
         .prog-val { font-size: 14px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
-        .prog-summary-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; border-top: 5px solid var(--st-primary); display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
 
         /* LAYOUTS & MUSHAF */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
@@ -160,6 +163,9 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .full-span { grid-column: span 2; }
         .form-label { font-size: 14px; font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+
+        /* APPROVAL CARD */
+        .approval-card { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
 
         @media (max-width: 900px) {
             .layout-split { flex-direction: column; }
@@ -261,6 +267,12 @@
                     <input type="date" id="semEnd" class="form-input">
                 </div>
                 <button class="big-btn" onclick="window.createSemester()">ސެމިސްޓަރ ހަދާ</button>
+            </div>
+            
+            <!-- Pending Approvals Section -->
+            <div id="pendingApprovalsSection" style="margin-top:30px;">
+                <h4 style="color:#e67e22;">Pending Approvals (ކުރީގެ ޑޭޓާ)</h4>
+                <div id="pendingApprovalsList"></div>
             </div>
 
             <h4 style="margin-top:20px;">ސެމިސްޓަރތައް</h4>
@@ -364,9 +376,9 @@
                     <div class="mushaf-top-bar" id="recMushafTopBar"><span id="recMushafJuz">Juz</span><span id="recMushafSurah">Surah</span></div>
                     <div class="mushaf-page"><div id="mushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p></div></div>
                     <div class="mushaf-nav">
-                        <button class="nav-btn" onclick="window.changeRecPage(-1)">ފަހަތަށް ⬅</button>
+                        <button class="nav-btn" onclick="window.changeRecPage(-1)">➡ ކުރިއަށް</button>
                         <span id="recPageDisplay">Page</span>
-                        <button class="nav-btn" onclick="window.changeRecPage(1)">➡ ކުރިއަށް</button>
+                        <button class="nav-btn" onclick="window.changeRecPage(1)">ފަހަތަށް ⬅</button>
                     </div>
                 </div>
             </div>
@@ -400,11 +412,7 @@
                 <div class="main-panel">
                     <div class="mushaf-top-bar" id="mushafTopBar"><span id="mushafJuzInfo"></span><span id="mushafSurahInfo"></span></div>
                     <div class="mushaf-page"><div id="examMushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">...</p></div></div>
-                    <div class="mushaf-nav">
-                        <button class="nav-btn" onclick="window.changeExamPage(-1)">ފަހަތަށް ⬅</button>
-                        <span id="currentPageDisplay">Page</span>
-                        <button class="nav-btn" onclick="window.changeExamPage(1)">➡ ކުރިއަށް</button>
-                    </div>
+                    <div class="mushaf-nav"><button class="nav-btn" onclick="window.changeExamPage(1)">➡ ކުރިއަށް</button><span id="currentPageDisplay">Page</span><button class="nav-btn" onclick="window.changeExamPage(-1)">ފަހަތަށް ⬅</button></div>
                 </div>
             </div>
         </div>
@@ -505,13 +513,15 @@
     <div id="bulkEntryModal" class="modal">
         <div class="modal-content">
             <h3 style="color:var(--primary); text-align:center;">ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</h3>
-            <p style="text-align:center; color:#777; font-size:12px;">މި ސެމިސްޓަރގައި ކިޔަވައިދެވުނު ބައިތައް އެއްކޮށް ލުމަށް</p>
-            
+            <div class="form-grid">
+                <div class="full-span"><label class="form-label">ކުރީ ސެމިސްޓަރގައި ކިޔެވި ޖުޒުއު އަދަދު</label><input type="number" id="prevSemJuz" class="form-input" placeholder="Ex: 2"></div>
+            </div>
+            <p style="text-align:center; color:#777; font-size:12px; margin-top:10px;">މި ސެމިސްޓަރގައި ކިޔަވައިދެވުނު ބައިތައް</p>
             <div id="bulkEntriesList" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
             
             <button class="big-btn btn-orange" onclick="window.addBulkRow()">+ އާ ރޯއެއް އިތުރުކުރޭ</button>
             <div style="display:flex; gap:10px;">
-                <button class="big-btn" onclick="window.saveBulkData()">ހުރިހާ އެއްޗެއް ސޭވްކުރޭ</button>
+                <button class="big-btn" onclick="window.saveBulkData()">ފޮނުވާ</button>
                 <button class="big-btn btn-red" onclick="document.getElementById('bulkEntryModal').style.display='none'">ކެންސަލް</button>
             </div>
         </div>
@@ -525,12 +535,12 @@
         // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU",
-  authDomain: "hifz-cde3b.firebaseapp.com",
-  databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
-  projectId: "hifz-cde3b",
-  storageBucket: "hifz-cde3b.firebasestorage.app",
-  messagingSenderId: "566754658580",
-  appId: "1:566754658580:web:d63d0f167960f53bab9a01"
+            authDomain: "hifz-cde3b.firebaseapp.com",
+            databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com",
+            projectId: "hifz-cde3b",
+            storageBucket: "hifz-cde3b.firebasestorage.app",
+            messagingSenderId: "566754658580",
+            appId: "1:566754658580:web:d63d0f167960f53bab9a01"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -573,6 +583,7 @@
             if(document.getElementById('management-page').classList.contains('hidden') === false) window.renderManageClassList();
             if(document.getElementById('teacher-mgmt-page').classList.contains('hidden') === false) window.renderTeacherList();
             if(document.getElementById('progress-page').classList.contains('hidden') === false) window.renderSemesterList();
+            if(document.getElementById('progress-page').classList.contains('hidden') === false) window.renderPendingApprovals();
         });
 
         function updateFirebase() { 
@@ -590,7 +601,6 @@
             const u = document.getElementById('teacherUsername').value;
             const p = document.getElementById('teacherPassInput').value;
             
-            // Allow admin login for setup
             if(p === '1234' && (u === 'admin' || u === '')) {
                  currentUserType = 'teacher'; currentUserRole = 'admin';
                  document.body.classList.remove('student-mode');
@@ -660,7 +670,7 @@
                 p.classList.remove('hidden');
                 if(id === 'management-page') window.renderManageClassList();
                 if(id === 'teacher-mgmt-page') window.renderTeacherList();
-                if(id === 'progress-page') window.renderSemesterList();
+                if(id === 'progress-page') { window.renderSemesterList(); window.renderPendingApprovals(); }
             }
         };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
@@ -729,12 +739,20 @@
                         <span class="card-sub">${s.id}</span>
                         <small style="color:${s.password?'green':'red'}">${pass}</small>
                         <div class="student-actions">
+                             <button class="btn-action-sm btn-edit" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button>
                             <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button>
                             <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
                         </div>
                     </div>`;
             });
         };
+        
+        window.resetPass = (idx) => {
+            if(confirm("Reset password? Student will need to create new one.")) {
+                classesData[currentClassIdx].students[idx].password = "";
+                updateFirebase(); window.renderStudentList();
+            }
+        }
 
         // STUDENT EDITING
         window.openAddStudentModal = () => { 
@@ -777,10 +795,12 @@
                 studentObj.history = classesData[currentClassIdx].students[editingStudentIndex].history;
                 studentObj.juzExams = classesData[currentClassIdx].students[editingStudentIndex].juzExams;
                 studentObj.password = classesData[currentClassIdx].students[editingStudentIndex].password;
+                studentObj.pendingData = classesData[currentClassIdx].students[editingStudentIndex].pendingData; // Preserve pending
                 classesData[currentClassIdx].students[editingStudentIndex] = studentObj;
             } else {
                 studentObj.history = [];
                 studentObj.juzExams = {};
+                studentObj.pendingData = [];
                 classesData[currentClassIdx].students.push(studentObj);
             }
 
@@ -794,7 +814,37 @@
                 updateFirebase(); window.renderStudentList();
             }
         }
-        window.downloadTemplate = () => {}; window.handleExcelUpload = () => {};
+        window.downloadTemplate = () => {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([["Name", "ID", "Module", "Level", "Direction", "Juz Count", "Remarks"]]);
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "Student_Template.xlsx");
+        };
+        window.handleExcelUpload = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
+                jsonData.forEach(row => {
+                    const name = row['Name'] || row['Student Name'];
+                    const id = row['ID'] || row['Student ID'];
+                    if(name && id) {
+                        classesData[currentClassIdx].students.push({
+                            name: name, id: id,
+                            module: row['Module']||'', level: row['Level']||'1', direction: row['Direction']||'top_down',
+                            juzCount: row['Juz Count']||'', remarks: row['Remarks']||'', history: [], juzExams: {}, pendingData: []
+                        });
+                    }
+                });
+                updateFirebase(); window.renderStudentList(); alert("Uploaded!");
+                input.value = "";
+            };
+            reader.readAsArrayBuffer(file);
+        };
 
         // --- GRADING ---
         window.openGradingClassList = () => {
@@ -835,96 +885,117 @@
             const select = document.getElementById('progClassSelect');
             select.innerHTML = '';
             if(classesData) classesData.forEach((c, i) => select.add(new Option(c.name, i)));
+            window.renderSemesterList();
+            window.renderPendingApprovals(); // Show approvals
             window.openPage('progress-page');
         }
         
-        window.generateProgressReport = () => {
-            const classIdx = document.getElementById('progClassSelect').value;
-            const startDate = new Date(document.getElementById('progStartDate').value);
-            const endDate = new Date(document.getElementById('progEndDate').value);
-            
-            if(!classIdx || isNaN(startDate) || isNaN(endDate)) return alert("Select Class and Dates");
-            
-            const resultsDiv = document.getElementById('progressResults');
-            resultsDiv.innerHTML = '';
-            
-            const students = classesData[classIdx].students || [];
-            
-            students.forEach(s => {
-                const records = (s.history || []).filter(r => r.type === 'new_lesson');
-                const validRecords = records.filter(r => {
-                    const d = new Date(r.date);
-                    return d >= startDate && d <= endDate;
-                }).sort((a,b) => new Date(a.date) - new Date(b.date));
-                
-                if(validRecords.length > 0) {
-                    const first = validRecords[0];
-                    const last = validRecords[validRecords.length-1];
-                    const totalPages = validRecords.length; 
-                    
-                    const startInfo = first.startDetails ? `${first.startDetails.surah}:${first.startDetails.ayah}` : '-';
-                    const endInfo = last.endDetails ? `${last.endDetails.surah}:${last.endDetails.ayah}` : '-';
-                    
-                    resultsDiv.innerHTML += `
-                    <div class="prog-card">
-                        <div class="prog-header"><span class="prog-name">${s.name}</span> <span class="prog-total">${totalPages} Pages</span></div>
-                        <div class="prog-body">
-                            <div class="prog-section"><span class="prog-lbl">Started</span><span class="prog-val">${startInfo} (Pg ${first.page})</span></div>
-                            <div class="prog-section"><span class="prog-lbl">Ended</span><span class="prog-val">${endInfo} (Pg ${last.endPage})</span></div>
-                        </div>
-                    </div>`;
-                } else {
-                     resultsDiv.innerHTML += `<div class="prog-card" style="padding:15px; text-align:center; color:#999;">${s.name}: No records</div>`;
-                }
+        window.createSemester = () => {
+            const name = document.getElementById('semName').value;
+            const start = document.getElementById('semStart').value;
+            const end = document.getElementById('semEnd').value;
+            if(name && start && end) {
+                semesters.push({ name: name, startDate: start, endDate: end });
+                updateFirebase();
+                window.renderSemesterList();
+                document.getElementById('semName').value = '';
+                document.getElementById('semStart').value = '';
+                document.getElementById('semEnd').value = '';
+            } else alert("Fill all fields");
+        }
+
+        window.renderSemesterList = () => {
+            const list = document.getElementById('semesterList'); list.innerHTML = '';
+            semesters.forEach((sem, i) => {
+                list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`;
             });
         }
-        
-        // Student Progress Calc
-        window.calculateStudentProgress = (student) => {
-            if(!semesters.length) { 
-                document.getElementById('studentSemPages').innerText = "0";
-                document.getElementById('studentSemJuz').innerText = "0";
-                document.getElementById('studentTotalJuz').innerText = student.juzCount || 0;
-                return; 
-            }
+
+        window.generateProgressReport = () => { /* Kept for compatibility but semantic logic moved to viewSemesterReport */ }
+
+        window.viewSemesterReport = (semIdx) => {
+            const sem = semesters[semIdx];
+            const startDate = new Date(sem.startDate);
+            const endDate = new Date(sem.endDate);
+            const resultsDiv = document.getElementById('progressResults');
+            resultsDiv.innerHTML = `<h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">${sem.name} Report</h3>`;
             
+            // Allow selecting class inside report or iterate all? Let's use the dropdown if selected, else all
+            const classIdx = document.getElementById('progClassSelect').value;
+            let targetClasses = classIdx ? [classesData[classIdx]] : classesData;
+
+            targetClasses.forEach(c => {
+                let classHtml = `<div style="margin-bottom:30px;"><h4 style="border-bottom:2px solid var(--accent); padding-bottom:5px;">${c.name}</h4>`;
+                
+                c.students.forEach(s => {
+                     const records = (s.history || []).filter(r => r.type === 'new_lesson');
+                     const validRecords = records.filter(r => {
+                        const d = new Date(r.date);
+                        return d >= startDate && d <= endDate;
+                     }).sort((a,b) => new Date(a.date) - new Date(b.date));
+                     
+                     // Passed Juz exams in this semester
+                     const passedJuz = (s.history || []).filter(r => r.type === 'juz_exam' && parseFloat(r.score) >= 60 && new Date(r.date) >= startDate && new Date(r.date) <= endDate).length;
+                     
+                     // Total Juz
+                     let totalJuz = parseFloat(s.juzCount || 0);
+                     let passedExams = new Set();
+                     if(s.history) s.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); });
+                     let grandTotal = totalJuz + passedExams.size;
+
+                     if(validRecords.length > 0 || passedJuz > 0) {
+                        const first = validRecords.length > 0 ? validRecords[0] : null;
+                        const last = validRecords.length > 0 ? validRecords[validRecords.length-1] : null;
+                        const totalPages = validRecords.length; 
+                        
+                        let startInfo = '-', endInfo = '-';
+                        if(first) startInfo = first.startDetails ? `${first.startDetails.surah}:${first.startDetails.ayah}` : '-';
+                        if(last) endInfo = last.endDetails ? `${last.endDetails.surah}:${last.endDetails.ayah}` : '-';
+
+                        classHtml += `
+                        <div class="prog-card">
+                            <div class="prog-header">
+                                <span class="prog-name">${s.name}</span> 
+                                <span class="prog-total">${totalPages} Pgs | ${passedJuz} Juz (Sem) | Total: ${grandTotal}</span>
+                            </div>
+                            <div class="prog-body">
+                                <div class="prog-section"><span class="prog-lbl">Started</span><span class="prog-val">${startInfo}</span></div>
+                                <div class="prog-section"><span class="prog-lbl">Ended</span><span class="prog-val">${endInfo}</span></div>
+                            </div>
+                        </div>`;
+                     }
+                });
+                
+                classHtml += `</div>`;
+                resultsDiv.innerHTML += classHtml;
+            });
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        window.calculateStudentProgress = (student) => {
+            if(!semesters.length) return;
             const latestSem = semesters[semesters.length - 1];
             const startDate = new Date(latestSem.startDate);
             const endDate = new Date(latestSem.endDate);
             
             // Calc Pages
             const newLessonRecs = (student.history || []).filter(r => r.type === 'new_lesson');
-            const validRecs = newLessonRecs.filter(r => {
-                const d = new Date(r.date);
-                return d >= startDate && d <= endDate;
-            });
+            const validRecs = newLessonRecs.filter(r => { const d = new Date(r.date); return d >= startDate && d <= endDate; });
             document.getElementById('studentSemPages').innerText = validRecs.length;
             
             // Calc Juz
             let semJuz = 0;
-            if(student.history) {
-                student.history.forEach(h => {
-                     if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) {
-                         const d = new Date(h.date);
-                         if(d >= startDate && d <= endDate) semJuz++;
-                     }
-                });
-            }
+            if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) { const d = new Date(h.date); if(d >= startDate && d <= endDate) semJuz++; } });
             document.getElementById('studentSemJuz').innerText = semJuz;
             
             // Total Juz
             let totalJuz = parseFloat(student.juzCount || 0);
-            // Add unique passed juz exams to total (simple logic for now)
             let passedExams = new Set();
-            if(student.history) {
-                student.history.forEach(h => {
-                    if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz);
-                });
-            }
+            if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); });
             document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size;
         }
 
-        // --- BULK ENTRY ---
+        // --- BULK ENTRY & APPROVALS ---
         window.openBulkEntryModal = () => {
             document.getElementById('bulkEntriesList').innerHTML = '';
             window.addBulkRow();
@@ -933,9 +1004,7 @@
         window.addBulkRow = () => {
             const div = document.createElement('div');
             div.className = 'form-grid';
-            div.style.marginBottom = '10px';
-            div.style.borderBottom = '1px solid #eee';
-            div.style.paddingBottom = '10px';
+            div.style.marginBottom = '10px'; div.style.borderBottom = '1px solid #eee'; div.style.paddingBottom = '10px';
             div.innerHTML = `
                 <input type="date" class="form-input b-date">
                 <select class="form-input b-type">
@@ -950,57 +1019,117 @@
         
         window.saveBulkData = async () => {
             const rows = document.querySelectorAll('#bulkEntriesList .form-grid');
-            const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-            if(!student.history) student.history = [];
-            
+            const prevJuz = document.getElementById('prevSemJuz').value;
+            const student = currentStudentObj; // Only student calls this
+
+            let pendingEntries = [];
+
+            // Add Juz Count request
+            if(prevJuz) {
+                pendingEntries.push({ type: 'juz_update', value: prevJuz, date: new Date().toLocaleDateString() });
+            }
+
             for (let row of rows) {
                 const date = row.querySelector('.b-date').value;
                 const type = row.querySelector('.b-type').value;
                 const page = row.querySelector('.b-page').value;
                 
                 if(date && page) {
-                    // Fetch details for this page
                     try {
-                        const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
-                        const data = await res.json();
-                        if(data.code === 200 && data.data.ayahs.length > 0) {
-                            const first = data.data.ayahs[0];
-                            const last = data.data.ayahs[data.data.ayahs.length-1];
-                            
-                            student.history.push({
-                                type: type,
-                                date: date,
-                                page: page,
-                                endPage: page, // Assumption for bulk
-                                startDetails: { surah: first.surah.name, ayah: first.numberInSurah },
-                                endDetails: { surah: last.surah.name, ayah: last.numberInSurah },
-                                mistakesCount: 0,
-                                mistakeDetails: []
-                            });
-                        }
-                    } catch(e) { console.log("Error fetching page " + page); }
+                        // Create Pending Entry
+                        pendingEntries.push({
+                            type: type, date: date, page: page, status: 'pending', timestamp: new Date().getTime()
+                        });
+                    } catch(e) {}
                 }
             }
             
-            if(currentUserType === 'student') {
-                // Update student object in main array
-                classesData.forEach(c => {
-                    let sIdx = c.students.findIndex(s => s.id === student.id);
-                    if(sIdx > -1) c.students[sIdx] = student;
-                });
-            }
+            // Find student in structure and update pendingData
+            classesData.forEach(c => {
+                let sIdx = c.students.findIndex(s => s.id === student.id);
+                if(sIdx > -1) {
+                    if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = [];
+                    c.students[sIdx].pendingData.push(...pendingEntries);
+                }
+            });
             
             updateFirebase();
-            alert("Bulk Data Saved!");
+            alert("Sent for approval!");
             document.getElementById('bulkEntryModal').style.display='none';
-            if(currentUserType === 'student') window.calculateStudentProgress(student);
+        }
+
+        // TEACHER APPROVAL LOGIC
+        window.renderPendingApprovals = () => {
+            const list = document.getElementById('pendingApprovalsList');
+            list.innerHTML = '';
+            
+            let hasPending = false;
+            classesData.forEach((c, cIdx) => {
+                c.students.forEach((s, sIdx) => {
+                    if(s.pendingData && s.pendingData.length > 0) {
+                        s.pendingData.forEach((p, pIdx) => {
+                            hasPending = true;
+                            let details = p.type === 'juz_update' ? `Update Total Juz to: ${p.value}` : `${p.type} - Page ${p.page} (${p.date})`;
+                            
+                            list.innerHTML += `
+                                <div class="approval-card">
+                                    <div style="font-weight:bold; margin-bottom:5px;">${s.name} (${c.name})</div>
+                                    <div>${details}</div>
+                                    <div style="margin-top:10px; text-align:right;">
+                                        <button class="btn-action-sm btn-edit" style="width:auto; padding:0 10px; border-radius:15px;" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">Approve</button>
+                                        <button class="btn-action-sm btn-del" style="width:auto; padding:0 10px; border-radius:15px;" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">Reject</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+            });
+            
+            if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>';
+        }
+
+        window.approveEntry = async (cIdx, sIdx, pIdx) => {
+            const student = classesData[cIdx].students[sIdx];
+            const entry = student.pendingData[pIdx];
+            
+            if(entry.type === 'juz_update') {
+                student.juzCount = entry.value;
+            } else {
+                // Fetch details for page
+                 try {
+                    const res = await fetch(`https://api.alquran.cloud/v1/page/${entry.page}/quran-uthmani`);
+                    const data = await res.json();
+                    if(data.code === 200 && data.data.ayahs.length > 0) {
+                        const first = data.data.ayahs[0];
+                        const last = data.data.ayahs[data.data.ayahs.length-1];
+                        
+                        student.history.push({
+                            type: entry.type, date: entry.date, page: entry.page, endPage: entry.page,
+                            startDetails: { surah: first.surah.name, ayah: first.numberInSurah },
+                            endDetails: { surah: last.surah.name, ayah: last.numberInSurah },
+                            mistakesCount: 0, mistakeDetails: []
+                        });
+                    }
+                } catch(e) {}
+            }
+            
+            // Remove from pending
+            student.pendingData.splice(pIdx, 1);
+            updateFirebase();
+            window.renderPendingApprovals();
+        }
+        
+        window.rejectEntry = (cIdx, sIdx, pIdx) => {
+             classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1);
+             updateFirebase(); window.renderPendingApprovals();
         }
 
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); list.innerHTML = '';
             if(!student.history) student.history = [];
             const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">ރެކޯޑެއް ނެތް</p>';
+            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">No Records</p>';
             
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec);
@@ -1019,9 +1148,6 @@
                                     <div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div>
                                     <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details.teacherMistakes}</span></div>
                                     <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details.selfMistakes}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details.tajweed}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details.fluency}</span></div>
-                                    <div class="hist-item"><span class="hist-label">މުތަޝާބިހް</span><span class="hist-val">${rec.details.mutashabihMarks}</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer exam-score">${rec.score}%</div>
@@ -1037,8 +1163,8 @@
                             <div class="hist-header"><span class="hist-title">Page ${rec.page}</span><span class="hist-date">${rec.date}</span></div>
                             <div class="hist-body">
                                 <div class="hist-grid">
-                                    <div class="hist-item"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
-                                    <div class="hist-item"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
+                                    <div class="hist-box"><span class="hist-label">ފެށުނީ</span><span class="hist-val">${sInfo}</span></div>
+                                    <div class="hist-box"><span class="hist-label">ނިމުނީ</span><span class="hist-val">${eInfo} (ޞ ${rec.endPage})</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount}</div>
@@ -1133,7 +1259,8 @@
                 populateSurahSelects(); // Ensure list is ready
                 document.getElementById('startSurah').value = first.surah.number;
                 document.getElementById('endSurah').value = last.surah.number;
-                window.updateAyahSelect('startAyah', first.numberInSurah); window.updateAyahSelect('endAyah', last.numberInSurah);
+                window.updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah); 
+                window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
             }
         };
         
