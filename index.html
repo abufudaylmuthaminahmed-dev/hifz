@@ -9,13 +9,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- FONTS --- */
+        /* --- FONTS FIX --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
 
-        @font-face { font-family: 'Faruma'; src: local('Faruma'), local('Faruma-Regular'); }
-        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), local('MV Waheed-Regular'); }
+        /* Updated Font Loading Logic for Mobile */
+        @font-face { 
+            font-family: 'Faruma'; 
+            src: local('Faruma'), 
+                 url('faruma.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face { 
+            font-family: 'MV Waheed'; 
+            src: local('MV Waheed'), 
+                 url('mvwaheed.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
 
         :root {
             --primary: #2c3e50; 
@@ -72,7 +85,7 @@
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
-        /* STUDENT STAT BAR (NEW COMPACT DESIGN) */
+        /* STUDENT STAT BAR (COMPACT) */
         .student-stat-container {
             background: white; border-radius: 15px; padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
@@ -83,12 +96,9 @@
         .st-stat-item:last-child { border-left: none; }
         .st-stat-val { font-size: 28px; font-weight: bold; line-height: 1; margin-bottom: 5px; font-family: var(--font-arabic); }
         .st-stat-lbl { font-size: 13px; color: #777; font-weight: 500; }
-        
-        /* COLORS FOR STATS */
         .st-color-1 { color: var(--st-primary); }
         .st-color-2 { color: var(--accent-rev); }
         .st-color-3 { color: var(--primary); }
-
 
         /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
@@ -142,7 +152,7 @@
         .prog-lbl { font-size: 11px; color: #777; display: block; margin-bottom: 5px; }
         .prog-val { font-size: 14px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
 
-        /* APPROVAL CARD STYLES */
+        /* APPROVAL CARD */
         .approval-card {
             background: white; border-radius: 12px; border: 1px solid #e0e0e0; border-right: 5px solid #e67e22;
             padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
