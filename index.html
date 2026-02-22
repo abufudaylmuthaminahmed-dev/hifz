@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (V38)</title>
+    <title>إتقان - Hifz Program (V40-Fixed)</title>
     
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -22,9 +22,9 @@
             --accent: #27ae60;
             --accent-rev: #e67e22;
             --mistake: #e74c3c;
-            --bg-light: #f4f6f8;
+            --bg-light: #f8f9fa;
             --mushaf-paper: #fffcf2;
-            --st-primary: #1e8449;
+            --st-primary: #117a65;
             
             --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
             --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
@@ -34,7 +34,7 @@
         * { box-sizing: border-box; }
         body { font-family: var(--font-main); margin: 0; min-height: 100vh; color: #333; background-color: var(--bg-light); overflow-x: hidden; transition: background 0.3s; }
         
-        body.student-mode { background-color: #eafaf1; }
+        body.student-mode { background-color: #e8f6f3; }
         body.student-mode .app-header { border-bottom: 3px solid var(--st-primary); }
         body.student-mode .header-title { color: var(--st-primary); }
 
@@ -71,6 +71,24 @@
         .card-sub { font-size: 13px; color: #7f8c8d; }
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
+
+        /* STUDENT STAT BAR (NEW COMPACT DESIGN) */
+        .student-stat-container {
+            background: white; border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
+            display: flex; justify-content: space-around; align-items: center;
+            border: 1px solid #e0e0e0;
+        }
+        .st-stat-item { text-align: center; flex: 1; border-left: 1px solid #eee; }
+        .st-stat-item:last-child { border-left: none; }
+        .st-stat-val { font-size: 28px; font-weight: bold; line-height: 1; margin-bottom: 5px; font-family: var(--font-arabic); }
+        .st-stat-lbl { font-size: 13px; color: #777; font-weight: 500; }
+        
+        /* COLORS FOR STATS */
+        .st-color-1 { color: var(--st-primary); }
+        .st-color-2 { color: var(--accent-rev); }
+        .st-color-3 { color: var(--primary); }
+
 
         /* BUTTONS */
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
@@ -111,12 +129,6 @@
         }
         .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
         .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
-        
-        /* Reset Password Button */
-        .btn-reset-pass { 
-            background: #fff3cd; color: #856404; width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; font-size: 14px;
-        }
 
         .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
 
@@ -129,6 +141,20 @@
         .prog-section { flex: 1; text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; }
         .prog-lbl { font-size: 11px; color: #777; display: block; margin-bottom: 5px; }
         .prog-val { font-size: 14px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
+
+        /* APPROVAL CARD STYLES */
+        .approval-card {
+            background: white; border-radius: 12px; border: 1px solid #e0e0e0; border-right: 5px solid #e67e22;
+            padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .app-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .app-stu-name { font-weight: bold; font-size: 16px; color: var(--primary); }
+        .app-date { background: #f0f2f5; color: #555; font-size: 12px; padding: 3px 8px; border-radius: 10px; }
+        .app-details { background: #fffcf2; padding: 10px; border-radius: 8px; font-family: var(--font-arabic); text-align: center; font-size: 18px; color: #333; }
+        .app-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; }
+        .btn-approve { background: #d4efdf; color: #1e8449; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
+        .btn-reject { background: #fadbd8; color: #c0392b; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
 
         /* LAYOUTS & MUSHAF */
         .layout-split { display: flex; height: calc(100vh - 65px); overflow: hidden; }
@@ -163,9 +189,6 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .full-span { grid-column: span 2; }
         .form-label { font-size: 14px; font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
-
-        /* APPROVAL CARD */
-        .approval-card { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
 
         @media (max-width: 900px) {
             .layout-split { flex-direction: column; }
@@ -271,7 +294,7 @@
             
             <!-- Pending Approvals Section -->
             <div id="pendingApprovalsSection" style="margin-top:30px;">
-                <h4 style="color:#e67e22;">Pending Approvals (ކުރީގެ ޑޭޓާ)</h4>
+                <h4 style="color:#e67e22;">ކުރީގެ ޑޭޓާ (Pending Approvals)</h4>
                 <div id="pendingApprovalsList"></div>
             </div>
 
@@ -359,7 +382,7 @@
                     <div style="margin-bottom:15px;"><label class="form-label">ތާރީޚް</label><input type="date" id="recDate" class="rec-input" style="text-align:center;"></div>
                     <div class="form-sec" style="border-top:3px solid var(--accent);">
                         <span class="sec-title">ފަށާ ހިސާބު</span>
-                        <label>ޞަފްޙާ</label><input type="number" id="startPage" class="rec-input" placeholder="Page (1-604)" onchange="window.loadSmartPage()">
+                        <label>ޞަފްޙާ</label><input type="number" id="startPage" class="rec-input" placeholder="Page (1-604)" onchange="window.handleStartPageChange()">
                         <div style="display:flex; gap:5px;"><div style="flex:1"><label>ސޫރަތް</label><select id="startSurah" class="rec-input"></select></div><div style="width:60px"><label>އާޔަތް</label><select id="startAyah" class="rec-input"></select></div></div>
                     </div>
                     <div class="form-sec" style="border-top:3px solid #e74c3c;">
@@ -376,9 +399,10 @@
                     <div class="mushaf-top-bar" id="recMushafTopBar"><span id="recMushafJuz">Juz</span><span id="recMushafSurah">Surah</span></div>
                     <div class="mushaf-page"><div id="mushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p></div></div>
                     <div class="mushaf-nav">
-                        <button class="nav-btn" onclick="window.changeRecPage(-1)">➡ ކުރިއަށް</button>
+                        <!-- Left Arrow (Next Page) moves forward, Right Arrow (Prev Page) moves back -->
+                        <button class="nav-btn" onclick="window.changeRecPage(-1)">➡</button>
                         <span id="recPageDisplay">Page</span>
-                        <button class="nav-btn" onclick="window.changeRecPage(1)">ފަހަތަށް ⬅</button>
+                        <button class="nav-btn" onclick="window.changeRecPage(1)">⬅</button>
                     </div>
                 </div>
             </div>
@@ -412,7 +436,11 @@
                 <div class="main-panel">
                     <div class="mushaf-top-bar" id="mushafTopBar"><span id="mushafJuzInfo"></span><span id="mushafSurahInfo"></span></div>
                     <div class="mushaf-page"><div id="examMushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">...</p></div></div>
-                    <div class="mushaf-nav"><button class="nav-btn" onclick="window.changeExamPage(1)">➡ ކުރިއަށް</button><span id="currentPageDisplay">Page</span><button class="nav-btn" onclick="window.changeExamPage(-1)">ފަހަތަށް ⬅</button></div>
+                    <div class="mushaf-nav">
+                        <button class="nav-btn" onclick="window.changeExamPage(-1)">➡</button>
+                        <span id="currentPageDisplay">Page</span>
+                        <button class="nav-btn" onclick="window.changeExamPage(1)">⬅</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -444,21 +472,19 @@
                 <h3 id="studentDashName"></h3>
             </div>
             
-            <div class="prog-summary-card">
-                <div style="border-left:1px solid #eee;">
-                    <span style="font-size:12px; color:#777;">މި ސެމިސްޓަރ</span>
-                    <div style="font-size:28px; font-weight:bold; color:var(--st-primary);" id="studentSemPages">0</div>
-                    <span style="font-size:12px;">ޞަފްޙާ</span>
+            <!-- REFACTORED PROGRESS STAT BAR -->
+            <div class="student-stat-container">
+                <div class="st-stat-item">
+                    <div class="st-stat-val st-color-1" id="studentSemPages">0</div>
+                    <div class="st-stat-lbl">މި ސެމިސްޓަރ<br>(ޞަފްޙާ)</div>
                 </div>
-                <div style="border-left:1px solid #eee;">
-                    <span style="font-size:12px; color:#777;">މި ސެމިސްޓަރ</span>
-                    <div style="font-size:28px; font-weight:bold; color:#e67e22;" id="studentSemJuz">0</div>
-                    <span style="font-size:12px;">ޖުޒުއު</span>
+                <div class="st-stat-item">
+                    <div class="st-stat-val st-color-2" id="studentSemJuz">0</div>
+                    <div class="st-stat-lbl">މި ސެމިސްޓަރ<br>(ޖުޒުއު)</div>
                 </div>
-                <div>
-                    <span style="font-size:12px; color:#777;">ޖުމްލަ ޙިފްޡް</span>
-                    <div style="font-size:28px; font-weight:bold; color:#2c3e50;" id="studentTotalJuz">0</div>
-                    <span style="font-size:12px;">ޖުޒުއު</span>
+                <div class="st-stat-item">
+                    <div class="st-stat-val st-color-3" id="studentTotalJuz">0</div>
+                    <div class="st-stat-lbl">ޖުމްލަ ޙިފްޡް<br>(ޖުޒުއު)</div>
                 </div>
             </div>
 
@@ -476,8 +502,14 @@
     </div>
 
     <!-- MODALS -->
+    <!-- PASSWORD CREATION MODAL (SHARED) -->
     <div id="createPassModal" class="modal">
-        <div class="modal-content" style="text-align:center;"><h3 style="color:var(--primary);">ޕާސްވޯޑް ހައްދަވާ</h3><input type="password" id="newStuPass" class="form-input" placeholder="އާ ޕާސްވޯޑް"><button class="big-btn" onclick="window.saveNewPassword()">ސޭވް & ލޮގިން</button></div>
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="color:var(--primary);">ޕާސްވޯޑް ހައްދަވާ</h3>
+            <p id="passModalUserText" style="color:#777; margin-bottom:10px;"></p>
+            <input type="password" id="newStuPass" class="form-input" placeholder="އާ ޕާސްވޯޑް">
+            <button class="big-btn" onclick="window.saveNewPassword()">ސޭވް & ލޮގިން</button>
+        </div>
     </div>
     
     <!-- ADD/EDIT STUDENT MODAL -->
@@ -514,7 +546,10 @@
         <div class="modal-content">
             <h3 style="color:var(--primary); text-align:center;">ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</h3>
             <div class="form-grid">
-                <div class="full-span"><label class="form-label">ކުރީ ސެމިސްޓަރގައި ކިޔެވި ޖުޒުއު އަދަދު</label><input type="number" id="prevSemJuz" class="form-input" placeholder="Ex: 2"></div>
+                <div class="full-span">
+                    <label class="form-label" style="color:var(--accent);">ކުރީ ސެމިސްޓަރގައި ކިޔެވި ޖުޒުއު އަދަދު</label>
+                    <input type="number" id="prevSemJuz" class="form-input" placeholder="މިސާލު: 2">
+                </div>
             </div>
             <p style="text-align:center; color:#777; font-size:12px; margin-top:10px;">މި ސެމިސްޓަރގައި ކިޔަވައިދެވުނު ބައިތައް</p>
             <div id="bulkEntriesList" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
@@ -565,7 +600,10 @@
         let isViewMode = false;
         let editingRecordIndex = -1;
         let editingStudentIndex = -1;
-        let currentRecPage = 1;
+        
+        let currentRecViewPage = 1; // Tracks what page is SHOWN in recorder
+
+        let pendingUserIndex = -1; // For teacher pass reset
 
         // LOAD DATA
         const dbRef = ref(db, 'hifz_system_v1');
@@ -584,6 +622,7 @@
             if(document.getElementById('teacher-mgmt-page').classList.contains('hidden') === false) window.renderTeacherList();
             if(document.getElementById('progress-page').classList.contains('hidden') === false) window.renderSemesterList();
             if(document.getElementById('progress-page').classList.contains('hidden') === false) window.renderPendingApprovals();
+            if(document.getElementById('class-details-page').classList.contains('hidden') === false) window.renderStudentList();
         });
 
         function updateFirebase() { 
@@ -601,6 +640,7 @@
             const u = document.getElementById('teacherUsername').value;
             const p = document.getElementById('teacherPassInput').value;
             
+            // Hardcoded fallback for first run
             if(p === '1234' && (u === 'admin' || u === '')) {
                  currentUserType = 'teacher'; currentUserRole = 'admin';
                  document.body.classList.remove('student-mode');
@@ -611,17 +651,31 @@
                  return;
             }
 
-            const user = hifzUsers.find(user => user.username === u && user.password === p);
+            const userIndex = hifzUsers.findIndex(user => user.username === u);
+            const user = hifzUsers[userIndex];
             
             if(user) {
-                currentUserType = 'teacher';
-                currentUserRole = user.role;
-                document.body.classList.remove('student-mode');
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
-                if(currentUserRole === 'admin') document.getElementById('admin-panel-btn').classList.remove('hidden');
-                else document.getElementById('admin-panel-btn').classList.add('hidden');
-                window.openPage('teacher-dashboard');
+                // Check if password reset is needed (empty string)
+                if(user.password === "" || (!user.password && user.role !=='admin')) {
+                    pendingUserIndex = userIndex;
+                    currentUserType = 'teacher';
+                    document.getElementById('passModalUserText').innerText = `މުދައްރިސް: ${user.name}`;
+                    document.getElementById('createPassModal').style.display = 'flex';
+                    return;
+                }
+
+                if(user.password === p) {
+                    currentUserType = 'teacher';
+                    currentUserRole = user.role;
+                    document.body.classList.remove('student-mode');
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-container').classList.remove('hidden');
+                    if(currentUserRole === 'admin') document.getElementById('admin-panel-btn').classList.remove('hidden');
+                    else document.getElementById('admin-panel-btn').classList.add('hidden');
+                    window.openPage('teacher-dashboard');
+                } else {
+                    alert('ޕާސްވޯޑް ނުބައި');
+                }
             } else {
                 alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ');
             }
@@ -634,8 +688,13 @@
             if(classesData) classesData.forEach((c, ci) => { if(c.students) c.students.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } }); });
             if(!found) return alert("Not Found");
             currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found;
-            if(!found.password) document.getElementById('createPassModal').style.display = 'flex';
-            else {
+            
+            // Check for empty password for reset/first-time
+            if(!found.password || found.password === "") {
+                currentUserType = 'student';
+                document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`;
+                document.getElementById('createPassModal').style.display = 'flex';
+            } else {
                 const passField = document.getElementById('stuPassField');
                 if(passField.classList.contains('hidden')) passField.classList.remove('hidden');
                 else {
@@ -644,10 +703,28 @@
                 }
             }
         };
+
         window.saveNewPassword = () => {
             const pass = document.getElementById('newStuPass').value;
-            if(pass) { classesData[currentClassIdx].students[currentStudentIdx].password = pass; updateFirebase(); document.getElementById('createPassModal').style.display='none'; window.loginSuccessStudent(); }
+            if(!pass) return alert("Enter a password");
+            
+            if(currentUserType === 'student') {
+                classesData[currentClassIdx].students[currentStudentIdx].password = pass; 
+                updateFirebase(); 
+                document.getElementById('createPassModal').style.display='none'; 
+                window.loginSuccessStudent();
+            } else if (currentUserType === 'teacher') {
+                if(pendingUserIndex > -1) {
+                    hifzUsers[pendingUserIndex].password = pass;
+                    updateFirebase();
+                    document.getElementById('createPassModal').style.display='none';
+                    // Auto login after set
+                    document.getElementById('teacherPassInput').value = pass;
+                    window.loginTeacher();
+                }
+            }
         };
+
         window.loginSuccessStudent = () => {
             currentUserType = 'student';
             document.body.classList.add('student-mode');
@@ -691,9 +768,24 @@
             const div = document.getElementById('teacherList'); div.innerHTML='';
             hifzUsers.forEach((u, i) => {
                 if(u.role !== 'admin') {
-                    div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username} | Pass: ${u.password}</span><button class="btn-delete-hist" onclick="window.deleteTeacher(${i})" style="bottom:10px; right:10px;">🗑</button></div>`;
+                    div.innerHTML += `
+                        <div class="card-btn" style="min-height:100px; position:relative;">
+                            <h4>${u.name}</h4>
+                            <span style="font-size:12px;color:#777;">User: ${u.username}</span>
+                            <div style="display:flex; gap:5px; margin-top:5px;">
+                                <button class="btn-action-sm" onclick="window.resetTeacherPass(${i})" style="position:static; background:#fff3cd; color:#856404;" title="Reset Password">🔑</button>
+                                <button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button>
+                            </div>
+                        </div>`;
                 }
             });
+        };
+        window.resetTeacherPass = (i) => {
+            if(confirm("Reset this teacher's password? They will set a new one on next login.")) {
+                hifzUsers[i].password = "";
+                updateFirebase();
+                alert("Password reset. Teacher must create new password on login.");
+            }
         };
         window.deleteTeacher = (i) => { if(confirm("Delete?")) { hifzUsers.splice(i, 1); updateFirebase(); window.renderTeacherList(); } };
 
@@ -732,14 +824,14 @@
             if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
             
             students.forEach((s, idx) => {
-                let pass = s.password ? `(Pass: ${s.password})` : '(No Pass)';
+                let pass = (s.password && s.password.length > 0) ? `<span style="color:green">(Has Pass)</span>` : `<span style="color:red; font-weight:bold;">(No Pass)</span>`;
                 div.innerHTML += `
                     <div class="card-btn" style="min-height:120px; position:relative;">
                         <h4 class="card-title">${s.name}</h4>
                         <span class="card-sub">${s.id}</span>
-                        <small style="color:${s.password?'green':'red'}">${pass}</small>
+                        <small style="margin-top:5px;">${pass}</small>
                         <div class="student-actions">
-                             <button class="btn-action-sm btn-edit" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button>
+                             <button class="btn-action-sm btn-edit" style="background:#fff3cd; color:#856404;" title="Reset Password" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button>
                             <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button>
                             <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
                         </div>
@@ -748,9 +840,10 @@
         };
         
         window.resetPass = (idx) => {
-            if(confirm("Reset password? Student will need to create new one.")) {
+            if(confirm("Reset password? Student will need to create new one on next login.")) {
                 classesData[currentClassIdx].students[idx].password = "";
-                updateFirebase(); window.renderStudentList();
+                updateFirebase(); 
+                window.renderStudentList(); // Immediately update UI to show "(No Pass)"
             }
         }
 
@@ -780,27 +873,33 @@
             const id = document.getElementById('m_id').value;
             if(!name || !id) return alert("Name & ID Required");
 
-            const studentObj = {
-                name: name, id: id,
-                module: document.getElementById('m_module').value,
-                level: document.getElementById('m_level').value,
-                direction: document.getElementById('m_direction').value,
-                juzCount: document.getElementById('m_juz_count').value,
-                remarks: document.getElementById('m_remarks').value,
-            };
-
             if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
 
             if(editingStudentIndex > -1) {
-                studentObj.history = classesData[currentClassIdx].students[editingStudentIndex].history;
-                studentObj.juzExams = classesData[currentClassIdx].students[editingStudentIndex].juzExams;
-                studentObj.password = classesData[currentClassIdx].students[editingStudentIndex].password;
-                studentObj.pendingData = classesData[currentClassIdx].students[editingStudentIndex].pendingData; // Preserve pending
-                classesData[currentClassIdx].students[editingStudentIndex] = studentObj;
+                // UPDATE EXISTING STUDENT - PRESERVE DATA
+                let s = classesData[currentClassIdx].students[editingStudentIndex];
+                s.name = name;
+                s.id = id;
+                s.module = document.getElementById('m_module').value;
+                s.level = document.getElementById('m_level').value;
+                s.direction = document.getElementById('m_direction').value;
+                s.juzCount = document.getElementById('m_juz_count').value;
+                s.remarks = document.getElementById('m_remarks').value;
+                // history, password, pendingData are NOT touched, so they are preserved
             } else {
-                studentObj.history = [];
-                studentObj.juzExams = {};
-                studentObj.pendingData = [];
+                // CREATE NEW STUDENT
+                const studentObj = {
+                    name: name, id: id,
+                    module: document.getElementById('m_module').value,
+                    level: document.getElementById('m_level').value,
+                    direction: document.getElementById('m_direction').value,
+                    juzCount: document.getElementById('m_juz_count').value,
+                    remarks: document.getElementById('m_remarks').value,
+                    history: [],
+                    juzExams: {},
+                    pendingData: [],
+                    password: "" // Start with empty password
+                };
                 classesData[currentClassIdx].students.push(studentObj);
             }
 
@@ -883,8 +982,10 @@
         // --- PROGRESS ---
         window.openProgressPage = () => {
             const select = document.getElementById('progClassSelect');
-            select.innerHTML = '';
-            if(classesData) classesData.forEach((c, i) => select.add(new Option(c.name, i)));
+            if(select) {
+                select.innerHTML = '';
+                if(classesData) classesData.forEach((c, i) => select.add(new Option(c.name, i)));
+            }
             window.renderSemesterList();
             window.renderPendingApprovals(); // Show approvals
             window.openPage('progress-page');
@@ -911,8 +1012,6 @@
             });
         }
 
-        window.generateProgressReport = () => { /* Kept for compatibility but semantic logic moved to viewSemesterReport */ }
-
         window.viewSemesterReport = (semIdx) => {
             const sem = semesters[semIdx];
             const startDate = new Date(sem.startDate);
@@ -920,11 +1019,7 @@
             const resultsDiv = document.getElementById('progressResults');
             resultsDiv.innerHTML = `<h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">${sem.name} Report</h3>`;
             
-            // Allow selecting class inside report or iterate all? Let's use the dropdown if selected, else all
-            const classIdx = document.getElementById('progClassSelect').value;
-            let targetClasses = classIdx ? [classesData[classIdx]] : classesData;
-
-            targetClasses.forEach(c => {
+            classesData.forEach(c => {
                 let classHtml = `<div style="margin-bottom:30px;"><h4 style="border-bottom:2px solid var(--accent); padding-bottom:5px;">${c.name}</h4>`;
                 
                 c.students.forEach(s => {
@@ -998,6 +1093,7 @@
         // --- BULK ENTRY & APPROVALS ---
         window.openBulkEntryModal = () => {
             document.getElementById('bulkEntriesList').innerHTML = '';
+            document.getElementById('prevSemJuz').value = '';
             window.addBulkRow();
             document.getElementById('bulkEntryModal').style.display='flex';
         }
@@ -1025,7 +1121,7 @@
             let pendingEntries = [];
 
             // Add Juz Count request
-            if(prevJuz) {
+            if(prevJuz && prevJuz !== "") {
                 pendingEntries.push({ type: 'juz_update', value: prevJuz, date: new Date().toLocaleDateString() });
             }
 
@@ -1058,7 +1154,7 @@
             document.getElementById('bulkEntryModal').style.display='none';
         }
 
-        // TEACHER APPROVAL LOGIC
+        // TEACHER APPROVAL LOGIC (UPDATED UI)
         window.renderPendingApprovals = () => {
             const list = document.getElementById('pendingApprovalsList');
             list.innerHTML = '';
@@ -1069,15 +1165,27 @@
                     if(s.pendingData && s.pendingData.length > 0) {
                         s.pendingData.forEach((p, pIdx) => {
                             hasPending = true;
-                            let details = p.type === 'juz_update' ? `Update Total Juz to: ${p.value}` : `${p.type} - Page ${p.page} (${p.date})`;
+                            // Distinct Style for Juz Update vs Normal Record
+                            let isJuzUpdate = p.type === 'juz_update';
+                            let typeLabel = "";
+                            if(p.type === 'new_lesson') typeLabel = "އާ ފިލާވަޅު";
+                            else if(p.type === 'short_rev') typeLabel = "ކުރު މުރާޖަޢާ";
+                            else if(p.type === 'long_rev') typeLabel = "ދިގު މުރާޖަޢާ";
+
+                            let detailsHtml = isJuzUpdate 
+                                ? `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>` 
+                                : `<span>${typeLabel}</span><br><strong>Page ${p.page}</strong>`;
                             
                             list.innerHTML += `
-                                <div class="approval-card">
-                                    <div style="font-weight:bold; margin-bottom:5px;">${s.name} (${c.name})</div>
-                                    <div>${details}</div>
-                                    <div style="margin-top:10px; text-align:right;">
-                                        <button class="btn-action-sm btn-edit" style="width:auto; padding:0 10px; border-radius:15px;" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">Approve</button>
-                                        <button class="btn-action-sm btn-del" style="width:auto; padding:0 10px; border-radius:15px;" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">Reject</button>
+                                <div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : ''}">
+                                    <div class="app-card-header">
+                                        <div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div>
+                                        <div class="app-date">${p.date}</div>
+                                    </div>
+                                    <div class="app-details">${detailsHtml}</div>
+                                    <div class="app-actions">
+                                        <button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button>
+                                        <button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button>
                                     </div>
                                 </div>
                             `;
@@ -1197,6 +1305,10 @@
                 document.getElementById('recSaveBtn').style.display = 'block';
                 document.getElementById('recDate').value = rec.date;
                 document.getElementById('startPage').value = rec.page;
+                
+                // When editing, start view at page 1
+                currentRecViewPage = parseInt(rec.page);
+                
                 // Load page to trigger API and then set values
                 window.loadSmartPage(true).then(() => {
                     document.getElementById('endPage').value = rec.endPage;
@@ -1213,7 +1325,7 @@
             }
         }
 
-        // RECORDER
+        // RECORDER LOGIC (FIXED)
         window.openRecorder = (type) => {
             editingRecordIndex = -1; isViewMode = false; currentMistakes = [];
             currentSessionType = type;
@@ -1228,45 +1340,75 @@
             
             // Auto fill
             const s = classesData[currentClassIdx].students[currentStudentIdx];
+            let initialPage = 1;
+
             if(s.history) {
                 const recs = s.history.filter(r => r.type === type);
                 if(recs.length > 0) {
                     const last = recs[recs.length-1];
                     const nextP = parseInt(last.endPage || last.page) + 1;
-                    if(nextP <= 604) {
-                        document.getElementById('startPage').value = nextP;
-                        window.loadSmartPage();
-                    }
+                    if(nextP <= 604) initialPage = nextP;
                 }
             }
+            
+            document.getElementById('startPage').value = initialPage;
+            currentRecViewPage = initialPage;
+            window.loadSmartPage();
+            
             document.getElementById('recorder-page').classList.remove('hidden');
         };
+
         window.closeRecorder = () => {
             document.getElementById('recorder-page').classList.add('hidden');
             if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null);
             else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType);
         };
+        
+        // This is called when User manually types in Start Page
+        window.handleStartPageChange = () => {
+            let val = parseInt(document.getElementById('startPage').value);
+            if(val) {
+                currentRecViewPage = val;
+                window.loadSmartPage();
+            }
+        }
+
         window.loadSmartPage = async (applyHighlights=false) => {
-            const page = document.getElementById('startPage').value;
+            const page = currentRecViewPage; // Use view page
             if(!page) return;
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
             const data = await res.json();
             window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
+            
+            // Logic: Start Page stays static unless manually changed. 
+            // End Page updates to match the current view page.
+            // If it's a new record, update endPage input automatically.
             if(!isViewMode && editingRecordIndex === -1 && data.data.ayahs.length > 0) {
-                const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
-                document.getElementById('endPage').value = page;
+                document.getElementById('endPage').value = page; // Update End Page Input
+
+                const last = data.data.ayahs[data.data.ayahs.length-1];
                 
-                populateSurahSelects(); // Ensure list is ready
-                document.getElementById('startSurah').value = first.surah.number;
+                // Only auto-populate start details if we are on the very first page of session
+                if(page == document.getElementById('startPage').value) {
+                    const first = data.data.ayahs[0];
+                    populateSurahSelects();
+                    document.getElementById('startSurah').value = first.surah.number;
+                    window.updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah); 
+                }
+
+                // Always update end details
                 document.getElementById('endSurah').value = last.surah.number;
-                window.updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah); 
                 window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
             }
         };
         
+        // Navigation: Moves view only, Updates End Page
         window.changeRecPage = (dir) => {
-            let p = parseInt(document.getElementById('startPage').value) + dir;
-            if(p>0 && p<=604) { document.getElementById('startPage').value=p; window.loadSmartPage(); }
+            let p = currentRecViewPage + dir;
+            if(p>0 && p<=604) { 
+                currentRecViewPage = p; 
+                window.loadSmartPage(); 
+            }
         }
 
         window.renderMushafText = (ayahs, target, highlights, isExam) => {
@@ -1331,6 +1473,8 @@
             document.getElementById('endPage').value = rec.endPage;
             document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
             document.getElementById('recorder-page').classList.remove('hidden');
+            
+            currentRecViewPage = parseInt(rec.page);
             window.loadSmartPage(true);
         };
         window.viewJuzRecord = (rec) => {
