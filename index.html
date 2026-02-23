@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (V45-Exam Details, PDF Slip & Progress)</title>
+    <title>إتقان - Hifz Program (Advanced Progress & Semesters)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -661,44 +661,180 @@
                 if(retainSelection && oldVal) { sel.value = oldVal; window.showDetailedProgress(); }
             } else { document.getElementById('detailedProgressView').style.display = 'none'; }
         }
+
+        // --- UPDATED PROGRESS LOGIC STARTS HERE ---
+        
+        // 1. Show Detailed Progress UI with Semester Filter & Past Entry Form
         window.showDetailedProgress = () => {
-            const cIdx = document.getElementById('progClassSelect').value; const sIdx = document.getElementById('progStudentSelect').value;
+            const cIdx = document.getElementById('progClassSelect').value; 
+            const sIdx = document.getElementById('progStudentSelect').value;
             const view = document.getElementById('detailedProgressView');
+            
             if(cIdx === "" || sIdx === "") { view.style.display = 'none'; return; }
             
             const s = classesData[cIdx].students[sIdx];
             
-            // Calc Semester Stats
-            let semPages = 0, semJuz = 0;
-            if(semesters.length > 0) {
-                const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate), end = new Date(latestSem.endDate);
-                const validRecs = (s.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end);
-                semPages = validRecs.length;
-                if(s.history) s.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; });
-            }
-
-            // Calc Total Stats
-            let totalJuz = parseFloat(s.juzCount || 0); let passedExams = new Set();
-            if(s.history) s.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); });
-            let grandTotal = totalJuz + passedExams.size;
-            
-            let passedHtml = '';
-            if(passedExams.size > 0) {
-                let badges = Array.from(passedExams).sort((a,b)=>a-b).map(j => `<span class="passed-badge">ޖުޒުއު ${j}</span>`).join('');
-                passedHtml = `<div style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;"><div class="prog-stat-lbl" style="font-weight:bold;">ފާސްވެފައިވާ ޖުޒުއުތައް</div><div class="passed-juz-list">${badges}</div></div>`;
-            }
+            // Build Semester Options
+            let semesterOptions = `<option value="all">ޖުމްލަ (All Time)</option>`;
+            semesters.forEach((sem, i) => {
+                // Select the last (current) semester by default
+                let selected = (i === semesters.length - 1) ? 'selected' : '';
+                semesterOptions += `<option value="${i}" ${selected}>${sem.name} (${sem.startDate} - ${sem.endDate})</option>`;
+            });
 
             view.innerHTML = `
-                <div style="font-size:18px; font-weight:bold; color:var(--primary); margin-bottom:15px;">${s.name}</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-                    <div class="prog-stat-box"><div class="prog-stat-val">${semPages}</div><div class="prog-stat-lbl">ސެމިސްޓަރ ޞަފްޙާ</div></div>
-                    <div class="prog-stat-box"><div class="prog-stat-val">${semJuz}</div><div class="prog-stat-lbl">ސެމިސްޓަރ ޖުޒުއު</div></div>
-                    <div class="prog-stat-box"><div class="prog-stat-val">${grandTotal}</div><div class="prog-stat-lbl">ޖުމްލަ ޙިފްޡް</div></div>
+                <div style="font-size:20px; font-weight:bold; color:var(--primary); margin-bottom:5px;">${s.name}</div>
+                <div style="font-size:12px; color:#777; margin-bottom:20px;">${classesData[cIdx].name}</div>
+
+                <!-- Semester Filter -->
+                <div style="background:#fffcf2; padding:10px; border:1px solid #fae5d3; border-radius:8px; margin-bottom:20px;">
+                    <label style="font-size:13px; font-weight:bold; display:block; margin-bottom:5px;">ސެމިސްޓަރ ޚިޔާރުކުރައްވާ:</label>
+                    <select id="progStatFilter" class="form-input" style="margin-bottom:0;" onchange="window.updateDetailedStats(${cIdx}, ${sIdx})">
+                        ${semesterOptions}
+                    </select>
                 </div>
-                ${passedHtml}
+
+                <!-- Stats Display Area -->
+                <div id="progStatsContainer" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
+                    <!-- Content injected by JS -->
+                </div>
+
+                <!-- Past/Manual Juz Entry Form -->
+                <div style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
+                    <button class="big-btn btn-orange" style="font-size:14px; padding:8px 15px; width:auto;" onclick="document.getElementById('manualJuzForm').classList.toggle('hidden')">➕ ކުރީގެ ޖުޒުއު ރެކޯޑެއް އިތުރުކުރަން</button>
+                    
+                    <div id="manualJuzForm" class="hidden" style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:10px; border:1px solid #ddd;">
+                        <h5 style="margin:0 0 10px 0; color:var(--primary);">ކުރީގެ ސެމިސްޓަރ ޖުޒުއު އެންޓަރކުރުން</h5>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div><label style="font-size:12px;">ޖުޒުއު</label><select id="manualJuzNo" class="form-input" style="padding:5px;">${Array.from({length:30},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}</select></div>
+                            <div><label style="font-size:12px;">ތާރީޚް</label><input type="date" id="manualJuzDate" class="form-input" style="padding:5px;"></div>
+                            <div><label style="font-size:12px;">ނަތީޖާ (%)</label><input type="number" id="manualJuzScore" class="form-input" placeholder="80" style="padding:5px;"></div>
+                        </div>
+                        <button class="btn-primary" style="margin-top:10px; padding:8px;" onclick="window.saveManualJuz(${cIdx}, ${sIdx})">ސޭވް ކުރޭ</button>
+                    </div>
+                </div>
             `;
             view.style.display = 'block';
+            
+            // Initial Load of Stats
+            window.updateDetailedStats(cIdx, sIdx);
         }
+
+        // 2. Logic to Calculate & Update Stats based on Filter
+        window.updateDetailedStats = (cIdx, sIdx) => {
+            const s = classesData[cIdx].students[sIdx];
+            const filterVal = document.getElementById('progStatFilter').value;
+            const container = document.getElementById('progStatsContainer');
+
+            let startDate = null, endDate = null;
+            let filterName = "All Time";
+
+            // Determine Date Range
+            if(filterVal !== "all" && semesters[filterVal]) {
+                startDate = new Date(semesters[filterVal].startDate);
+                endDate = new Date(semesters[filterVal].endDate);
+                // Adjust end date to include the full day
+                endDate.setHours(23, 59, 59, 999);
+                filterName = semesters[filterVal].name;
+            }
+
+            // Calculations
+            let statsPages = 0;
+            let statsNewJuz = 0;
+            let passedJuzSet = new Set(); // For unique Juzs in this period
+            let allTimePassedJuz = new Set();
+
+            if(s.history) {
+                s.history.forEach(h => {
+                    const recDate = new Date(h.date);
+                    const score = parseFloat(h.score || 0);
+
+                    // All Time Logic (To show cumulative completed juz)
+                    if(h.type === 'juz_exam' && score >= 60) {
+                        // Check if it's a full juz exam (completed)
+                        if(h.status !== 'partial') allTimePassedJuz.add(h.juz);
+                    }
+
+                    // Filtering Logic
+                    let inRange = true;
+                    if(startDate && endDate) {
+                        if(recDate < startDate || recDate > endDate) inRange = false;
+                    }
+
+                    if(inRange) {
+                        if(h.type === 'new_lesson') {
+                            statsPages++;
+                        } else if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
+                            statsNewJuz++;
+                            passedJuzSet.add(h.juz);
+                        }
+                    }
+                });
+            }
+
+            // Determine what to show in the 3rd box
+            // If filtering by Semester -> Show Total Juz COMPLETED in that semester
+            // If filtering by All Time -> Show GRAND TOTAL Juz memorized
+            
+            let box3Title = (filterVal === 'all') ? "ޖުމްލަ ޙިފްޡް" : "މި ސެމިސްޓަރ ޖުޒުއު";
+            let box3Val = (filterVal === 'all') ? (parseFloat(s.juzCount || 0) + allTimePassedJuz.size) : statsNewJuz;
+
+            // Generate Badge HTML for passed Juzs in the selected period
+            let badgeHtml = '';
+            let badgesToShow = (filterVal === 'all') ? Array.from(allTimePassedJuz) : Array.from(passedJuzSet);
+            
+            if(badgesToShow.length > 0) {
+                let badges = badgesToShow.sort((a,b)=>a-b).map(j => `<span class="passed-badge">ޖުޒުއު ${j}</span>`).join('');
+                badgeHtml = `<div style="grid-column:span 3; margin-top:15px; border-top:1px solid #eee; padding-top:15px; text-align:center;">
+                    <div class="prog-stat-lbl" style="font-weight:bold; margin-bottom:5px;">މި މުއްދަތުގައި ފާސްވި ޖުޒުއުތައް</div>
+                    <div class="passed-juz-list">${badges}</div>
+                </div>`;
+            } else {
+                badgeHtml = `<div style="grid-column:span 3; margin-top:10px; text-align:center; font-size:12px; color:#ccc;">މި މުއްދަތުގައި އިތުރު ޖުޒުއެއް ނެތް</div>`;
+            }
+
+            container.innerHTML = `
+                <div class="prog-stat-box"><div class="prog-stat-val">${statsPages}</div><div class="prog-stat-lbl">ޞަފްޙާ (މުއްދަތުގައި)</div></div>
+                <div class="prog-stat-box"><div class="prog-stat-val" style="color:#e67e22">${statsNewJuz}</div><div class="prog-stat-lbl">ޖުޒުއު (މުއްދަތުގައި)</div></div>
+                <div class="prog-stat-box"><div class="prog-stat-val" style="color:#27ae60">${box3Val}</div><div class="prog-stat-lbl">${box3Title}</div></div>
+                ${badgeHtml}
+            `;
+        }
+
+        // 3. Save Manual/Past Juz Record
+        window.saveManualJuz = (cIdx, sIdx) => {
+            const juz = parseInt(document.getElementById('manualJuzNo').value);
+            const dateStr = document.getElementById('manualJuzDate').value;
+            const score = parseFloat(document.getElementById('manualJuzScore').value);
+
+            if(!dateStr || isNaN(score)) return alert("ތާރީޚް އަދި ނަތީޖާ ފުރިހަމަކުރައްވާ");
+
+            const s = classesData[cIdx].students[sIdx];
+            if(!s.history) s.history = [];
+
+            // Add the record. Because the date is custom, the filter logic will automatically
+            // assign it to the correct semester (or archive it if the date is old).
+            s.history.push({
+                type: 'juz_exam',
+                status: 'completed', // Assumed completed for manual entry
+                juz: juz,
+                date: dateStr, // Uses the manually entered date (YYYY-MM-DD)
+                score: score,
+                duration: "Manual Entry",
+                details: { manual: true },
+                isManual: true
+            });
+
+            updateFirebase();
+            alert("ރެކޯޑް އިތުރުކުރެވިއްޖެ! ޕްރޮގްރެސް އަޕްޑޭޓް ވަނީ...");
+            
+            // Hide form and refresh stats
+            document.getElementById('manualJuzForm').classList.add('hidden');
+            document.getElementById('manualJuzDate').value = '';
+            document.getElementById('manualJuzScore').value = '';
+            window.updateDetailedStats(cIdx, sIdx);
+        }
+        // --- UPDATED PROGRESS LOGIC ENDS HERE ---
 
         window.calculateStudentProgress = (student) => { if(!semesters.length) return; const latestSem = semesters[semesters.length - 1], start = new Date(latestSem.startDate), end = new Date(latestSem.endDate); const validRecs = (student.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end); document.getElementById('studentSemPages').innerText = validRecs.length; let semJuz = 0; if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; }); document.getElementById('studentSemJuz').innerText = semJuz; let totalJuz = parseFloat(student.juzCount || 0); let passedExams = new Set(); if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); }); document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size; }
 
