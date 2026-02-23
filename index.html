@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (V44-Mobile Toggle & Manual Override)</title>
+    <title>إتقان - Hifz Program (V45-Exam Details, PDF Slip & Progress)</title>
     
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
@@ -109,16 +111,21 @@
         .hist-detail-pg { font-size:16px; font-weight:bold; background:var(--accent); color:white; padding:3px 10px; border-radius:15px; margin-right:10px;}
         .hist-badge-external { background: #8e44ad; color: white; padding: 5px 15px; border-radius: 20px; font-size: 13px; text-align: center; margin-bottom: 15px; font-weight:bold;}
 
+        .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hist-item { text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #f0f0f0; }
+        .hist-label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 2px; }
+        .hist-val { font-size: 16px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
+
         .hist-footer { padding: 15px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 20px; font-weight: bold; color: var(--accent); position: relative; }
-        .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; }
+        .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;}
         .hist-card.type-new_lesson { border-right: 5px solid var(--accent); }
         .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
         .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
         .btn-edit-hist, .btn-delete-hist, .btn-action-sm { width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-delete-hist { background: #fee2e2; color: #c0392b; } .btn-edit-hist { background: #e3f2fd; color: #2980b9; }
-        .btn-delete-hist.abs-pos { position:absolute; bottom:10px; left:10px; }
-        .btn-edit-hist.abs-pos { position:absolute; bottom:10px; left:55px; }
+        .btn-delete-hist.abs-pos { position:absolute; top:15px; left:15px; }
+        .btn-edit-hist.abs-pos { position:absolute; top:15px; left:60px; }
 
         .approval-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; border-right: 5px solid #e67e22; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
         .app-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
@@ -167,16 +174,19 @@
         @media (max-width: 900px) {
             .mobile-only-btn { display: inline-flex; }
             .layout-split { flex-direction: column; }
-            
-            /* Default: Form shows, Mushaf hidden */
             .layout-split:not(.show-mushaf-mobile) .sidebar-panel { display: flex; width: 100%; height: calc(100vh - 65px); max-height: none; order: 1; border-bottom: none; }
             .layout-split:not(.show-mushaf-mobile) .main-panel { display: none; }
-            
-            /* Toggled: Form hidden, Mushaf full view */
             .layout-split.show-mushaf-mobile .sidebar-panel { display: none; }
             .layout-split.show-mushaf-mobile .main-panel { display: flex; width: 100%; height: calc(100vh - 65px); order: 1; border-top: none; }
             .mushaf-page { min-height: unset; flex-grow: 1; overflow-y: auto; }
         }
+
+        /* Detailed Progress UI */
+        .prog-stat-box { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px; padding:15px; text-align:center; }
+        .prog-stat-val { font-size:24px; font-weight:bold; color:var(--primary); font-family:var(--font-arabic);}
+        .prog-stat-lbl { font-size:12px; color:#777; margin-top:5px; }
+        .passed-juz-list { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:10px; }
+        .passed-badge { background:#d4efdf; color:#1e8449; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -255,6 +265,18 @@
         <div id="progress-page" class="container hidden">
             <div class="app-header"><div class="header-title">ޕްރޮގްރެސް ރިޕޯޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             
+            <!-- NEW DETAILED PROGRESS SECTION FOR TEACHERS -->
+            <div class="action-card" style="margin-top:20px; background:#f4f6f8; border-top: 5px solid var(--st-primary);">
+                <h4 style="color:var(--primary); margin-bottom:15px;">ދަރިވަރުންގެ ތަފްޞީލީ ޕްރޮގްރެސް</h4>
+                <div style="display:flex; gap:10px; max-width:600px; margin:0 auto;">
+                    <select id="progClassSelect" class="form-input" style="margin-bottom:0;" onchange="window.loadProgStudents()"><option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option></select>
+                    <select id="progStudentSelect" class="form-input" style="margin-bottom:0;" onchange="window.showDetailedProgress()"><option value="">ދަރިވަރު ޚިޔާރުކުރައްވާ</option></select>
+                </div>
+                <div id="detailedProgressView" style="margin-top:20px; text-align:right; display:none; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                    <!-- Content injected via JS -->
+                </div>
+            </div>
+
             <div class="action-card" style="margin-top:20px; border-top: 5px solid var(--accent-rev);">
                 <h4>އާ ސެމިސްޓަރ ހެދުން</h4>
                 <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
@@ -320,7 +342,7 @@
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('long_rev')"><span class="menu-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
-                <div class="menu-btn" onclick="window.openJuzExamSetup()"><span class="menu-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')"><span class="menu-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('final_exam')"><span class="menu-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
             </div>
         </div>
@@ -399,7 +421,7 @@
                     <div class="exam-section" id="mutashabihSection">
                         <button class="big-btn btn-orange" style="padding:10px; font-size:14px;" onclick="window.generateQuestions()">🎲 މުތަޝާބިހް ސުވާލު</button>
                         <div id="questionList" style="margin:10px 0;"></div>
-                        <div style="display:flex; justify-content:space-between;"><label>Q1 <input type="number" id="q1_score" value="2.5" max="2.5" style="width:50px;" onchange="window.calcScore()"></label><label>Q2 <input type="number" id="q2_score" value="2.5" max="2.5" style="width:50px;" onchange="window.calcScore()"></label></div>
+                        <div style="display:flex; justify-content:space-between;"><label>Q1 <input type="number" id="q1_score" value="2.5" max="2.5" step="0.5" style="width:50px;" onchange="window.calcScore()"></label><label>Q2 <input type="number" id="q2_score" value="2.5" max="2.5" step="0.5" style="width:50px;" onchange="window.calcScore()"></label></div>
                     </div>
                     <div style="padding:20px;"><button id="saveExamBtn" class="big-btn" onclick="window.saveJuzExamPart()">💾 ސޭވް</button></div>
                 </div>
@@ -508,66 +530,36 @@
         </div>
     </div>
 
-    <!-- BULK ENTRY MODAL (MANUAL OVERRIDE CAPABLE) -->
     <div id="bulkEntryModal" class="modal">
         <div class="modal-content" style="position:relative;">
             <div id="bulkApiLoader" class="api-loader"><span>މަޢުލޫމާތު ހޯދަނީ... ⏳</span></div>
             <h3 style="color:var(--primary); text-align:center;">ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</h3>
-            
             <div style="border-bottom:2px solid #eee; margin-bottom:15px; padding-bottom:10px;">
                 <label class="form-label" style="color:var(--accent);">ކުރީ ސެމިސްޓަރގައި ކިޔެވި ޖުޒުއު އަދަދު</label>
                 <input type="number" id="prevSemJuz" class="form-input" placeholder="މިސާލު: 2" style="margin-bottom:0;">
             </div>
-            
             <p style="text-align:center; color:#777; font-size:13px; margin-top:10px;">މި ސެމިސްޓަރގައި ކިޔަވައިދެވުނު ބައިތައް</p>
             <div id="bulkEntriesList" style="max-height:40vh; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
-            
             <button class="big-btn btn-orange" style="width:100%; font-size:14px;" onclick="window.addBulkRow()">+ އިތުރު ރެކޯޑެއް</button>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="big-btn" onclick="window.saveBulkData()">ފޮނުވާ</button>
-                <button class="big-btn btn-red" onclick="document.getElementById('bulkEntryModal').style.display='none'">ކެންސަލް</button>
-            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;"><button class="big-btn" onclick="window.saveBulkData()">ފޮނުވާ</button><button class="big-btn btn-red" onclick="document.getElementById('bulkEntryModal').style.display='none'">ކެންސަލް</button></div>
         </div>
     </div>
 
-    <!-- EXTERNAL RECITATION MODAL (MANUAL OVERRIDE CAPABLE) -->
     <div id="externalRecModal" class="modal">
         <div class="modal-content" style="position:relative;">
             <div id="extApiLoader" class="api-loader"><span>މަޢުލޫމާތު ހޯދަނީ... ⏳</span></div>
             <h3 style="color:#8e44ad; text-align:center;">އެހެން ފަރާތަކަށް ކިޔައިދިނުން</h3>
             <p style="text-align:center; color:#777; font-size:13px; margin-bottom:15px;">ގޭގައި ނުވަތަ އެހެން ފަރާތަކަށް ފިލާވަޅު ކިޔައިދިންކަމުގެ މަޢުލޫމާތު</p>
-            
             <div class="form-grid ext-form-container">
                 <div class="full-span"><label class="form-label">ކިޔައިދިން ފަރާތުގެ ނަން</label><input type="text" id="extPerson" class="form-input" placeholder="މިސާލު: މަންމަ / އުސްތާޛް ޢަލީ"></div>
                 <div><label class="form-label">ތާރީޚް</label><input type="date" id="extDate" class="form-input"></div>
                 <div><label class="form-label">ބާވަތް</label><select id="extType" class="form-input"><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select></div>
-                
-                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;">
-                    <label class="form-label">ފެށޭ ޞަފްޙާ</label>
-                    <input type="number" id="extStartPage" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')">
-                    <div style="display:flex; gap:5px;">
-                        <select class="form-input start-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select>
-                        <select class="form-input start-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select>
-                    </div>
-                </div>
-                
-                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;">
-                    <label class="form-label">ނިމޭ ޞަފްޙާ</label>
-                    <input type="number" id="extEndPage" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')">
-                    <div style="display:flex; gap:5px;">
-                        <select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select>
-                        <select class="form-input end-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select>
-                    </div>
-                </div>
+                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;"><label class="form-label">ފެށޭ ޞަފްޙާ</label><input type="number" id="extStartPage" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"><div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select></div></div>
+                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;"><label class="form-label">ނިމޭ ޞަފްޙާ</label><input type="number" id="extEndPage" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"><div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select></div></div>
             </div>
-            
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="big-btn" style="background:#8e44ad;" onclick="window.saveExternalRecitation()">ފޮނުވާ</button>
-                <button class="big-btn btn-red" onclick="document.getElementById('externalRecModal').style.display='none'">ކެންސަލް</button>
-            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;"><button class="big-btn" style="background:#8e44ad;" onclick="window.saveExternalRecitation()">ފޮނުވާ</button><button class="big-btn btn-red" onclick="document.getElementById('externalRecModal').style.display='none'">ކެންސަލް</button></div>
         </div>
     </div>
-
 
     <!-- FIREBASE & LOGIC -->
     <script type="module">
@@ -597,7 +589,7 @@
 
             if(!document.getElementById('management-page').classList.contains('hidden')) window.renderManageClassList();
             if(!document.getElementById('teacher-mgmt-page').classList.contains('hidden')) window.renderTeacherList();
-            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); }
+            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); if(document.getElementById('progClassSelect').value) window.loadProgStudents(true); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
             
             if(currentUserType === 'student' && currentStudentObj) {
@@ -608,14 +600,9 @@
         });
 
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
+        window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
 
-        // TOGGLE MOBILE MUSHAF
-        window.toggleMobileMushaf = (layoutId, show) => {
-            const layout = document.getElementById(layoutId);
-            if(layout) layout.classList.toggle('show-mushaf-mobile', show);
-        };
-
-        // LOGIN LOGIC
+        // LOGIN
         window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
         window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(!user.password) { pendingUserIndex = uIdx; currentUserType = 'teacher'; document.getElementById('passModalUserText').innerText = `މުދައްރިސް: ${user.name}`; document.getElementById('createPassModal').style.display = 'flex'; return; } if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
         window.handleStudentLoginStep = () => { const id = document.getElementById('stuIdInput').value.trim(); if(!id) return alert("ID Required"); let found = null, cIdx = -1, sIdx = -1; classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } })); if(!found) return alert("Not Found"); currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found; if(!found.password) { currentUserType = 'student'; document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`; document.getElementById('createPassModal').style.display = 'flex'; } else { const passField = document.getElementById('stuPassField'); if(passField.classList.contains('hidden')) passField.classList.remove('hidden'); else { if(document.getElementById('stuPassInput').value === found.password) window.loginSuccessStudent(); else alert("Wrong Password"); } } };
@@ -624,7 +611,7 @@
         window.loginSuccessStudent = () => { currentUserType = 'student'; document.body.classList.add('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('studentDashName').innerText = currentStudentObj.name; window.calculateStudentProgress(currentStudentObj); window.openPage('student-dashboard'); };
         window.logout = () => location.reload();
         
-        window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); ['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.renderSemesterList(); window.renderPendingApprovals(); } } };
+        window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); ['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); } } };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
 
         // TEACHER & CLASS MGMT
@@ -640,159 +627,99 @@
         window.downloadTemplate = () => { const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet([["Name", "ID", "Module", "Level", "Direction", "Juz Count", "Remarks"]]); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, "Student_Template.xlsx"); };
         window.handleExcelUpload = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { const data = new Uint8Array(e.target.result), workbook = XLSX.read(data, {type: 'array'}), jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; jsonData.forEach(row => { const name = row['Name'] || row['Student Name'], id = row['ID'] || row['Student ID']; if(name && id) classesData[currentClassIdx].students.push({name, id, module:row['Module']||'', level:row['Level']||'1', direction:row['Direction']||'top_down', juzCount:row['Juz Count']||'', remarks:row['Remarks']||'', history:[], juzExams:{}, pendingData:[]}); }); updateFirebase(); window.renderStudentList(); alert("Uploaded!"); input.value = ""; }; reader.readAsArrayBuffer(file); };
 
-        // GRADING & CATEGORY
+        // GRADING
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students || []; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
         window.openStudentMenu = (i) => { currentStudentIdx = i; document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; window.openPage('grading-menu-page'); }
-        window.openCategoryPage = (type) => { currentSessionType = type; let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); document.getElementById('catPageTitle').innerText = title; const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; window.renderHistory(s, 'categoryHistoryList', type); document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; window.openPage('category-page'); }
+        
+        window.openCategoryPage = (type) => { 
+            currentSessionType = type; let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
+            document.getElementById('catPageTitle').innerText = title; 
+            const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
+            window.renderHistory(s, 'categoryHistoryList', type); 
+            document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
+            window.openPage('category-page'); 
+        }
         window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup(); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
 
         // PROGRESS
-        window.openProgressPage = () => { window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
+        window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
         window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
+        
+        // TEACHER DETAILED PROGRESS
+        window.populateProgClassSelect = () => {
+            const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>';
+            classesData.forEach((c, i) => sel.add(new Option(c.name, i)));
+        }
+        window.loadProgStudents = (retainSelection=false) => {
+            const cIdx = document.getElementById('progClassSelect').value;
+            const sel = document.getElementById('progStudentSelect'); 
+            let oldVal = sel.value; sel.innerHTML = '<option value="">ދަރިވަރު ޚިޔާރުކުރައްވާ</option>';
+            if(cIdx !== "") {
+                classesData[cIdx].students?.forEach((s, i) => sel.add(new Option(s.name, i)));
+                if(retainSelection && oldVal) { sel.value = oldVal; window.showDetailedProgress(); }
+            } else { document.getElementById('detailedProgressView').style.display = 'none'; }
+        }
+        window.showDetailedProgress = () => {
+            const cIdx = document.getElementById('progClassSelect').value; const sIdx = document.getElementById('progStudentSelect').value;
+            const view = document.getElementById('detailedProgressView');
+            if(cIdx === "" || sIdx === "") { view.style.display = 'none'; return; }
+            
+            const s = classesData[cIdx].students[sIdx];
+            
+            // Calc Semester Stats
+            let semPages = 0, semJuz = 0;
+            if(semesters.length > 0) {
+                const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate), end = new Date(latestSem.endDate);
+                const validRecs = (s.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end);
+                semPages = validRecs.length;
+                if(s.history) s.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; });
+            }
+
+            // Calc Total Stats
+            let totalJuz = parseFloat(s.juzCount || 0); let passedExams = new Set();
+            if(s.history) s.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); });
+            let grandTotal = totalJuz + passedExams.size;
+            
+            let passedHtml = '';
+            if(passedExams.size > 0) {
+                let badges = Array.from(passedExams).sort((a,b)=>a-b).map(j => `<span class="passed-badge">ޖުޒުއު ${j}</span>`).join('');
+                passedHtml = `<div style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;"><div class="prog-stat-lbl" style="font-weight:bold;">ފާސްވެފައިވާ ޖުޒުއުތައް</div><div class="passed-juz-list">${badges}</div></div>`;
+            }
+
+            view.innerHTML = `
+                <div style="font-size:18px; font-weight:bold; color:var(--primary); margin-bottom:15px;">${s.name}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                    <div class="prog-stat-box"><div class="prog-stat-val">${semPages}</div><div class="prog-stat-lbl">ސެމިސްޓަރ ޞަފްޙާ</div></div>
+                    <div class="prog-stat-box"><div class="prog-stat-val">${semJuz}</div><div class="prog-stat-lbl">ސެމިސްޓަރ ޖުޒުއު</div></div>
+                    <div class="prog-stat-box"><div class="prog-stat-val">${grandTotal}</div><div class="prog-stat-lbl">ޖުމްލަ ޙިފްޡް</div></div>
+                </div>
+                ${passedHtml}
+            `;
+            view.style.display = 'block';
+        }
+
         window.calculateStudentProgress = (student) => { if(!semesters.length) return; const latestSem = semesters[semesters.length - 1], start = new Date(latestSem.startDate), end = new Date(latestSem.endDate); const validRecs = (student.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end); document.getElementById('studentSemPages').innerText = validRecs.length; let semJuz = 0; if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; }); document.getElementById('studentSemJuz').innerText = semJuz; let totalJuz = parseFloat(student.juzCount || 0); let passedExams = new Set(); if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); }); document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size; }
 
-        // --- DYNAMIC SELECT HELPERS ---
-        window.populateSurahsForElement = (container) => {
-            const selects = container.querySelectorAll('.start-surah-sel, .end-surah-sel');
-            selects.forEach(sel => {
-                sel.innerHTML = '';
-                SURAH_NAMES_AR.forEach((n,i) => sel.add(new Option(n, i+1)));
-                window.updateLocalAyahOptions(sel, sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel');
-            });
-        };
-        window.updateLocalAyahOptions = (surahSelect, targetClass) => {
-            const container = surahSelect.parentElement;
-            const targetSelect = container.querySelector('.' + targetClass);
-            if(!targetSelect) return;
-            const surahIdx = parseInt(surahSelect.value) - 1;
-            targetSelect.innerHTML = '';
-            for(let i=1; i<=AYAH_COUNTS[surahIdx]; i++) targetSelect.add(new Option(i, i));
-        };
+        // DYNAMIC SELECT HELPERS
+        window.populateSurahsForElement = (container) => { const selects = container.querySelectorAll('.start-surah-sel, .end-surah-sel'); selects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n,i) => sel.add(new Option(n, i+1))); window.updateLocalAyahOptions(sel, sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'); }); };
+        window.updateLocalAyahOptions = (surahSelect, targetClass) => { const container = surahSelect.parentElement; const targetSelect = container.querySelector('.' + targetClass); if(!targetSelect) return; const surahIdx = parseInt(surahSelect.value) - 1; targetSelect.innerHTML = ''; for(let i=1; i<=AYAH_COUNTS[surahIdx]; i++) targetSelect.add(new Option(i, i)); };
+        window.fetchPageDetailsForInput = async (pageInput, prefix) => { const page = parseInt(pageInput.value); if(!page || page < 1 || page > 604) return; const container = pageInput.parentElement; if(prefix === 'end') { const startInp = container.parentElement.querySelector('.p-start'); if(startInp && startInp.value && parseInt(page) < parseInt(startInp.value)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); pageInput.value = startInp.value; return window.fetchPageDetailsForInput(pageInput, 'end'); } } if(prefix === 'start') { const endInp = container.parentElement.querySelector('.p-end'); if(endInp && endInp.value && parseInt(endInp.value) < parseInt(page)) { alert("ފެށޭ ޞަފްޙާ ނިމޭ ޞަފްޙާއަށްވުރެ ބޮޑު ނުކުރެވޭނެއެވެ."); pageInput.value = endInp.value; return window.fetchPageDetailsForInput(pageInput, 'start'); } } try { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); if(data.code === 200 && data.data.ayahs.length > 0) { const targetAyah = prefix === 'start' ? data.data.ayahs[0] : data.data.ayahs[data.data.ayahs.length-1]; const surahSel = container.querySelector(`.${prefix}-surah-sel`); const ayahSel = container.querySelector(`.${prefix}-ayah-sel`); if(surahSel && ayahSel) { surahSel.value = targetAyah.surah.number; window.updateLocalAyahOptions(surahSel, `${prefix}-ayah-sel`); ayahSel.value = targetAyah.numberInSurah; } } } catch(e) {} }
 
-        window.fetchPageDetailsForInput = async (pageInput, prefix) => {
-            const page = parseInt(pageInput.value);
-            if(!page || page < 1 || page > 604) return;
-            const container = pageInput.parentElement;
-            
-            if(prefix === 'end') {
-                const startInp = container.parentElement.querySelector('.p-start');
-                if(startInp && startInp.value && parseInt(page) < parseInt(startInp.value)) {
-                    alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ.");
-                    pageInput.value = startInp.value; 
-                    return window.fetchPageDetailsForInput(pageInput, 'end');
-                }
-            }
-            if(prefix === 'start') {
-                const endInp = container.parentElement.querySelector('.p-end');
-                if(endInp && endInp.value && parseInt(endInp.value) < parseInt(page)) {
-                    alert("ފެށޭ ޞަފްޙާ ނިމޭ ޞަފްޙާއަށްވުރެ ބޮޑު ނުކުރެވޭނެއެވެ.");
-                    pageInput.value = endInp.value; 
-                    return window.fetchPageDetailsForInput(pageInput, 'start');
-                }
-            }
-
-            try {
-                const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
-                const data = await res.json();
-                if(data.code === 200 && data.data.ayahs.length > 0) {
-                    const targetAyah = prefix === 'start' ? data.data.ayahs[0] : data.data.ayahs[data.data.ayahs.length-1];
-                    const surahSel = container.querySelector(`.${prefix}-surah-sel`);
-                    const ayahSel = container.querySelector(`.${prefix}-ayah-sel`);
-                    if(surahSel && ayahSel) {
-                        surahSel.value = targetAyah.surah.number;
-                        window.updateLocalAyahOptions(surahSel, `${prefix}-ayah-sel`);
-                        ayahSel.value = targetAyah.numberInSurah;
-                    }
-                }
-            } catch(e) {}
-        }
-
-        // --- BULK ENTRY & EXTERNAL ---
+        // BULK & EXTERNAL
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; document.getElementById('prevSemJuz').value = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
-        window.addBulkRow = () => {
-            const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px';
-            div.innerHTML = `
-                <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;">
-                <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select>
-                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;">
-                    <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label>
-                    <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')">
-                    <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div>
-                </div>
-                <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;">
-                    <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label>
-                    <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')">
-                    <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div>
-                </div>
-            `;
-            document.getElementById('bulkEntriesList').appendChild(div);
-            window.populateSurahsForElement(div);
-        }
-        window.saveBulkData = async () => {
-            const rows = document.querySelectorAll('#bulkEntriesList .b-row');
-            const prevJuz = document.getElementById('prevSemJuz').value;
-            let pendingEntries = [];
-            if(prevJuz) pendingEntries.push({ type: 'juz_update', value: prevJuz, date: new Date().toLocaleDateString() });
-
-            for (let row of rows) {
-                const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value;
-                const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value;
-                const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value;
-                const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value;
-                
-                if(date && startP && endP) {
-                    if(sSurahIdx < 0 || eSurahIdx < 0) { alert("މަޢުލޫމާތު ލޯޑުވަނީ، މަޑުކޮށްލައްވާ"); return; }
-                    if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; }
-                    pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx], ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx], ayah: eAyah } });
-                }
-            }
-            if(pendingEntries.length > 0) {
-                classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } });
-                updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none';
-            }
-        }
-
-        window.openExternalRecModal = () => {
-            document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date();
-            document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = '';
-            window.populateSurahsForElement(document.querySelector('.ext-form-container'));
-            document.getElementById('externalRecModal').style.display='flex';
-        }
-        window.saveExternalRecitation = () => {
-            const container = document.querySelector('.ext-form-container');
-            const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value;
-            const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value;
-            
-            if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ");
-            
-            const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value;
-            const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value;
-            if(sSurahIdx < 0 || eSurahIdx < 0) return alert("މަޢުލޫމާތު ލޯޑުވަނީ، މަޑުކޮށްލައްވާ");
-            if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި");
-
-            const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx], ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx], ayah: eAyah } };
-            classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(entry); } });
-            updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none';
-        }
+        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
+        window.saveBulkData = async () => { const rows = document.querySelectorAll('#bulkEntriesList .b-row'); const prevJuz = document.getElementById('prevSemJuz').value; let pendingEntries = []; if(prevJuz) pendingEntries.push({ type: 'juz_update', value: prevJuz, date: new Date().toLocaleDateString() }); for (let row of rows) { const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; if(date && startP && endP) { if(sSurahIdx < 0 || eSurahIdx < 0) { alert("މަޢުލޫމާތު ލޯޑުވަނީ، މަޑުކޮށްލައްވާ"); return; } if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx], ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx], ayah: eAyah } }); } } if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } }
+        window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
+        window.saveExternalRecitation = () => { const container = document.querySelector('.ext-form-container'); const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value; const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value; if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ"); const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value; const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value; if(sSurahIdx < 0 || eSurahIdx < 0) return alert("މަޢުލޫމާތު ލޯޑުވަނީ، މަޑުކޮށްލައްވާ"); if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx], ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx], ayah: eAyah } }; classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(entry); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none'; }
 
         // TEACHER APPROVAL
-        window.renderPendingApprovals = () => {
-            const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false;
-            classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => {
-                hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : "ދިގު މުރާޖަޢާ");
-                let detailsHtml = "";
-                if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`;
-                else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; }
-                list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"><button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button><button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`;
-            }); } }); });
-            if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>';
-        }
-        window.approveEntry = async (cIdx, sIdx, pIdx) => { const student = classesData[cIdx].students[sIdx]; const entry = student.pendingData[pIdx]; if(entry.type === 'juz_update') student.juzCount = entry.value; else { student.history.push({ type: entry.type, date: entry.date, page: entry.page, endPage: entry.endPage, startDetails: entry.startDetails, endDetails: entry.endDetails, mistakesCount: 0, mistakeDetails: [], recitedTo: entry.recitedTo || null }); } student.pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
+        window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : "ދިގު މުރާޖަޢާ"); let detailsHtml = ""; if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`; else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; } list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"><button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button><button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
+        window.approveEntry = async (cIdx, sIdx, pIdx) => { const student = classesData[cIdx].students[sIdx]; const entry = student.pendingData[pIdx]; if(entry.type === 'juz_update') student.juzCount = entry.value; else { if(!student.history) student.history = []; student.history.push({ type: entry.type, date: entry.date, page: entry.page, endPage: entry.endPage, startDetails: entry.startDetails, endDetails: entry.endDetails, mistakesCount: 0, mistakeDetails: [], recitedTo: entry.recitedTo || null }); } student.pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
         window.rejectEntry = (cIdx, sIdx, pIdx) => { classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
 
-        // HISTORY
+        // HISTORY & SLIP DOWNLOAD
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); list.innerHTML = ''; if(!student.history) student.history = [];
             const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
@@ -800,7 +727,30 @@
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec); let html = '';
                 let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist abs-pos" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist abs-pos" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
-                if(rec.type === 'juz_exam') { let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>'; html = `<div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'><div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div><div class="hist-body"><div class="hist-grid"><div class="hist-item"><span class="hist-label">ތާރީޚް</span><span class="hist-val">${rec.date}</span></div><div class="hist-item"><span class="hist-label">ވަގުތު</span><span class="hist-val">${rec.duration}</span></div><div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0}</span></div><div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val">${rec.details?.selfMistakes||0}</span></div></div></div><div class="hist-footer exam-score">${rec.score}%</div>${deleteBtn}</div>`; } 
+                
+                if(rec.type === 'juz_exam') { 
+                    let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending" style="background:#f1c40f;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete" style="background:#2ecc71;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފުރިހަމަ</span>'; 
+                    let dlBtn = `<button style="background:none; border:none; cursor:pointer; font-size:20px; title="Download Slip" onclick="event.stopPropagation(); window.downloadExamSlip('${encodeURIComponent(student.name)}', '${encodeURIComponent(JSON.stringify(rec))}')">📥</button>`;
+                    html = `
+                        <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
+                            <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
+                            <div class="hist-body">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                                    <div><span style="font-size:12px;color:#777;display:block;">ތާރީޚް</span><b>${rec.date}</b></div>
+                                    <div style="text-align:left;"><span style="font-size:12px;color:#777;display:block;">ވަގުތު</span><b>${rec.duration}</b></div>
+                                </div>
+                                <div class="hist-grid" style="grid-template-columns: 1fr 1fr;">
+                                    <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0} <span style="font-size:12px;">(-${(rec.details?.teacherMistakes||0)*2})</span></span></div>
+                                    <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val" style="color:#e67e22">${rec.details?.selfMistakes||0} <span style="font-size:12px;">(-${(rec.details?.selfMistakes||0)*1})</span></span></div>
+                                    <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details?.tajweed||10} / 10</span></div>
+                                    <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details?.fluency||5} / 5</span></div>
+                                    <div class="hist-item" style="grid-column: span 2;"><span class="hist-label">މުތަޝާބިހް ސުވާލު</span><span class="hist-val">${rec.details?.mutashabihMarks||0} / 5</span></div>
+                                </div>
+                            </div>
+                            <div class="hist-footer exam-score"><span>ނަތީޖާ: ${rec.score}%</span> ${dlBtn}</div>
+                            ${deleteBtn}
+                        </div>`; 
+                } 
                 else if(rec.type === 'final_exam') { html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-footer">${rec.score}%</div>${deleteBtn}</div>`; } 
                 else { const sInfo = rec.startDetails ? `سورة ${rec.startDetails.surah}، آية ${rec.startDetails.ayah}` : '-'; const eInfo = rec.endDetails ? `سورة ${rec.endDetails.surah}، آية ${rec.endDetails.ayah}` : '-'; const extBadge = rec.recitedTo ? `<div class="hist-badge-external">👤 ކިޔައިދިނީ: ${rec.recitedTo}</div>` : ''; html = `<div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'><div class="hist-header"><span class="hist-title">Page ${rec.page} - ${rec.endPage||rec.page}</span><span class="hist-date">${rec.date}</span></div><div class="hist-body">${extBadge}<div class="hist-detail-row"><span class="hist-detail-lbl">ފެށުނީ</span><span class="hist-detail-val">${sInfo}</span><span class="hist-detail-pg">ޞ ${rec.page}</span></div><div class="hist-detail-row"><span class="hist-detail-lbl">ނިމުނީ</span><span class="hist-detail-val">${eInfo}</span><span class="hist-detail-pg">ޞ ${rec.endPage || rec.page}</span></div></div><div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount||0}</div>${deleteBtn} ${editBtn}</div>`; }
                 list.innerHTML += html;
@@ -809,43 +759,57 @@
         window.deleteHistoryRecord = (index) => { if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) { const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(index, 1); updateFirebase(); window.renderHistory(s, currentUserType==='student'?'studentDashHistory':'categoryHistoryList', currentSessionType); } }
         window.editRecord = (index, type) => { const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; const rec = student.history[index]; isViewMode = false; editingRecordIndex = index; if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') { currentMistakes = rec.mistakeDetails || []; currentSessionType = rec.type; document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true).then(() => { document.getElementById('endPage').value = rec.endPage; document.getElementById('startSurah').value = SURAH_NAMES_AR.indexOf(rec.startDetails.surah) + 1; document.getElementById('endSurah').value = SURAH_NAMES_AR.indexOf(rec.endDetails.surah) + 1; window.updateAyahOptions('startAyah', SURAH_NAMES_AR.indexOf(rec.startDetails.surah), rec.startDetails.ayah); window.updateAyahOptions('endAyah', SURAH_NAMES_AR.indexOf(rec.endDetails.surah), rec.endDetails.ayah); }); document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); } }
 
-        // RECORDER (UPDATED NAVIGATION & SYNC)
+        window.downloadExamSlip = (encName, encRec) => {
+            const name = decodeURIComponent(encName);
+            const rec = JSON.parse(decodeURIComponent(encRec));
+            
+            const slip = document.createElement('div');
+            slip.style.cssText = "width:600px; padding:30px; background:white; font-family:'MV Waheed', sans-serif; direction:rtl; text-align:right; color:#333;";
+            slip.innerHTML = `
+                <div style="text-align:center; border-bottom:3px solid #2c3e50; padding-bottom:15px; margin-bottom:20px;">
+                    <h1 style="margin:0; color:#2c3e50; font-size:32px;">إتقان - ޙިފްޡް ޕްރޮގްރާމް</h1>
+                    <h2 style="margin:5px 0 0 0; color:#27ae60; font-size:24px;">ޖުޒުއު އިމްތިޙާން ރިޕޯޓް</h2>
+                </div>
+                <div style="font-size:20px; margin-bottom:10px;"><strong>ދަރިވަރު:</strong> ${name}</div>
+                <div style="font-size:20px; margin-bottom:20px;"><strong>ޖުޒުއު:</strong> ${rec.juz} (${rec.status === 'partial' ? 'ފަހުބައި ނުނިމޭ' : 'ފުރިހަމަ'})</div>
+                
+                <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:18px;">
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9; width:60%;">ތާރީޚް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.date}</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ހޭދަވި ވަގުތު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.duration}</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުދައްރިސް ކުށް (ކޮންމެ ކުށަކަށް -2)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.teacherMistakes||0}</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (ކޮންމެ ކުށަކަށް -1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr>
+                </table>
+                <div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;">
+                    <span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span>
+                    <span style="font-size:32px; font-weight:bold; color:#27ae60; margin-right:15px;">${rec.score}%</span>
+                </div>
+            `;
+            
+            document.body.appendChild(slip);
+            html2pdf().set({
+                margin: 10, filename: `Juz_${rec.juz}_Slip_${name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(slip).save().then(() => { document.body.removeChild(slip); });
+        };
+
+        // RECORDER
         window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>'; populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
         window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null); else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType); };
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
         window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
-
-        window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => {
-            const page = currentRecViewPage; if(!page) return;
-            const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json();
-            window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
-            
-            if(!isViewMode && data.data.ayahs.length > 0) {
-                // Initial Load for New Record
-                if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) {
-                    document.getElementById('endPage').value = page; 
-                    const first = data.data.ayahs[0]; populateSurahSelects(); 
-                    document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah);
-                    const last = data.data.ayahs[data.data.ayahs.length-1];
-                    document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
-                } 
-                // Navigation specific Sync
-                else if(isNavigating) {
-                    document.getElementById('endPage').value = page;
-                    const last = data.data.ayahs[data.data.ayahs.length-1];
-                    document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah);
-                }
-            }
-        };
-        
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p>0 && p<=604) { currentRecViewPage = p; window.loadSmartPage(false, true); } } // Pass true for navigation flag
+        window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => { const page = currentRecViewPage; if(!page) return; const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); if(!isViewMode && data.data.ayahs.length > 0) { if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; populateSurahSelects(); document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1, first.numberInSurah); const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah); } else if(isNavigating) { document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1, last.numberInSurah); } } };
+        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p>0 && p<=604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
         window.renderMushafText = (ayahs, target, highlights, isExam) => { let html = ''; const f = ayahs[0]; const juzTarget = isExam ? 'mushafJuzInfo' : 'recMushafJuz'; const surahTarget = isExam ? 'mushafSurahInfo' : 'recMushafSurah'; if(document.getElementById(juzTarget)) document.getElementById(juzTarget).innerText = `Juz ${f.juz}`; if(document.getElementById(surahTarget)) document.getElementById(surahTarget).innerText = `سورة ${f.surah.name}`; ayahs.forEach(a => { const words = a.text.split(' '); words.forEach((w, i) => { const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`; let cls = highlights.includes(id) ? 'word mistake' : 'word'; let fn = isExam ? `window.clickExamWord('${id}')` : `window.clickRecWord('${id}')`; html += `<span id="${id}" class="${cls}" onclick="${fn}">${w}</span> `; }); html += `<span class="ayah-marker">(${a.numberInSurah})</span> `; }); document.getElementById(target).innerHTML = html; };
         window.clickRecWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x=>x!==id); } else { el.classList.add('mistake'); currentMistakes.push(id); } document.getElementById('mistakeCountDisplay').innerText = currentMistakes.length; };
-        
         window.saveRecord = () => { const startP = document.getElementById('startPage').value; const endP = document.getElementById('endPage').value; if(parseInt(endP) < parseInt(startP)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); return; } const s = classesData[currentClassIdx].students[currentStudentIdx]; if(!s.history) s.history = []; const ssIdx = document.getElementById('startSurah').selectedIndex; const esIdx = document.getElementById('endSurah').selectedIndex; const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value }; const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value }; const record = { type: currentSessionType, date: document.getElementById('recDate').value, page: startP, endPage: endP, startDetails: startObj, endDetails: endObj, mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes }; if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); alert("ސޭވް ކުރެވިއްޖެ"); window.closeRecorder(); };
         window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails || []; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
         
-        // JUZ & FINAL EXAM (Kept same as before but utilizing new mobile layout toggle natively)
+        // JUZ EXAM
         window.openJuzExamSetup = () => { const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = ''; for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('juzSetupModal').style.display='flex'; };
         window.startJuzExam = () => { const juz = parseInt(document.getElementById('examJuzSelect').value); const mode = document.querySelector('input[name="examPart"]:checked').value; let startPage = ((juz-1)*20)+2; if(mode === 'part2') startPage += 10; examState = { juz: juz, mode: mode, mistakesTeacher: 0, mistakesSelf: 0, currentPage: startPage, mistakesList: [], isMutashabih: false, timer: null, seconds: 0 }; document.getElementById('juzSetupModal').style.display='none'; document.getElementById('juzExamTitle').innerText = `ޖުޒުއު ${juz}`; document.getElementById('partBadge').innerText = mode==='full'?'Full':(mode==='part1'?'Part 1':'Part 2'); document.getElementById('liveScore').innerText = "100%"; document.getElementById('countTeacher').innerText = "0"; document.getElementById('countSelf').innerText = "0"; document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); };
         window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
@@ -853,13 +817,45 @@
         window.changeExamPage = (dir) => { let newPage = examState.currentPage + dir; if(newPage < 1 || newPage > 604) return; examState.currentPage = newPage; window.loadExamPage(newPage); };
         window.clickExamWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id); if(!examState.isMutashabih) window.updateScore('teacher', -1); } else { el.classList.add('mistake'); examState.mistakesList.push(id); if(!examState.isMutashabih) window.updateScore('teacher', 1); } };
         window.updateScore = (type, delta) => { if(type==='teacher') examState.mistakesTeacher = Math.max(0, examState.mistakesTeacher+delta); else examState.mistakesSelf = Math.max(0, examState.mistakesSelf+delta); document.getElementById('countTeacher').innerText = examState.mistakesTeacher; document.getElementById('countSelf').innerText = examState.mistakesSelf; window.calcScore(); };
-        window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(examState.mode !== 'part1') deduct += (2.5 - document.getElementById('q1_score').value) + (2.5 - document.getElementById('q2_score').value); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
+        window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(examState.mode !== 'part1') deduct += (2.5 - parseFloat(document.getElementById('q1_score').value||0)) + (2.5 - parseFloat(document.getElementById('q2_score').value||0)); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
         window.startTimer = () => { if(examState.timer) return; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').innerText = d.toISOString().substr(11,8); }, 1000); };
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
-        window.saveJuzExamPart = () => { const score = window.calcScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let duration = document.getElementById('stopwatchDisplay').innerText; if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; let details = { teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: document.getElementById('scoreTajweed').value, fluency: document.getElementById('scoreFluency').value, mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value) + parseFloat(document.getElementById('q2_score').value)) : 0 }; if(examState.mode === 'part1') { s.juzExams[examState.juz].part1 = score; s.history.push({ type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } else { let p1 = s.juzExams[examState.juz].part1 || 0; let final = (examState.mode === 'full') ? score : (p1 + score) / 2; s.history.push({ type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } updateFirebase(); alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); window.closeJuzExam(); window.openStudentMenu(currentStudentIdx); };
-        window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00"; document.getElementById('countTeacher').innerText = rec.details.teacherMistakes; document.getElementById('countSelf').innerText = rec.details.selfMistakes; document.getElementById('scoreTajweed').value = rec.details.tajweed; document.getElementById('scoreFluency').value = rec.details.fluency; isViewMode = true; examState.mistakesList = rec.mistakeDetails || []; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
+        
+        window.saveJuzExamPart = () => { 
+            const score = window.calcScore(); 
+            const s = classesData[currentClassIdx].students[currentStudentIdx]; 
+            let duration = document.getElementById('stopwatchDisplay').innerText; 
+            
+            // Fix: Thorough Initialization
+            if(!s.history) s.history = [];
+            if(!s.juzExams) s.juzExams={}; 
+            if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; 
+            
+            let details = { 
+                teacherMistakes: examState.mistakesTeacher, 
+                selfMistakes: examState.mistakesSelf, 
+                tajweed: parseFloat(document.getElementById('scoreTajweed').value || 10), 
+                fluency: parseFloat(document.getElementById('scoreFluency').value || 5), 
+                mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) : 0 
+            }; 
+            
+            if(examState.mode === 'part1') { 
+                s.juzExams[examState.juz].part1 = score; 
+                s.history.push({ type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+            } else { 
+                let p1 = s.juzExams[examState.juz].part1 || 0; 
+                let final = (examState.mode === 'full') ? score : (p1 + score) / 2; 
+                s.history.push({ type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+            } 
+            updateFirebase(); 
+            alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
+            window.closeJuzExam(); 
+            window.openCategoryPage('juz_exam'); // Auto-open the history view after saving
+        };
+        window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00"; document.getElementById('countTeacher').innerText = rec.details?.teacherMistakes||0; document.getElementById('countSelf').innerText = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; isViewMode = true; examState.mistakesList = rec.mistakeDetails || []; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
+        // FINAL EXAM
         window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
         window.closeFinalExam = () => { document.getElementById('final-exam-page').classList.add('hidden'); };
         window.loadFinalQuestion = async () => { const juz = document.getElementById('finalJuzSelect').value; const startP = ((juz-1)*20)+2; const randomP = startP + Math.floor(Math.random()*18); const res = await fetch(`https://api.alquran.cloud/v1/page/${randomP}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'finalMushafContent', [], true); };
@@ -867,9 +863,6 @@
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
         window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:new Date().toLocaleDateString(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
-
-        function populateSurahSelects() { const s1 = document.getElementById('startSurah'), s2 = document.getElementById('endSurah'); if(s1 && s2) { s1.innerHTML=''; s2.innerHTML=''; SURAH_NAMES_AR.forEach((n,i) => { s1.add(new Option(n, i+1)); s2.add(new Option(n, i+1)); }); s1.onchange = function() { window.updateAyahOptions('startAyah', this.value - 1); }; s2.onchange = function() { window.updateAyahOptions('endAyah', this.value - 1); }; } }
-        window.updateAyahOptions = (selectId, surahIndex, selectedValue) => { const select = document.getElementById(selectId); select.innerHTML = ''; const total = AYAH_COUNTS[surahIndex]; for(let i=1; i<=total; i++) { select.add(new Option(i, i)); } if(selectedValue && selectedValue <= total) select.value = selectedValue; else select.value = 1; }
 
     </script>
 </body>
