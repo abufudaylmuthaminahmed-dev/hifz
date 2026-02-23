@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Advanced Progress & Semesters)</title>
+    <title>إتقان - Hifz Program (Semester System)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -347,12 +347,18 @@
             </div>
         </div>
 
-        <!-- CATEGORY HISTORY PAGE -->
+        <!-- CATEGORY HISTORY PAGE WITH SEMESTER TABS -->
         <div id="category-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="catPageTitle">Title</div>
                 <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
             </div>
+            
+            <!-- NEW: Semester Tabs Container -->
+            <div id="historySemesterTabs" class="tabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:5px; justify-content:flex-start;">
+                <!-- Tabs will be injected here by JS -->
+            </div>
+
             <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
                 <button id="addRecordBtn" class="add-record-btn big-btn btn-green" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
@@ -580,6 +586,8 @@
         let currentMistakes = []; let isViewMode = false;
         let editingRecordIndex = -1, editingStudentIndex = -1;
         let currentRecViewPage = 1; let pendingUserIndex = -1;
+        
+        let activeHistorySemesterIdx = -1; // New variable to track active semester tab
 
         const dbRef = ref(db, 'hifz_system_v1');
         onValue(dbRef, (snapshot) => {
@@ -633,13 +641,60 @@
         window.openStudentMenu = (i) => { currentStudentIdx = i; document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; window.openPage('grading-menu-page'); }
         
         window.openCategoryPage = (type) => { 
-            currentSessionType = type; let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
+            currentSessionType = type; 
+            let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
             document.getElementById('catPageTitle').innerText = title; 
+            
             const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-            window.renderHistory(s, 'categoryHistoryList', type); 
+            
+            // Set default to the latest semester (Current) if semesters exist
+            if(semesters.length > 0) {
+                activeHistorySemesterIdx = semesters.length - 1;
+            } else {
+                activeHistorySemesterIdx = -1;
+            }
+
+            window.renderSemesterTabs(); // Render the tabs
+            window.renderHistory(s, 'categoryHistoryList', type); // Render the filtered list
+            
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
             window.openPage('category-page'); 
         }
+
+        window.renderSemesterTabs = () => {
+            const container = document.getElementById('historySemesterTabs');
+            container.innerHTML = '';
+            
+            if(semesters.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+            
+            semesters.forEach((sem, i) => {
+                const isCurrent = (i === semesters.length - 1);
+                const isActive = (i === activeHistorySemesterIdx);
+                
+                let btnClass = isActive ? 'tab-btn active' : 'tab-btn';
+                let label = sem.name;
+                if(isCurrent) label += " (Current)";
+
+                const btn = document.createElement('button');
+                btn.className = btnClass;
+                btn.innerText = label;
+                btn.style.minWidth = "fit-content";
+                btn.style.padding = "10px 20px";
+                btn.onclick = () => {
+                    activeHistorySemesterIdx = i;
+                    window.renderSemesterTabs(); // Refresh tabs to show active state
+                    
+                    const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
+                    window.renderHistory(s, 'categoryHistoryList', currentSessionType);
+                };
+                container.appendChild(btn);
+            });
+        }
+
         window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup(); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
 
         // PROGRESS
@@ -855,14 +910,42 @@
         window.approveEntry = async (cIdx, sIdx, pIdx) => { const student = classesData[cIdx].students[sIdx]; const entry = student.pendingData[pIdx]; if(entry.type === 'juz_update') student.juzCount = entry.value; else { if(!student.history) student.history = []; student.history.push({ type: entry.type, date: entry.date, page: entry.page, endPage: entry.endPage, startDetails: entry.startDetails, endDetails: entry.endDetails, mistakesCount: 0, mistakeDetails: [], recitedTo: entry.recitedTo || null }); } student.pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
         window.rejectEntry = (cIdx, sIdx, pIdx) => { classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
 
-        // HISTORY & SLIP DOWNLOAD
+        // HISTORY & SLIP DOWNLOAD WITH SEMESTER FILTER
         window.renderHistory = (student, listId, filterType) => {
-            const list = document.getElementById(listId); list.innerHTML = ''; if(!student.history) student.history = [];
-            const records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(!records.length) list.innerHTML = '<p style="text-align:center;color:#999;">No Records</p>';
+            const list = document.getElementById(listId); 
+            list.innerHTML = ''; 
+            if(!student.history) student.history = [];
+            
+            // 1. Filter by Type (Lesson/Revision/Exam)
+            let records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
+
+            // 2. Filter by Semester Date (New Logic)
+            if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
+                const currentSem = semesters[activeHistorySemesterIdx];
+                const startDate = new Date(currentSem.startDate);
+                const endDate = new Date(currentSem.endDate);
+                // Set end date to end of day to include records made on that day
+                endDate.setHours(23, 59, 59, 999);
+
+                records = records.filter(rec => {
+                    const rDate = new Date(rec.date);
+                    return rDate >= startDate && rDate <= endDate;
+                });
+            }
+
+            if(!records.length) {
+                list.innerHTML = `<div style="text-align:center; padding:40px; color:#999;">
+                    <div style="font-size:40px; margin-bottom:10px;">📭</div>
+                    މި ސެމިސްޓަރގައި ރެކޯޑެއް ނެތް
+                </div>`;
+                return;
+            }
+
             records.slice().reverse().forEach(rec => {
-                const realIndex = student.history.indexOf(rec); let html = '';
-                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist abs-pos" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist abs-pos" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
+                const realIndex = student.history.indexOf(rec); 
+                let html = '';
+                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist abs-pos" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
+                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist abs-pos" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
                 
                 if(rec.type === 'juz_exam') { 
                     let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending" style="background:#f1c40f;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete" style="background:#2ecc71;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފުރިހަމަ</span>'; 
