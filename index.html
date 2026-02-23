@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (V40-Fixed)</title>
+    <title>إتقان - Hifz Program (V42-Student Details)</title>
     
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,7 +14,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
 
-        /* Updated Font Loading Logic for Mobile */
+        /* Font Loading Logic for Mobile */
         @font-face { 
             font-family: 'Faruma'; 
             src: local('Faruma'), 
@@ -85,6 +85,22 @@
         .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .dashboard-center .card-btn { width: 250px; }
 
+        /* STUDENT DETAIL CARD (New for Management) */
+        .student-detail-card {
+            background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee;
+            position: relative; transition: 0.2s;
+        }
+        .student-detail-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .st-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 10px; }
+        .st-name { font-family: var(--font-heading); font-size: 18px; color: var(--primary); }
+        .st-id { background: #ecf0f1; padding: 2px 8px; border-radius: 8px; font-size: 12px; color: #7f8c8d; font-weight: bold; }
+        .st-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: #555; }
+        .st-info-item { display: flex; justify-content: space-between; }
+        .st-info-label { color: #999; }
+        .st-remarks-box { margin-top: 10px; background: #fffcf2; padding: 8px; border-radius: 5px; font-size: 12px; border: 1px solid #fae5d3; color: #d35400; }
+        .st-footer-actions { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+
         /* STUDENT STAT BAR (COMPACT) */
         .student-stat-container {
             background: white; border-radius: 15px; padding: 20px;
@@ -134,13 +150,14 @@
         .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
 
         .btn-edit-hist, .btn-delete-hist, .btn-action-sm { 
-            position: absolute; bottom: 10px; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .btn-delete-hist { left: 10px; background: #fee2e2; color: #c0392b; }
-        .btn-edit-hist { left: 55px; background: #e3f2fd; color: #2980b9; }
-
-        .student-actions { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
+        .btn-delete-hist { background: #fee2e2; color: #c0392b; }
+        .btn-edit-hist { background: #e3f2fd; color: #2980b9; }
+        
+        .btn-delete-hist.abs-pos { position:absolute; bottom:10px; left:10px; }
+        .btn-edit-hist.abs-pos { position:absolute; bottom:10px; left:55px; }
 
         /* PROGRESS REPORT */
         .prog-card { background: white; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
@@ -482,7 +499,7 @@
                 <h3 id="studentDashName"></h3>
             </div>
             
-            <!-- REFACTORED PROGRESS STAT BAR -->
+            <!-- PROGRESS STAT BAR -->
             <div class="student-stat-container">
                 <div class="st-stat-item">
                     <div class="st-stat-val st-color-1" id="studentSemPages">0</div>
@@ -834,16 +851,29 @@
             if(students.length === 0) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>";
             
             students.forEach((s, idx) => {
-                let pass = (s.password && s.password.length > 0) ? `<span style="color:green">(Has Pass)</span>` : `<span style="color:red; font-weight:bold;">(No Pass)</span>`;
+                let pass = (s.password && s.password.length > 0) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`;
+                let dirText = s.direction === 'bottom_up' ? 'ތިރިން މަތިއަށް' : 'މަތިން ތިރިއަށް';
+                
                 div.innerHTML += `
-                    <div class="card-btn" style="min-height:120px; position:relative;">
-                        <h4 class="card-title">${s.name}</h4>
-                        <span class="card-sub">${s.id}</span>
-                        <small style="margin-top:5px;">${pass}</small>
-                        <div class="student-actions">
-                             <button class="btn-action-sm btn-edit" style="background:#fff3cd; color:#856404;" title="Reset Password" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button>
-                            <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button>
-                            <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
+                    <div class="student-detail-card">
+                        <div class="st-card-header">
+                            <div class="st-name">${s.name}</div>
+                            <div class="st-id">${s.id}</div>
+                        </div>
+                        <div class="st-info-grid">
+                            <div class="st-info-item"><span class="st-info-label">Module:</span> <b>${s.module || '-'}</b></div>
+                            <div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div>
+                            <div class="st-info-item"><span class="st-info-label">Direction:</span> <b>${dirText}</b></div>
+                            <div class="st-info-item"><span class="st-info-label">Hifz Juz:</span> <b>${s.juzCount || '-'}</b></div>
+                        </div>
+                        <div class="st-remarks-box">${s.remarks || 'No remarks'}</div>
+                        <div class="st-footer-actions">
+                            <div style="font-size:12px;">${pass}</div>
+                            <div class="student-actions" style="position:static;">
+                                 <button class="btn-action-sm btn-edit" style="background:#fff3cd; color:#856404;" title="Reset Password" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button>
+                                <button class="btn-action-sm btn-edit" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button>
+                                <button class="btn-action-sm btn-del" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button>
+                            </div>
                         </div>
                     </div>`;
             });
@@ -853,7 +883,7 @@
             if(confirm("Reset password? Student will need to create new one on next login.")) {
                 classesData[currentClassIdx].students[idx].password = "";
                 updateFirebase(); 
-                window.renderStudentList(); // Immediately update UI to show "(No Pass)"
+                window.renderStudentList();
             }
         }
 
@@ -1252,8 +1282,8 @@
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec);
                 let html = '';
-                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : '';
-                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
+                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist abs-pos" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : '';
+                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist abs-pos" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
 
                 if(rec.type === 'juz_exam') {
                     let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete">ފުރިހަމަ</span>';
