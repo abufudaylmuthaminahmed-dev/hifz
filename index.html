@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Semester System)</title>
+    <title>إتقان - Hifz Program (Detailed Progress Table)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -187,6 +187,31 @@
         .prog-stat-lbl { font-size:12px; color:#777; margin-top:5px; }
         .passed-juz-list { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:10px; }
         .passed-badge { background:#d4efdf; color:#1e8449; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; }
+        
+        /* New Table Styles */
+        .styled-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 14px; font-family: sans-serif; box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
+        .styled-table thead tr { background-color: var(--primary); color: #ffffff; text-align: right; }
+        .styled-table th, .styled-table td { padding: 12px 15px; border: 1px solid #eee; }
+        .styled-table tbody tr { border-bottom: 1px solid #dddddd; }
+        .styled-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }
+        .styled-table tbody tr:last-of-type { border-bottom: 2px solid var(--primary); }
+        .styled-table .ar-txt { font-family: var(--font-arabic); font-size: 16px; }
+
+        .sem-tag {
+            padding: 8px 15px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .sem-tag.active {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -265,15 +290,19 @@
         <div id="progress-page" class="container hidden">
             <div class="app-header"><div class="header-title">ޕްރޮގްރެސް ރިޕޯޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             
-            <!-- NEW DETAILED PROGRESS SECTION FOR TEACHERS -->
-            <div class="action-card" style="margin-top:20px; background:#f4f6f8; border-top: 5px solid var(--st-primary);">
-                <h4 style="color:var(--primary); margin-bottom:15px;">ދަރިވަރުންގެ ތަފްޞީލީ ޕްރޮގްރެސް</h4>
-                <div style="display:flex; gap:10px; max-width:600px; margin:0 auto;">
-                    <select id="progClassSelect" class="form-input" style="margin-bottom:0;" onchange="window.loadProgStudents()"><option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option></select>
-                    <select id="progStudentSelect" class="form-input" style="margin-bottom:0;" onchange="window.showDetailedProgress()"><option value="">ދަރިވަރު ޚިޔާރުކުރައްވާ</option></select>
+            <!-- NEW DETAILED PROGRESS TABLE SECTION -->
+            <div class="action-card" style="margin-top:20px; background:#fff; border-top: 5px solid var(--st-primary); max-width:100%;">
+                <h4 style="color:var(--primary); margin-bottom:15px; text-align:right;">ކްލާސް ޕްރޮގްރެސް ރިޕޯޓް (މި ސެމިސްޓަރ)</h4>
+                
+                <div style="display:flex; gap:10px; margin-bottom:20px; justify-content: flex-end;">
+                     <select id="progClassSelect" class="form-input" style="margin-bottom:0; max-width:300px;" onchange="window.showClassProgressTable(this.value)">
+                        <option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>
+                    </select>
                 </div>
-                <div id="detailedProgressView" style="margin-top:20px; text-align:right; display:none; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-                    <!-- Content injected via JS -->
+
+                <div id="classProgressTableContainer" style="overflow-x:auto;">
+                    <!-- Table will be injected here -->
+                    <p style="text-align:center; color:#999; padding:20px;">ކްލާހެއް ޚިޔާރުކުރައްވާ</p>
                 </div>
             </div>
 
@@ -294,7 +323,6 @@
 
             <h4 style="margin-top:20px;">ސެމިސްޓަރތައް</h4>
             <div id="semesterList" class="grid-container"></div>
-            <div id="progressResults" style="margin-top:20px;"></div>
         </div>
 
         <!-- MANAGEMENT PAGES -->
@@ -354,9 +382,9 @@
                 <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
             </div>
             
-            <!-- NEW: Semester Tabs Container -->
-            <div id="historySemesterTabs" class="tabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:5px; justify-content:flex-start;">
-                <!-- Tabs will be injected here by JS -->
+            <!-- Semester Tags Container -->
+            <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;">
+                <!-- Tags will be injected here by JS -->
             </div>
 
             <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
@@ -587,7 +615,7 @@
         let editingRecordIndex = -1, editingStudentIndex = -1;
         let currentRecViewPage = 1; let pendingUserIndex = -1;
         
-        let activeHistorySemesterIdx = -1; // New variable to track active semester tab
+        let activeHistorySemesterIdx = -1; // To track active semester tab
 
         const dbRef = ref(db, 'hifz_system_v1');
         onValue(dbRef, (snapshot) => {
@@ -597,7 +625,7 @@
 
             if(!document.getElementById('management-page').classList.contains('hidden')) window.renderManageClassList();
             if(!document.getElementById('teacher-mgmt-page').classList.contains('hidden')) window.renderTeacherList();
-            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); if(document.getElementById('progClassSelect').value) window.loadProgStudents(true); }
+            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
             
             if(currentUserType === 'student' && currentStudentObj) {
@@ -647,15 +675,15 @@
             
             const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
             
-            // Set default to the latest semester (Current) if semesters exist
+            // Default to latest semester
             if(semesters.length > 0) {
                 activeHistorySemesterIdx = semesters.length - 1;
             } else {
                 activeHistorySemesterIdx = -1;
             }
 
-            window.renderSemesterTabs(); // Render the tabs
-            window.renderHistory(s, 'categoryHistoryList', type); // Render the filtered list
+            window.renderSemesterTabs(); 
+            window.renderHistory(s, 'categoryHistoryList', type); 
             
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
             window.openPage('category-page'); 
@@ -669,25 +697,22 @@
                 container.style.display = 'none';
                 return;
             }
-            container.style.display = 'flex';
+            container.style.display = 'block';
             
             semesters.forEach((sem, i) => {
                 const isCurrent = (i === semesters.length - 1);
                 const isActive = (i === activeHistorySemesterIdx);
                 
-                let btnClass = isActive ? 'tab-btn active' : 'tab-btn';
+                let btnClass = isActive ? 'sem-tag active' : 'sem-tag';
                 let label = sem.name;
                 if(isCurrent) label += " (Current)";
 
                 const btn = document.createElement('button');
                 btn.className = btnClass;
                 btn.innerText = label;
-                btn.style.minWidth = "fit-content";
-                btn.style.padding = "10px 20px";
                 btn.onclick = () => {
                     activeHistorySemesterIdx = i;
-                    window.renderSemesterTabs(); // Refresh tabs to show active state
-                    
+                    window.renderSemesterTabs();
                     const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
                     window.renderHistory(s, 'categoryHistoryList', currentSessionType);
                 };
@@ -707,189 +732,124 @@
             const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>';
             classesData.forEach((c, i) => sel.add(new Option(c.name, i)));
         }
-        window.loadProgStudents = (retainSelection=false) => {
-            const cIdx = document.getElementById('progClassSelect').value;
-            const sel = document.getElementById('progStudentSelect'); 
-            let oldVal = sel.value; sel.innerHTML = '<option value="">ދަރިވަރު ޚިޔާރުކުރައްވާ</option>';
-            if(cIdx !== "") {
-                classesData[cIdx].students?.forEach((s, i) => sel.add(new Option(s.name, i)));
-                if(retainSelection && oldVal) { sel.value = oldVal; window.showDetailedProgress(); }
-            } else { document.getElementById('detailedProgressView').style.display = 'none'; }
-        }
 
-        // --- UPDATED PROGRESS LOGIC STARTS HERE ---
-        
-        // 1. Show Detailed Progress UI with Semester Filter & Past Entry Form
-        window.showDetailedProgress = () => {
-            const cIdx = document.getElementById('progClassSelect').value; 
-            const sIdx = document.getElementById('progStudentSelect').value;
-            const view = document.getElementById('detailedProgressView');
-            
-            if(cIdx === "" || sIdx === "") { view.style.display = 'none'; return; }
-            
-            const s = classesData[cIdx].students[sIdx];
-            
-            // Build Semester Options
-            let semesterOptions = `<option value="all">ޖުމްލަ (All Time)</option>`;
-            semesters.forEach((sem, i) => {
-                // Select the last (current) semester by default
-                let selected = (i === semesters.length - 1) ? 'selected' : '';
-                semesterOptions += `<option value="${i}" ${selected}>${sem.name} (${sem.startDate} - ${sem.endDate})</option>`;
-            });
-
-            view.innerHTML = `
-                <div style="font-size:20px; font-weight:bold; color:var(--primary); margin-bottom:5px;">${s.name}</div>
-                <div style="font-size:12px; color:#777; margin-bottom:20px;">${classesData[cIdx].name}</div>
-
-                <!-- Semester Filter -->
-                <div style="background:#fffcf2; padding:10px; border:1px solid #fae5d3; border-radius:8px; margin-bottom:20px;">
-                    <label style="font-size:13px; font-weight:bold; display:block; margin-bottom:5px;">ސެމިސްޓަރ ޚިޔާރުކުރައްވާ:</label>
-                    <select id="progStatFilter" class="form-input" style="margin-bottom:0;" onchange="window.updateDetailedStats(${cIdx}, ${sIdx})">
-                        ${semesterOptions}
-                    </select>
-                </div>
-
-                <!-- Stats Display Area -->
-                <div id="progStatsContainer" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
-                    <!-- Content injected by JS -->
-                </div>
-
-                <!-- Past/Manual Juz Entry Form -->
-                <div style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
-                    <button class="big-btn btn-orange" style="font-size:14px; padding:8px 15px; width:auto;" onclick="document.getElementById('manualJuzForm').classList.toggle('hidden')">➕ ކުރީގެ ޖުޒުއު ރެކޯޑެއް އިތުރުކުރަން</button>
-                    
-                    <div id="manualJuzForm" class="hidden" style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:10px; border:1px solid #ddd;">
-                        <h5 style="margin:0 0 10px 0; color:var(--primary);">ކުރީގެ ސެމިސްޓަރ ޖުޒުއު އެންޓަރކުރުން</h5>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div><label style="font-size:12px;">ޖުޒުއު</label><select id="manualJuzNo" class="form-input" style="padding:5px;">${Array.from({length:30},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}</select></div>
-                            <div><label style="font-size:12px;">ތާރީޚް</label><input type="date" id="manualJuzDate" class="form-input" style="padding:5px;"></div>
-                            <div><label style="font-size:12px;">ނަތީޖާ (%)</label><input type="number" id="manualJuzScore" class="form-input" placeholder="80" style="padding:5px;"></div>
-                        </div>
-                        <button class="btn-primary" style="margin-top:10px; padding:8px;" onclick="window.saveManualJuz(${cIdx}, ${sIdx})">ސޭވް ކުރޭ</button>
-                    </div>
-                </div>
-            `;
-            view.style.display = 'block';
-            
-            // Initial Load of Stats
-            window.updateDetailedStats(cIdx, sIdx);
-        }
-
-        // 2. Logic to Calculate & Update Stats based on Filter
-        window.updateDetailedStats = (cIdx, sIdx) => {
-            const s = classesData[cIdx].students[sIdx];
-            const filterVal = document.getElementById('progStatFilter').value;
-            const container = document.getElementById('progStatsContainer');
-
-            let startDate = null, endDate = null;
-            let filterName = "All Time";
-
-            // Determine Date Range
-            if(filterVal !== "all" && semesters[filterVal]) {
-                startDate = new Date(semesters[filterVal].startDate);
-                endDate = new Date(semesters[filterVal].endDate);
-                // Adjust end date to include the full day
-                endDate.setHours(23, 59, 59, 999);
-                filterName = semesters[filterVal].name;
+        // --- NEW TABLE LOGIC START ---
+        window.showClassProgressTable = (cIdx) => {
+            const container = document.getElementById('classProgressTableContainer');
+            if(cIdx === "") {
+                container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ކްލާހެއް ޚިޔާރުކުރައްވާ</p>`;
+                return;
             }
 
-            // Calculations
-            let statsPages = 0;
-            let statsNewJuz = 0;
-            let passedJuzSet = new Set(); // For unique Juzs in this period
-            let allTimePassedJuz = new Set();
+            if(semesters.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ސެމިސްޓަރއެއް ނެތް</p>`;
+                return;
+            }
 
-            if(s.history) {
-                s.history.forEach(h => {
-                    const recDate = new Date(h.date);
-                    const score = parseFloat(h.score || 0);
+            const currentSem = semesters[semesters.length - 1]; // Use current semester
+            const startDate = new Date(currentSem.startDate);
+            const endDate = new Date(currentSem.endDate);
+            endDate.setHours(23, 59, 59, 999);
 
-                    // All Time Logic (To show cumulative completed juz)
-                    if(h.type === 'juz_exam' && score >= 60) {
-                        // Check if it's a full juz exam (completed)
-                        if(h.status !== 'partial') allTimePassedJuz.add(h.juz);
-                    }
+            let tableHtml = `
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">ނަން</th>
+                        <th rowspan="2">ލެވެލް</th>
+                        <th colspan="2" style="text-align:center;">މި ސެމިސްޓަރ</th>
+                        <th rowspan="2">ބެލެންސް</th>
+                        <th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th>
+                        <th rowspan="2">ޖުމްލަ ޖުޒުއު</th>
+                    </tr>
+                    <tr>
+                        <th>ފެށި ހިސާބު</th>
+                        <th>ނިންމި ހިސާބު</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
 
-                    // Filtering Logic
-                    let inRange = true;
-                    if(startDate && endDate) {
-                        if(recDate < startDate || recDate > endDate) inRange = false;
-                    }
-
-                    if(inRange) {
-                        if(h.type === 'new_lesson') {
-                            statsPages++;
-                        } else if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
-                            statsNewJuz++;
-                            passedJuzSet.add(h.juz);
-                        }
-                    }
+            const students = classesData[cIdx].students || [];
+            
+            if(students.length === 0) {
+                tableHtml += `<tr><td colspan="7" style="text-align:center;">No students</td></tr>`;
+            } else {
+                students.forEach(s => {
+                    // Calculate Data for this student
+                    const stats = window.calculateSemesterStats(s, startDate, endDate);
+                    
+                    tableHtml += `
+                        <tr>
+                            <td style="font-weight:bold;">${s.name}</td>
+                            <td>${s.level || '-'}</td>
+                            <td class="ar-txt">${stats.startPoint}</td>
+                            <td class="ar-txt">${stats.endPoint}</td>
+                            <td style="font-weight:bold; color:var(--primary); text-align:center;">${stats.balancePages}</td>
+                            <td style="text-align:center; color:#e67e22;">${stats.semJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.semJuzDetails})</span></td>
+                            <td style="text-align:center; color:#27ae60; font-weight:bold;">${stats.totalJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.totalJuzDetails})</span></td>
+                        </tr>
+                    `;
                 });
             }
 
-            // Determine what to show in the 3rd box
-            // If filtering by Semester -> Show Total Juz COMPLETED in that semester
-            // If filtering by All Time -> Show GRAND TOTAL Juz memorized
-            
-            let box3Title = (filterVal === 'all') ? "ޖުމްލަ ޙިފްޡް" : "މި ސެމިސްޓަރ ޖުޒުއު";
-            let box3Val = (filterVal === 'all') ? (parseFloat(s.juzCount || 0) + allTimePassedJuz.size) : statsNewJuz;
+            tableHtml += `</tbody></table>`;
+            container.innerHTML = tableHtml;
+        }
 
-            // Generate Badge HTML for passed Juzs in the selected period
-            let badgeHtml = '';
-            let badgesToShow = (filterVal === 'all') ? Array.from(allTimePassedJuz) : Array.from(passedJuzSet);
-            
-            if(badgesToShow.length > 0) {
-                let badges = badgesToShow.sort((a,b)=>a-b).map(j => `<span class="passed-badge">ޖުޒުއު ${j}</span>`).join('');
-                badgeHtml = `<div style="grid-column:span 3; margin-top:15px; border-top:1px solid #eee; padding-top:15px; text-align:center;">
-                    <div class="prog-stat-lbl" style="font-weight:bold; margin-bottom:5px;">މި މުއްދަތުގައި ފާސްވި ޖުޒުއުތައް</div>
-                    <div class="passed-juz-list">${badges}</div>
-                </div>`;
-            } else {
-                badgeHtml = `<div style="grid-column:span 3; margin-top:10px; text-align:center; font-size:12px; color:#ccc;">މި މުއްދަތުގައި އިތުރު ޖުޒުއެއް ނެތް</div>`;
+        window.calculateSemesterStats = (student, startDate, endDate) => {
+            let startPoint = "-";
+            let endPoint = "-";
+            let balancePages = 0;
+            let semJuzCount = 0;
+            let semJuzDetails = "";
+            let passedJuzSet = new Set();
+            let allTimePassedJuz = new Set();
+
+            if (student.history) {
+                // Filter new lessons for page stats
+                let lessonRecs = student.history.filter(h => {
+                    const d = new Date(h.date);
+                    return h.type === 'new_lesson' && d >= startDate && d <= endDate;
+                }).sort((a,b) => new Date(a.date) - new Date(b.date)); // Sort oldest to newest
+
+                if (lessonRecs.length > 0) {
+                    // Start Point = First Record
+                    const first = lessonRecs[0];
+                    startPoint = `ޞ ${first.page} (${first.startDetails?.surah}:${first.startDetails?.ayah})`;
+                    
+                    // End Point = Last Record
+                    const last = lessonRecs[lessonRecs.length - 1];
+                    endPoint = `ޞ ${last.endPage || last.page} (${last.endDetails?.surah}:${last.endDetails?.ayah})`;
+
+                    // Balance = Total records (pages)
+                    balancePages = lessonRecs.length; 
+                }
+
+                // Juz Stats
+                student.history.forEach(h => {
+                     const recDate = new Date(h.date);
+                     const score = parseFloat(h.score || 0);
+                     
+                     if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
+                         allTimePassedJuz.add(h.juz);
+                         if (recDate >= startDate && recDate <= endDate) {
+                             passedJuzSet.add(h.juz);
+                         }
+                     }
+                });
             }
 
-            container.innerHTML = `
-                <div class="prog-stat-box"><div class="prog-stat-val">${statsPages}</div><div class="prog-stat-lbl">ޞަފްޙާ (މުއްދަތުގައި)</div></div>
-                <div class="prog-stat-box"><div class="prog-stat-val" style="color:#e67e22">${statsNewJuz}</div><div class="prog-stat-lbl">ޖުޒުއު (މުއްދަތުގައި)</div></div>
-                <div class="prog-stat-box"><div class="prog-stat-val" style="color:#27ae60">${box3Val}</div><div class="prog-stat-lbl">${box3Title}</div></div>
-                ${badgeHtml}
-            `;
+            semJuzCount = passedJuzSet.size;
+            semJuzDetails = Array.from(passedJuzSet).sort((a,b)=>a-b).join(', ');
+
+            let totalJuzCount = (parseFloat(student.juzCount || 0) + allTimePassedJuz.size);
+            let totalJuzDetails = Array.from(allTimePassedJuz).sort((a,b)=>a-b).join(', ');
+
+            return { startPoint, endPoint, balancePages, semJuzCount, semJuzDetails, totalJuzCount, totalJuzDetails };
         }
+        // --- NEW TABLE LOGIC END ---
 
-        // 3. Save Manual/Past Juz Record
-        window.saveManualJuz = (cIdx, sIdx) => {
-            const juz = parseInt(document.getElementById('manualJuzNo').value);
-            const dateStr = document.getElementById('manualJuzDate').value;
-            const score = parseFloat(document.getElementById('manualJuzScore').value);
-
-            if(!dateStr || isNaN(score)) return alert("ތާރީޚް އަދި ނަތީޖާ ފުރިހަމަކުރައްވާ");
-
-            const s = classesData[cIdx].students[sIdx];
-            if(!s.history) s.history = [];
-
-            // Add the record. Because the date is custom, the filter logic will automatically
-            // assign it to the correct semester (or archive it if the date is old).
-            s.history.push({
-                type: 'juz_exam',
-                status: 'completed', // Assumed completed for manual entry
-                juz: juz,
-                date: dateStr, // Uses the manually entered date (YYYY-MM-DD)
-                score: score,
-                duration: "Manual Entry",
-                details: { manual: true },
-                isManual: true
-            });
-
-            updateFirebase();
-            alert("ރެކޯޑް އިތުރުކުރެވިއްޖެ! ޕްރޮގްރެސް އަޕްޑޭޓް ވަނީ...");
-            
-            // Hide form and refresh stats
-            document.getElementById('manualJuzForm').classList.add('hidden');
-            document.getElementById('manualJuzDate').value = '';
-            document.getElementById('manualJuzScore').value = '';
-            window.updateDetailedStats(cIdx, sIdx);
-        }
-        // --- UPDATED PROGRESS LOGIC ENDS HERE ---
 
         window.calculateStudentProgress = (student) => { if(!semesters.length) return; const latestSem = semesters[semesters.length - 1], start = new Date(latestSem.startDate), end = new Date(latestSem.endDate); const validRecs = (student.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end); document.getElementById('studentSemPages').innerText = validRecs.length; let semJuz = 0; if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; }); document.getElementById('studentSemJuz').innerText = semJuz; let totalJuz = parseFloat(student.juzCount || 0); let passedExams = new Set(); if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); }); document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size; }
 
@@ -999,7 +959,8 @@
                     <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (ކޮންމެ ކުށަކަށް -1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr>
                     <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr>
                     <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr>
-                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr>
+                    <tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝ
+<tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr>
                 </table>
                 <div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;">
                     <span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span>
@@ -1016,7 +977,7 @@
             }).from(slip).save().then(() => { document.body.removeChild(slip); });
         };
 
-        // RECORDER
+        // --- RECORDER FUNCTIONS ---
         window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>'; populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
         window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null); else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType); };
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
@@ -1028,7 +989,7 @@
         window.saveRecord = () => { const startP = document.getElementById('startPage').value; const endP = document.getElementById('endPage').value; if(parseInt(endP) < parseInt(startP)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); return; } const s = classesData[currentClassIdx].students[currentStudentIdx]; if(!s.history) s.history = []; const ssIdx = document.getElementById('startSurah').selectedIndex; const esIdx = document.getElementById('endSurah').selectedIndex; const startObj = { surah: SURAH_NAMES_AR[ssIdx], ayah: document.getElementById('startAyah').value }; const endObj = { surah: SURAH_NAMES_AR[esIdx], ayah: document.getElementById('endAyah').value }; const record = { type: currentSessionType, date: document.getElementById('recDate').value, page: startP, endPage: endP, startDetails: startObj, endDetails: endObj, mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes }; if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); alert("ސޭވް ކުރެވިއްޖެ"); window.closeRecorder(); };
         window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails || []; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
         
-        // JUZ EXAM
+        // --- JUZ EXAM FUNCTIONS ---
         window.openJuzExamSetup = () => { const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = ''; for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('juzSetupModal').style.display='flex'; };
         window.startJuzExam = () => { const juz = parseInt(document.getElementById('examJuzSelect').value); const mode = document.querySelector('input[name="examPart"]:checked').value; let startPage = ((juz-1)*20)+2; if(mode === 'part2') startPage += 10; examState = { juz: juz, mode: mode, mistakesTeacher: 0, mistakesSelf: 0, currentPage: startPage, mistakesList: [], isMutashabih: false, timer: null, seconds: 0 }; document.getElementById('juzSetupModal').style.display='none'; document.getElementById('juzExamTitle').innerText = `ޖުޒުއު ${juz}`; document.getElementById('partBadge').innerText = mode==='full'?'Full':(mode==='part1'?'Part 1':'Part 2'); document.getElementById('liveScore').innerText = "100%"; document.getElementById('countTeacher').innerText = "0"; document.getElementById('countSelf').innerText = "0"; document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); };
         window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
@@ -1046,7 +1007,7 @@
             const s = classesData[currentClassIdx].students[currentStudentIdx]; 
             let duration = document.getElementById('stopwatchDisplay').innerText; 
             
-            // Fix: Thorough Initialization
+            // Initialization
             if(!s.history) s.history = [];
             if(!s.juzExams) s.juzExams={}; 
             if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; 
@@ -1070,11 +1031,11 @@
             updateFirebase(); 
             alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
             window.closeJuzExam(); 
-            window.openCategoryPage('juz_exam'); // Auto-open the history view after saving
+            window.openCategoryPage('juz_exam'); 
         };
         window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00"; document.getElementById('countTeacher').innerText = rec.details?.teacherMistakes||0; document.getElementById('countSelf').innerText = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; isViewMode = true; examState.mistakesList = rec.mistakeDetails || []; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
-        // FINAL EXAM
+        // --- FINAL EXAM FUNCTIONS ---
         window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
         window.closeFinalExam = () => { document.getElementById('final-exam-page').classList.add('hidden'); };
         window.loadFinalQuestion = async () => { const juz = document.getElementById('finalJuzSelect').value; const startP = ((juz-1)*20)+2; const randomP = startP + Math.floor(Math.random()*18); const res = await fetch(`https://api.alquran.cloud/v1/page/${randomP}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'finalMushafContent', [], true); };
