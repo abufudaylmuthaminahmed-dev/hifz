@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Final Fixed)</title>
+    <title>إتقان - Hifz Program (Final Logic Fixes)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -617,6 +617,15 @@
         
         let activeHistorySemesterIdx = -1; // To track active semester tab
 
+        // Helper to format date for saving (YYYY-MM-DD) to ensure correct sorting/filtering
+        window.getFormattedDate = () => {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         const dbRef = ref(db, 'hifz_system_v1');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
@@ -758,7 +767,7 @@
                         <th rowspan="2">ނަން</th>
                         <th rowspan="2">ލެވެލް</th>
                         <th colspan="2" style="text-align:center;">މި ސެމިސްޓަރ</th>
-                        <th rowspan="2">ބެލެންސް</th>
+                        <th rowspan="2">ޞަފްޙާ ޢަދަދު</th>
                         <th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th>
                         <th rowspan="2">ޖުމްލަ ޖުޒުއު</th>
                     </tr>
@@ -822,8 +831,12 @@
                     const last = lessonRecs[lessonRecs.length - 1];
                     endPoint = `ޞ ${last.endPage || last.page} (${last.endDetails?.surah}:${last.endDetails?.ayah})`;
 
-                    // Balance = Total records (pages)
-                    balancePages = lessonRecs.length; 
+                    // Balance Calculation (End - Start + 1)
+                    let startPageNum = parseInt(first.page);
+                    let endPageNum = parseInt(last.endPage || last.page);
+                    if(endPageNum >= startPageNum) {
+                        balancePages = (endPageNum - startPageNum) + 1;
+                    }
                 }
 
                 // Juz Stats
@@ -854,8 +867,33 @@
         window.calculateStudentProgress = (student) => { if(!semesters.length) return; const latestSem = semesters[semesters.length - 1], start = new Date(latestSem.startDate), end = new Date(latestSem.endDate); const validRecs = (student.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end); document.getElementById('studentSemPages').innerText = validRecs.length; let semJuz = 0; if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; }); document.getElementById('studentSemJuz').innerText = semJuz; let totalJuz = parseFloat(student.juzCount || 0); let passedExams = new Set(); if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); }); document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size; }
 
         // DYNAMIC SELECT HELPERS
-        window.populateSurahsForElement = (container) => { const selects = container.querySelectorAll('.start-surah-sel, .end-surah-sel'); selects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n,i) => sel.add(new Option(n, i+1))); window.updateLocalAyahOptions(sel, sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'); }); };
-        window.updateLocalAyahOptions = (surahSelect, targetClass) => { const container = surahSelect.parentElement; const targetSelect = container.querySelector('.' + targetClass); if(!targetSelect) return; const surahIdx = parseInt(surahSelect.value) - 1; targetSelect.innerHTML = ''; for(let i=1; i<=AYAH_COUNTS[surahIdx]; i++) targetSelect.add(new Option(i, i)); };
+        window.populateSurahSelects = () => {
+            const sSel = document.getElementById('startSurah');
+            const eSel = document.getElementById('endSurah');
+            if(!sSel || !eSel) return;
+            sSel.innerHTML = ''; eSel.innerHTML = '';
+            SURAH_NAMES_AR.forEach((n, i) => {
+                sSel.add(new Option(n, i + 1));
+                eSel.add(new Option(n, i + 1));
+            });
+            // Add listeners
+            sSel.onchange = () => window.updateAyahOptions('startAyah', sSel.selectedIndex);
+            eSel.onchange = () => window.updateAyahOptions('endAyah', eSel.selectedIndex);
+            // Init
+            window.updateAyahOptions('startAyah', 0);
+            window.updateAyahOptions('endAyah', 0);
+        }
+
+        window.updateAyahOptions = (targetId, surahIndex) => {
+            const target = document.getElementById(targetId);
+            if(!target) return;
+            target.innerHTML = '';
+            if (surahIndex >= 0 && surahIndex < AYAH_COUNTS.length) {
+                const count = AYAH_COUNTS[surahIndex];
+                for(let i=1; i<=count; i++) target.add(new Option(i, i));
+            }
+        }
+
         window.fetchPageDetailsForInput = async (pageInput, prefix) => { const page = parseInt(pageInput.value); if(!page || page < 1 || page > 604) return; const container = pageInput.parentElement; if(prefix === 'end') { const startInp = container.parentElement.querySelector('.p-start'); if(startInp && startInp.value && parseInt(page) < parseInt(startInp.value)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); pageInput.value = startInp.value; return window.fetchPageDetailsForInput(pageInput, 'end'); } } if(prefix === 'start') { const endInp = container.parentElement.querySelector('.p-end'); if(endInp && endInp.value && parseInt(endInp.value) < parseInt(page)) { alert("ފެށޭ ޞަފްޙާ ނިމޭ ޞަފްޙާއަށްވުރެ ބޮޑު ނުކުރެވޭނެއެވެ."); pageInput.value = endInp.value; return window.fetchPageDetailsForInput(pageInput, 'start'); } } try { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); if(data.code === 200 && data.data.ayahs.length > 0) { const targetAyah = prefix === 'start' ? data.data.ayahs[0] : data.data.ayahs[data.data.ayahs.length-1]; const surahSel = container.querySelector(`.${prefix}-surah-sel`); const ayahSel = container.querySelector(`.${prefix}-ayah-sel`); if(surahSel && ayahSel) { surahSel.value = targetAyah.surah.number; window.updateLocalAyahOptions(surahSel, `${prefix}-ayah-sel`); ayahSel.value = targetAyah.numberInSurah; } } } catch(e) {} }
 
         // BULK & EXTERNAL
@@ -1050,13 +1088,16 @@
                 mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) : 0 
             }; 
             
+            // Use ISO Date for better filtering
+            const todayISO = window.getFormattedDate();
+
             if(examState.mode === 'part1') { 
                 s.juzExams[examState.juz].part1 = score; 
-                s.history.push({ type:'juz_exam', status:'partial', date:new Date().toLocaleDateString(), juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+                s.history.push({ type:'juz_exam', status:'partial', date:todayISO, juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
             } else { 
                 let p1 = s.juzExams[examState.juz].part1 || 0; 
                 let final = (examState.mode === 'full') ? score : (p1 + score) / 2; 
-                s.history.push({ type:'juz_exam', status:'completed', date:new Date().toLocaleDateString(), juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+                s.history.push({ type:'juz_exam', status:'completed', date:todayISO, juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
             } 
             updateFirebase(); 
             alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
@@ -1072,7 +1113,7 @@
         window.updateFinalScore = (type, delta) => { if(type==='teacher') finalExamState.totalMistakesT = Math.max(0, finalExamState.totalMistakesT+delta); else finalExamState.totalMistakesS = Math.max(0, finalExamState.totalMistakesS+delta); document.getElementById('finalTeacherCount').innerText = finalExamState.totalMistakesT; document.getElementById('finalSelfCount').innerText = finalExamState.totalMistakesS; window.calcFinalScore(); };
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
-        window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:new Date().toLocaleDateString(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
+        window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
 
     </script>
 </body>
