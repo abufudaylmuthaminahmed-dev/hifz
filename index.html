@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Madina Layout)</title>
+    <title>إتقان - Hifz Program (Final V5)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -522,6 +522,9 @@
                 <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
                 <div style="display:flex; gap:10px;">
                     <button id="pastJuzBtn" class="big-btn btn-orange" style="display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openPastJuzModal()">ކުރީގެ ޖުޒުއުތައް</button>
+                    <!-- PEER EXAM BUTTON (Visible only for students in Juz Exam mode) -->
+                    <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
+
                     <button id="addRecordBtn" class="add-record-btn big-btn btn-green" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
                 </div>
             </div>
@@ -585,6 +588,13 @@
             <div class="layout-split" id="juz-layout">
                 <div class="sidebar-panel">
                     <button class="big-btn btn-orange mobile-only-btn" style="width:100%; margin-bottom:15px; font-size:14px;" onclick="window.toggleMobileMushaf('juz-layout', true)">📖 މުޞްޙަފް ހުޅުވާ</button>
+                    
+                    <!-- PEER EXAM FIELD -->
+                    <div id="examinerNameField" style="display:none; margin-bottom:20px;">
+                         <label class="form-label">އިމްތިޙާން ކުރާ ފަރާތުގެ ނަން</label>
+                         <input type="text" id="examinerName" class="form-input" style="text-align:right;">
+                    </div>
+
                     <div class="score-header"><div class="big-score" id="liveScore">100%</div></div>
                     <div class="exam-section">
                         <div class="stopwatch-box"><span id="stopwatchDisplay">00:00:00</span><div style="font-size:12px;"><button onclick="window.startTimer()" style="border:none; color:green; background:none;">▶</button> <button onclick="window.stopTimer()" style="border:none; color:red; background:none;">⏹</button></div></div>
@@ -741,7 +751,7 @@
             <h3>ޖުޒުއު އިމްތިޙާން</h3>
             <select id="examJuzSelect" class="form-input"></select>
             <div style="text-align:right; margin:15px 0;"><label><input type="radio" name="examPart" value="full" checked> ފޮތް އެއްކޮށް</label><br><label><input type="radio" name="examPart" value="part1"> ފުރަތަމަ ބައި (1/2)</label><br><label><input type="radio" name="examPart" value="part2"> ފަހު ބައި (2/2)</label></div>
-            <button class="big-btn" onclick="window.startJuzExam()">ފަށާ</button>
+            <button class="big-btn" onclick="window.startJuzExam('teacher')">ފަށާ</button>
             <button class="big-btn btn-red" onclick="document.getElementById('juzSetupModal').style.display='none'">ކެންސަލް</button>
         </div>
     </div>
@@ -812,7 +822,10 @@
         let currentMistakes = []; let isViewMode = false;
         let editingRecordIndex = -1, editingStudentIndex = -1;
         let currentRecViewPage = 1; let pendingUserIndex = -1;
-        
+        let isPeerExam = false; // New flag for peer exam mode
+        let currentPendingExamData = null; // To store data for teacher review
+        let currentPendingExamIndices = null; // {cIdx, sIdx, pIdx}
+
         let activeHistorySemesterIdx = -1; 
 
         window.getFormattedDate = () => {
@@ -926,10 +939,15 @@
             window.renderSemesterTabs(); 
             window.renderHistory(s, 'categoryHistoryList', type); 
             
-            if(type === 'juz_exam' && currentUserType === 'teacher') {
-                document.getElementById('pastJuzBtn').style.display = 'inline-block';
+            if(type === 'juz_exam' && currentUserType === 'student') {
+                document.getElementById('pastJuzBtn').style.display = 'none';
+                document.getElementById('peerExamBtn').style.display = 'inline-block'; // Show for students
+            } else if(type === 'juz_exam' && currentUserType === 'teacher') {
+                 document.getElementById('pastJuzBtn').style.display = 'inline-block';
+                 document.getElementById('peerExamBtn').style.display = 'none';
             } else {
                 document.getElementById('pastJuzBtn').style.display = 'none';
+                document.getElementById('peerExamBtn').style.display = 'none';
             }
 
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
@@ -967,7 +985,7 @@
             });
         }
 
-        window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup(); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
+        window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup('teacher'); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
 
         window.openPastJuzModal = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
@@ -1132,7 +1150,7 @@
         
         window.downloadProgressExcel = () => {
             const table = document.getElementById("progressTable");
-if(!table) return;
+            if(!table) return;
             const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"});
             XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx");
         }
@@ -1258,7 +1276,8 @@ if(!table) return;
                 for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i));
             }
         };
-// --- BULK ENTRY & EXTERNAL REC LOGIC ---
+
+        // --- BULK ENTRY & EXTERNAL REC LOGIC (NOW FIXED) ---
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
         
         window.addBulkRow = () => { 
@@ -1353,42 +1372,80 @@ if(!table) return;
             alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); 
             document.getElementById('externalRecModal').style.display='none'; 
         }
-
-        // TEACHER APPROVAL
-        window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : "ދިގު މުރާޖަޢާ"); let detailsHtml = ""; if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`; else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; } list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"><button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button><button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
-        
-        window.approveEntry = async (cIdx, sIdx, pIdx) => { 
-            const student = classesData[cIdx].students[sIdx]; 
-            const entry = student.pendingData[pIdx]; 
+// --- GRADING & NAVIGATION ---
+        window.openCategoryPage = (type) => { 
+            currentSessionType = type; 
+            let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
+            document.getElementById('catPageTitle').innerText = title; 
             
-            if(entry.type === 'juz_update') {
-                student.juzCount = entry.value; 
-            } else { 
-                if(!student.history) student.history = []; 
-                student.history.push({ 
-                    type: entry.type, 
-                    date: entry.date, 
-                    page: entry.page, 
-                    endPage: entry.endPage, 
-                    startDetails: entry.startDetails, 
-                    endDetails: entry.endDetails, 
-                    mistakesCount: 0, 
-                    mistakeDetails: [], 
-                    recitedTo: entry.recitedTo || null 
-                }); 
-            } 
-            student.pendingData.splice(pIdx, 1); 
-            updateFirebase(); 
-            window.renderPendingApprovals(); 
+            const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
+            
+            // Default to latest semester
+            if(semesters.length > 0) {
+                activeHistorySemesterIdx = semesters.length - 1;
+            } else {
+                activeHistorySemesterIdx = -1;
+            }
+
+            window.renderSemesterTabs(); 
+            window.renderHistory(s, 'categoryHistoryList', type); 
+            
+            // Button Visibility Logic
+            if(type === 'juz_exam') {
+                // Teacher sees Past Juz, Student sees Peer Exam
+                if(currentUserType === 'teacher') {
+                    document.getElementById('pastJuzBtn').style.display = 'inline-block';
+                    document.getElementById('peerExamBtn').style.display = 'none';
+                } else {
+                    document.getElementById('pastJuzBtn').style.display = 'none';
+                    document.getElementById('peerExamBtn').style.display = 'inline-block';
+                }
+            } else {
+                document.getElementById('pastJuzBtn').style.display = 'none';
+                document.getElementById('peerExamBtn').style.display = 'none';
+            }
+
+            // Add Record Button (Only for Teachers OR Peer Exam flow handled separately)
+            // Regular Add button is hidden for students except they use specific buttons above
+            document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
+            
+            window.openPage('category-page'); 
         }
 
-        window.rejectEntry = (cIdx, sIdx, pIdx) => { 
-            classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); 
-            updateFirebase(); 
-            window.renderPendingApprovals(); 
+        window.renderSemesterTabs = () => {
+            const container = document.getElementById('historySemesterTabs');
+            container.innerHTML = '';
+            
+            if(semesters.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+            
+            semesters.forEach((sem, i) => {
+                const isCurrent = (i === semesters.length - 1);
+                const isActive = (i === activeHistorySemesterIdx);
+                
+                let btnClass = isActive ? 'sem-tag active' : 'sem-tag';
+                let label = sem.name;
+                if(isCurrent) label += " (Current)";
+
+                const btn = document.createElement('button');
+                btn.className = btnClass;
+                btn.innerText = label;
+                btn.onclick = () => {
+                    activeHistorySemesterIdx = i;
+                    window.renderSemesterTabs();
+                    const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
+                    window.renderHistory(s, 'categoryHistoryList', currentSessionType);
+                };
+                container.appendChild(btn);
+            });
         }
 
-        // HISTORY & SLIP DOWNLOAD
+        window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup('teacher'); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
+
+        // --- HISTORY & EDITING ---
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); 
             list.innerHTML = ''; 
@@ -1396,11 +1453,13 @@ if(!table) return;
             
             let records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
 
+            // Filter by Semester
             if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
                 const currentSem = semesters[activeHistorySemesterIdx];
                 const startDate = new Date(currentSem.startDate);
                 const endDate = new Date(currentSem.endDate);
                 endDate.setHours(23, 59, 59, 999);
+
                 records = records.filter(rec => {
                     const rDate = new Date(rec.date);
                     return rDate >= startDate && rDate <= endDate;
@@ -1485,14 +1544,17 @@ if(!table) return;
                 
                 currentRecViewPage = parseInt(rec.page); 
                 
+                // Load page then set dropdowns with static data to avoid async race
                 window.loadSmartPage(true).then(() => { 
                     document.getElementById('endPage').value = rec.endPage; 
                     
-                    window.populateSurahSelects();
+                    window.populateSurahSelects(); // Reset selects
 
+                    // Direct set using static arrays
                     let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah);
                     if(sIndex > -1) {
                         document.getElementById('startSurah').value = sIndex + 1;
+                        // Manually trigger update options
                         window.updateAyahOptions('startAyah', sIndex);
                         document.getElementById('startAyah').value = rec.startDetails.ayah;
                     }
@@ -1545,7 +1607,7 @@ if(!table) return;
             }).from(slip).save().then(() => { document.body.removeChild(slip); });
         };
 
-        // --- CORE RECORDER & EXAM FUNCTIONS ---
+        // --- RECORDER LOGIC ---
         window.openRecorder = (type) => { 
             editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type; 
             document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; 
@@ -1632,7 +1694,6 @@ if(!table) return;
             } 
         }
         
-        // --- FIXED MUSHAF RENDERER: NO DOUBLE BISMILLAH & PAGE NUM ---
         window.renderMushafText = (ayahs, target, highlights, isExam) => { 
             const container = document.getElementById(target);
             container.innerHTML = '';
@@ -1657,14 +1718,12 @@ if(!table) return;
                     currentSurah = a.surah.number;
                     html += `<div class="surah-header-box"><div class="surah-title">سورة ${a.surah.name}</div></div>`;
                     
-                    // Add Bismillah Box except for Tawbah
                     if (a.numberInSurah === 1 && a.surah.number !== 9) {
                          html += `<div class="bismillah-box">${BISMILLAH}</div>`;
                     }
                     html += '<div class="quran-block" dir="rtl">';
                 }
 
-                // Remove Bismillah from text if it's the first Ayah
                 let ayahText = a.text;
                 if(a.numberInSurah === 1 && a.surah.number !== 9) {
                     ayahText = ayahText.replace(BISMILLAH, '').trim();
@@ -1682,13 +1741,7 @@ if(!table) return;
             });
 
             html += '</div>'; 
-            
-            // Add Page Number at Bottom
-            if(!isExam) {
-                 document.getElementById('recPageDisplay').innerText = `Page ${currentPageNum}`;
-            } else {
-                 document.getElementById('currentPageDisplay').innerText = `Page ${currentPageNum}`;
-            }
+            html += `<div class="page-footer-num" style="text-align:center; margin-top:20px; font-size:14px; color:#777; border-top:1px solid #eee; padding-top:5px;">Page ${currentPageNum}</div>`;
 
             container.innerHTML = html;
         };
@@ -1755,7 +1808,9 @@ if(!table) return;
             window.loadSmartPage(true); 
         };
         
-        window.openJuzExamSetup = () => { 
+        // --- EXAMS ---
+        window.openJuzExamSetup = (role) => { 
+            isPeerExam = (role === 'peer');
             const juzSel = document.getElementById('examJuzSelect'); 
             juzSel.innerHTML = ''; 
             for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); 
@@ -1767,14 +1822,25 @@ if(!table) return;
             const mode = document.querySelector('input[name="examPart"]:checked').value; 
             let startPage = ((juz-1)*20)+2; 
             if(mode === 'part2') startPage += 10; 
+            
             examState = { juz: juz, mode: mode, mistakesTeacher: 0, mistakesSelf: 0, currentPage: startPage, mistakesList: [], isMutashabih: false, timer: null, seconds: 0 }; 
+            
             document.getElementById('juzSetupModal').style.display='none'; 
             document.getElementById('juzExamTitle').innerText = `ޖުޒުއު ${juz}`; 
             document.getElementById('partBadge').innerText = mode==='full'?'Full':(mode==='part1'?'Part 1':'Part 2'); 
             document.getElementById('liveScore').innerText = "100%"; 
             document.getElementById('countTeacher').innerText = "0"; 
             document.getElementById('countSelf').innerText = "0"; 
-            document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; 
+            
+            // Peer Exam Adjustments
+            if(isPeerExam) {
+                document.getElementById('examinerNameField').style.display = 'block';
+                document.getElementById('mutashabihSection').style.display = 'none'; // Hide for peer
+            } else {
+                document.getElementById('examinerNameField').style.display = 'none';
+                document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; 
+            }
+            
             document.getElementById('saveExamBtn').style.display = 'block'; 
             isViewMode = false; 
             window.loadExamPage(startPage); 
@@ -1794,7 +1860,6 @@ if(!table) return;
         };
 
         window.changeExamPage = (dir) => { let newPage = examState.currentPage + dir; if(newPage < 1 || newPage > 604) return; examState.currentPage = newPage; window.loadExamPage(newPage); };
-        
         window.clickExamWord = (id) => { 
             if(isViewMode) return; 
             const el = document.getElementById(id); 
@@ -1808,9 +1873,8 @@ if(!table) return;
                 if(!examState.isMutashabih) window.updateScore('teacher', 1); 
             } 
         };
-
         window.updateScore = (type, delta) => { if(type==='teacher') examState.mistakesTeacher = Math.max(0, examState.mistakesTeacher+delta); else examState.mistakesSelf = Math.max(0, examState.mistakesSelf+delta); document.getElementById('countTeacher').innerText = examState.mistakesTeacher; document.getElementById('countSelf').innerText = examState.mistakesSelf; window.calcScore(); };
-        window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(examState.mode !== 'part1') deduct += (2.5 - parseFloat(document.getElementById('q1_score').value||0)) + (2.5 - parseFloat(document.getElementById('q2_score').value||0)); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
+        window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(!isPeerExam && examState.mode !== 'part1') deduct += (2.5 - parseFloat(document.getElementById('q1_score').value||0)) + (2.5 - parseFloat(document.getElementById('q2_score').value||0)); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
         window.startTimer = () => { if(examState.timer) return; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').innerText = d.toISOString().substr(11,8); }, 1000); };
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
@@ -1820,34 +1884,60 @@ if(!table) return;
             const s = classesData[currentClassIdx].students[currentStudentIdx]; 
             let duration = document.getElementById('stopwatchDisplay').innerText; 
             
-            if(!s.history) s.history = [];
-            if(!s.juzExams) s.juzExams={}; 
-            if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; 
-            
             let details = { 
                 teacherMistakes: examState.mistakesTeacher, 
                 selfMistakes: examState.mistakesSelf, 
                 tajweed: parseFloat(document.getElementById('scoreTajweed').value || 10), 
                 fluency: parseFloat(document.getElementById('scoreFluency').value || 5), 
-                mutashabihMarks: (examState.mode!=='part1') ? (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) : 0 
+                mutashabihMarks: (isPeerExam || examState.mode==='part1') ? 0 : (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) 
             }; 
             
             const todayISO = window.getFormattedDate();
+            
+            if(isPeerExam) {
+                // Send to Pending
+                const examiner = document.getElementById('examinerName').value || "Unknown";
+                const entry = {
+                    type: 'juz_exam',
+                    mode: examState.mode,
+                    juz: examState.juz,
+                    score: score,
+                    duration: duration,
+                    details: details,
+                    mistakeDetails: examState.mistakesList,
+                    recitedTo: examiner,
+                    date: todayISO,
+                    status: 'pending',
+                    isExternal: true
+                };
+                
+                if(!s.pendingData) s.pendingData = [];
+                s.pendingData.push(entry);
+                updateFirebase();
+                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!");
+                window.closeJuzExam();
 
-            if(examState.mode === 'part1') { 
-                s.juzExams[examState.juz].part1 = score; 
-                s.history.push({ type:'juz_exam', status:'partial', date:todayISO, juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
-            } else { 
-                let p1 = s.juzExams[examState.juz].part1 || 0; 
-                let final = (examState.mode === 'full') ? score : (p1 + score) / 2; 
-                s.history.push({ type:'juz_exam', status:'completed', date:todayISO, juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
-            } 
-            updateFirebase(); 
-            alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
-            window.closeJuzExam(); 
-            window.openCategoryPage('juz_exam'); 
+            } else {
+                // Teacher Saves Directly
+                if(!s.history) s.history = [];
+                if(!s.juzExams) s.juzExams={}; 
+                if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; 
+
+                if(examState.mode === 'part1') { 
+                    s.juzExams[examState.juz].part1 = score; 
+                    s.history.push({ type:'juz_exam', status:'partial', date:todayISO, juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+                } else { 
+                    let p1 = s.juzExams[examState.juz].part1 || 0; 
+                    let final = (examState.mode === 'full') ? score : (p1 + score) / 2; 
+                    s.history.push({ type:'juz_exam', status:'completed', date:todayISO, juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); 
+                } 
+                updateFirebase(); 
+                alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
+                window.closeJuzExam(); 
+                window.openCategoryPage('juz_exam'); 
+            }
         };
-        
+
         window.viewJuzRecord = (rec) => { 
             document.getElementById('juzExamTitle').innerText = "View Exam"; 
             document.getElementById('juz-exam-page').classList.remove('hidden'); 
@@ -1858,6 +1948,10 @@ if(!table) return;
             document.getElementById('countSelf').innerText = rec.details?.selfMistakes||0; 
             document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; 
             document.getElementById('scoreFluency').value = rec.details?.fluency||5; 
+            
+            // Hide Examiner field in view mode for neatness
+            document.getElementById('examinerNameField').style.display = 'none';
+
             isViewMode = true; 
             examState.mistakesList = rec.mistakeDetails || []; 
             let startP = ((rec.juz-1)*20)+2; 
@@ -1871,7 +1965,6 @@ if(!table) return;
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
         window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
-
     </script>
 </body>
 </html>
