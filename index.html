@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Final V2)</title>
+    <title>إتقان - Hifz Program (Final Fixed V3)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -629,10 +629,7 @@
         <div class="modal-content" style="position:relative;">
             <div id="bulkApiLoader" class="api-loader"><span>މަޢުލޫމާތު ހޯދަނީ... ⏳</span></div>
             <h3 style="color:var(--primary); text-align:center;">ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</h3>
-            <div style="border-bottom:2px solid #eee; margin-bottom:15px; padding-bottom:10px;">
-                <label class="form-label" style="color:var(--accent);">ކުރީ ސެމިސްޓަރގައި ކިޔެވި ޖުޒުއު އަދަދު</label>
-                <input type="number" id="prevSemJuz" class="form-input" placeholder="މިސާލު: 2" style="margin-bottom:0;">
-            </div>
+            <!-- Removed Prev Sem Juz Count -->
             <p style="text-align:center; color:#777; font-size:13px; margin-top:10px;">މި ސެމިސްޓަރގައި ކިޔަވައިދެވުނު ބައިތައް</p>
             <div id="bulkEntriesList" style="max-height:40vh; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
             <button class="big-btn btn-orange" style="width:100%; font-size:14px;" onclick="window.addBulkRow()">+ އިތުރު ރެކޯޑެއް</button>
@@ -676,9 +673,8 @@
         let editingRecordIndex = -1, editingStudentIndex = -1;
         let currentRecViewPage = 1; let pendingUserIndex = -1;
         
-        let activeHistorySemesterIdx = -1; // To track active semester tab
+        let activeHistorySemesterIdx = -1; 
 
-        // Helper to format date for saving (YYYY-MM-DD) to ensure correct sorting/filtering
         window.getFormattedDate = () => {
             const d = new Date();
             const year = d.getFullYear();
@@ -708,7 +704,6 @@
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
         window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
 
-        // LOGIN
         window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
         window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(!user.password) { pendingUserIndex = uIdx; currentUserType = 'teacher'; document.getElementById('passModalUserText').innerText = `މުދައްރިސް: ${user.name}`; document.getElementById('createPassModal').style.display = 'flex'; return; } if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
         window.handleStudentLoginStep = () => { const id = document.getElementById('stuIdInput').value.trim(); if(!id) return alert("ID Required"); let found = null, cIdx = -1, sIdx = -1; classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } })); if(!found) return alert("Not Found"); currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found; if(!found.password) { currentUserType = 'student'; document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`; document.getElementById('createPassModal').style.display = 'flex'; } else { const passField = document.getElementById('stuPassField'); if(passField.classList.contains('hidden')) passField.classList.remove('hidden'); else { if(document.getElementById('stuPassInput').value === found.password) window.loginSuccessStudent(); else alert("Wrong Password"); } } };
@@ -755,7 +750,6 @@
             window.renderSemesterTabs(); 
             window.renderHistory(s, 'categoryHistoryList', type); 
             
-            // Show Past Juz Button only for Juz Exam and Teachers
             if(type === 'juz_exam' && currentUserType === 'teacher') {
                 document.getElementById('pastJuzBtn').style.display = 'inline-block';
             } else {
@@ -799,7 +793,6 @@
 
         window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup(); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
 
-        // --- NEW JUZ MANAGEMENT LOGIC START ---
         window.openPastJuzModal = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             const grid = document.getElementById('pastJuzGrid');
@@ -829,20 +822,16 @@
             alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!");
             document.getElementById('pastJuzModal').style.display = 'none';
         }
-        // --- NEW JUZ MANAGEMENT LOGIC END ---
 
-        // PROGRESS
         window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
         window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
         
-        // TEACHER DETAILED PROGRESS
         window.populateProgClassSelect = () => {
             const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>';
             classesData.forEach((c, i) => sel.add(new Option(c.name, i)));
         }
 
-        // --- NEW TABLE LOGIC START ---
         window.showClassProgressTable = (cIdx) => {
             const container = document.getElementById('classProgressTableContainer');
             const dlBtn = document.getElementById('btnDownloadExcel');
@@ -891,9 +880,7 @@
                 tableHtml += `<tr><td colspan="7" style="text-align:center;">No students</td></tr>`;
             } else {
                 students.forEach(s => {
-                    // Calculate Data for this student
                     const stats = window.calculateSemesterStats(s, startDate, endDate);
-                    
                     tableHtml += `
                         <tr>
                             <td style="font-weight:bold;">${s.name}</td>
@@ -921,28 +908,23 @@
             let passedJuzSet = new Set();
             let allTimePassedJuz = new Set();
 
-            // Add Manually selected Past Juz to the All Time set
             if(student.manualPassedJuz && Array.isArray(student.manualPassedJuz)) {
                 student.manualPassedJuz.forEach(j => allTimePassedJuz.add(j));
             }
 
             if (student.history) {
-                // Filter new lessons for page stats
                 let lessonRecs = student.history.filter(h => {
                     const d = new Date(h.date);
                     return h.type === 'new_lesson' && d >= startDate && d <= endDate;
-                }).sort((a,b) => new Date(a.date) - new Date(b.date)); // Sort oldest to newest
+                }).sort((a,b) => new Date(a.date) - new Date(b.date));
 
                 if (lessonRecs.length > 0) {
-                    // Start Point = First Record
                     const first = lessonRecs[0];
                     startPoint = `ޞ ${first.page} (${first.startDetails?.surah}:${first.startDetails?.ayah})`;
                     
-                    // End Point = Last Record
                     const last = lessonRecs[lessonRecs.length - 1];
                     endPoint = `ޞ ${last.endPage || last.page} (${last.endDetails?.surah}:${last.endDetails?.ayah})`;
 
-                    // Balance Calculation (End - Start + 1)
                     let startPageNum = parseInt(first.page);
                     let endPageNum = parseInt(last.endPage || last.page);
                     if(endPageNum >= startPageNum) {
@@ -950,15 +932,14 @@
                     }
                 }
 
-                // Juz Stats (from Exams)
                 student.history.forEach(h => {
                      const recDate = new Date(h.date);
                      const score = parseFloat(h.score || 0);
                      
                      if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
-                         allTimePassedJuz.add(h.juz); // Add exam pass to total
+                         allTimePassedJuz.add(h.juz);
                          if (recDate >= startDate && recDate <= endDate) {
-                             passedJuzSet.add(h.juz); // Add to semester count
+                             passedJuzSet.add(h.juz);
                          }
                      }
                 });
@@ -967,7 +948,6 @@
             semJuzCount = passedJuzSet.size;
             semJuzDetails = Array.from(passedJuzSet).sort((a,b)=>a-b).join(', ');
 
-            // Calculate Total Juz (Manual + Exams)
             let totalJuzCount = allTimePassedJuz.size;
             let totalJuzDetails = Array.from(allTimePassedJuz).sort((a,b)=>a-b).join(', ');
 
@@ -980,12 +960,9 @@
             const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"});
             XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx");
         }
-        // --- NEW TABLE LOGIC END ---
-
 
         window.calculateStudentProgress = (student) => { if(!semesters.length) return; const latestSem = semesters[semesters.length - 1], start = new Date(latestSem.startDate), end = new Date(latestSem.endDate); const validRecs = (student.history || []).filter(r => r.type === 'new_lesson' && new Date(r.date) >= start && new Date(r.date) <= end); document.getElementById('studentSemPages').innerText = validRecs.length; let semJuz = 0; if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60 && new Date(h.date) >= start && new Date(h.date) <= end) semJuz++; }); document.getElementById('studentSemJuz').innerText = semJuz; let totalJuz = parseFloat(student.juzCount || 0); let passedExams = new Set(); if(student.history) student.history.forEach(h => { if(h.type === 'juz_exam' && parseFloat(h.score) >= 60) passedExams.add(h.juz); }); document.getElementById('studentTotalJuz').innerText = totalJuz + passedExams.size; }
 
-        // DYNAMIC SELECT HELPERS
         window.populateSurahSelects = () => {
             const sSel = document.getElementById('startSurah');
             const eSel = document.getElementById('endSurah');
@@ -995,10 +972,8 @@
                 sSel.add(new Option(n, i + 1));
                 eSel.add(new Option(n, i + 1));
             });
-            // Add listeners
             sSel.onchange = () => window.updateAyahOptions('startAyah', sSel.selectedIndex);
             eSel.onchange = () => window.updateAyahOptions('endAyah', eSel.selectedIndex);
-            // Init
             window.updateAyahOptions('startAyah', 0);
             window.updateAyahOptions('endAyah', 0);
         }
@@ -1015,11 +990,38 @@
 
         window.fetchPageDetailsForInput = async (pageInput, prefix) => { const page = parseInt(pageInput.value); if(!page || page < 1 || page > 604) return; const container = pageInput.parentElement; if(prefix === 'end') { const startInp = container.parentElement.querySelector('.p-start'); if(startInp && startInp.value && parseInt(page) < parseInt(startInp.value)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); pageInput.value = startInp.value; return window.fetchPageDetailsForInput(pageInput, 'end'); } } if(prefix === 'start') { const endInp = container.parentElement.querySelector('.p-end'); if(endInp && endInp.value && parseInt(endInp.value) < parseInt(page)) { alert("ފެށޭ ޞަފްޙާ ނިމޭ ޞަފްޙާއަށްވުރެ ބޮޑު ނުކުރެވޭނެއެވެ."); pageInput.value = endInp.value; return window.fetchPageDetailsForInput(pageInput, 'start'); } } try { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); if(data.code === 200 && data.data.ayahs.length > 0) { const targetAyah = prefix === 'start' ? data.data.ayahs[0] : data.data.ayahs[data.data.ayahs.length-1]; const surahSel = container.querySelector(`.${prefix}-surah-sel`); const ayahSel = container.querySelector(`.${prefix}-ayah-sel`); if(surahSel && ayahSel) { surahSel.value = targetAyah.surah.number; window.updateLocalAyahOptions(surahSel, `${prefix}-ayah-sel`); ayahSel.value = targetAyah.numberInSurah; } } } catch(e) {} }
 
-        // BULK & EXTERNAL
+        // --- FIXED: ADDED MISSING FUNCTIONS FOR BULK/EXTERNAL ---
+        window.populateSurahsForElement = (container) => {
+            const surahSelects = container.querySelectorAll('.start-surah-sel, .end-surah-sel');
+            surahSelects.forEach(sel => {
+                sel.innerHTML = '';
+                SURAH_NAMES_AR.forEach((n, i) => sel.add(new Option(n, i + 1)));
+                // Trigger initial population
+                const prefix = sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel';
+                window.updateLocalAyahOptions(sel, prefix);
+            });
+        };
+
+        window.updateLocalAyahOptions = (surahSel, targetClass) => {
+            const parent = surahSel.parentElement; // div containing surah and ayah selects
+            if(!parent) return;
+            const ayahSel = parent.querySelector('.' + targetClass);
+            if(!ayahSel) return;
+
+            const surahIdx = surahSel.value - 1;
+            ayahSel.innerHTML = '';
+            if(surahIdx >= 0 && surahIdx < AYAH_COUNTS.length) {
+                const count = AYAH_COUNTS[surahIdx];
+                for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i));
+            }
+        };
+        // -----------------------------------------------------
+
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; document.getElementById('prevSemJuz').value = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
         
         window.addBulkRow = () => { 
-            const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); 
+            const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); 
+            window.populateSurahsForElement(div); // Now correctly calls the function
         }
         
         window.saveBulkData = async () => { 
@@ -1067,7 +1069,14 @@
             } 
         }
 
-        window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
+        window.openExternalRecModal = () => { 
+            document.getElementById('extPerson').value = ''; 
+            document.getElementById('extDate').valueAsDate = new Date(); 
+            document.getElementById('extStartPage').value = ''; 
+            document.getElementById('extEndPage').value = ''; 
+            window.populateSurahsForElement(document.querySelector('.ext-form-container')); // Now correctly calls the function
+            document.getElementById('externalRecModal').style.display='flex'; 
+        }
         
         window.saveExternalRecitation = () => { 
             const container = document.querySelector('.ext-form-container'); 
@@ -1235,35 +1244,6 @@
             }).from(slip).save().then(() => { document.body.removeChild(slip); });
         };
 
-        // HELPER FUNCTIONS FOR RECORDER
-        window.populateSurahSelects = () => {
-            const sSel = document.getElementById('startSurah');
-            const eSel = document.getElementById('endSurah');
-            if(!sSel || !eSel) return;
-            sSel.innerHTML = ''; eSel.innerHTML = '';
-            SURAH_NAMES_AR.forEach((n, i) => {
-                sSel.add(new Option(n, i + 1));
-                eSel.add(new Option(n, i + 1));
-            });
-            // Add listeners
-            sSel.onchange = () => window.updateAyahOptions('startAyah', sSel.selectedIndex);
-            eSel.onchange = () => window.updateAyahOptions('endAyah', eSel.selectedIndex);
-            // Init
-            window.updateAyahOptions('startAyah', 0);
-            window.updateAyahOptions('endAyah', 0);
-        }
-
-        window.updateAyahOptions = (targetId, surahIndex) => {
-            const target = document.getElementById(targetId);
-            if(!target) return;
-            target.innerHTML = '';
-            if (surahIndex >= 0 && surahIndex < AYAH_COUNTS.length) {
-                const count = AYAH_COUNTS[surahIndex];
-                for(let i=1; i<=count; i++) target.add(new Option(i, i));
-            }
-        }
-
-        // RECORDER LOGIC
         window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">...</p>'; 
         window.populateSurahSelects(); 
         const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
@@ -1272,7 +1252,6 @@
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
         window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
         
-        // --- UPDATED MUSHAF RENDERER ---
         window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => { const page = currentRecViewPage; if(!page) return; const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); if(!isViewMode && data.data.ayahs.length > 0) { if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; window.populateSurahSelects(); document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1); document.getElementById('startAyah').value = first.numberInSurah; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } else if(isNavigating) { document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } } };
         window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p>0 && p<=604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
         
@@ -1293,28 +1272,17 @@
             let html = '';
 
             ayahs.forEach(a => {
-                // Check if we are starting a new Surah on this page
                 if (currentSurah !== a.surah.number) {
-                    if (currentSurah !== null) html += '</div>'; // Close previous surah block if exists
-                    
+                    if (currentSurah !== null) html += '</div>'; 
                     currentSurah = a.surah.number;
-                    
-                    // Surah Header
                     html += `<div class="surah-header-box"><div class="surah-title">سورة ${a.surah.name}</div></div>`;
-                    
-                    // Bismillah (If not Surah Tawbah [9] and is Ayah 1)
                     if (a.numberInSurah === 1 && a.surah.number !== 9) {
                          html += `<div class="bismillah-box">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>`;
                     }
-                    
                     html += '<div class="quran-block" dir="rtl">';
                 }
 
                 const words = a.text.split(' ');
-                // If Ayah 1, remove Bismillah from text if it's there (API usually includes it)
-                // Note: api.alquran.cloud for 'quran-uthmani' includes Bismillah in text for Ayah 1.
-                // We will rely on visual separation, but keeping text consistent.
-                
                 words.forEach((w, i) => {
                     const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`;
                     let cls = highlights.includes(id) ? 'word mistake' : 'word';
@@ -1325,10 +1293,9 @@
                 html += `<span class="ayah-marker">(${a.numberInSurah})</span> `;
             });
 
-            html += '</div>'; // Close last block
+            html += '</div>'; 
             container.innerHTML = html;
         };
-        // --- END MUSHAF RENDERER ---
 
         window.clickRecWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x=>x!==id); } else { el.classList.add('mistake'); currentMistakes.push(id); } document.getElementById('mistakeCountDisplay').innerText = currentMistakes.length; };
         
@@ -1342,14 +1309,10 @@
             if(!s.history) s.history = []; 
             const ssIdx = document.getElementById('startSurah').selectedIndex; 
             const esIdx = document.getElementById('endSurah').selectedIndex; 
-            
-            // Fix: Fallback for surah names
             const startSurahName = SURAH_NAMES_AR[ssIdx] || "-";
             const endSurahName = SURAH_NAMES_AR[esIdx] || "-";
-
             const startObj = { surah: startSurahName, ayah: document.getElementById('startAyah').value }; 
             const endObj = { surah: endSurahName, ayah: document.getElementById('endAyah').value }; 
-            
             const record = { 
                 type: currentSessionType, 
                 date: document.getElementById('recDate').value, 
@@ -1360,7 +1323,6 @@
                 mistakesCount: currentMistakes.length, 
                 mistakeDetails: currentMistakes 
             }; 
-            
             if(editingRecordIndex > -1) { 
                 s.history[editingRecordIndex] = record; 
             } else { 
@@ -1373,7 +1335,6 @@
 
         window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails || []; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
         
-        // JUZ EXAM
         window.openJuzExamSetup = () => { const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = ''; for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('juzSetupModal').style.display='flex'; };
         window.startJuzExam = () => { const juz = parseInt(document.getElementById('examJuzSelect').value); const mode = document.querySelector('input[name="examPart"]:checked').value; let startPage = ((juz-1)*20)+2; if(mode === 'part2') startPage += 10; examState = { juz: juz, mode: mode, mistakesTeacher: 0, mistakesSelf: 0, currentPage: startPage, mistakesList: [], isMutashabih: false, timer: null, seconds: 0 }; document.getElementById('juzSetupModal').style.display='none'; document.getElementById('juzExamTitle').innerText = `ޖުޒުއު ${juz}`; document.getElementById('partBadge').innerText = mode==='full'?'Full':(mode==='part1'?'Part 1':'Part 2'); document.getElementById('liveScore').innerText = "100%"; document.getElementById('countTeacher').innerText = "0"; document.getElementById('countSelf').innerText = "0"; document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); };
         window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
@@ -1420,7 +1381,6 @@
         };
         window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').innerText = rec.duration || "00:00:00"; document.getElementById('countTeacher').innerText = rec.details?.teacherMistakes||0; document.getElementById('countSelf').innerText = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; isViewMode = true; examState.mistakesList = rec.mistakeDetails || []; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
-        // FINAL EXAM
         window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
         window.closeFinalExam = () => { document.getElementById('final-exam-page').classList.add('hidden'); };
         window.loadFinalQuestion = async () => { const juz = document.getElementById('finalJuzSelect').value; const startP = ((juz-1)*20)+2; const randomP = startP + Math.floor(Math.random()*18); const res = await fetch(`https://api.alquran.cloud/v1/page/${randomP}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'finalMushafContent', [], true); };
