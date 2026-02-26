@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Final Layout Fix)</title>
+    <title>إتقان - Hifz Program (Final V4)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -210,11 +210,11 @@
             min-height: fit-content;
         }
 
-        /* Smaller font size to fit screen */
+        /* INCREASED FONT SIZE */
         .quran-text { 
             font-family: var(--font-arabic); 
-            font-size: clamp(18px, 3.5vw, 24px); 
-            line-height: 2.0; 
+            font-size: clamp(22px, 5vw, 34px); /* Increased size */
+            line-height: 2.2; 
             text-align: justify;
             text-align-last: center; 
             direction: rtl;
@@ -259,7 +259,7 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            z-index: 30; /* Ensure visibility */
+            z-index: 30; 
             position: relative;
         }
         .nav-btn-dark { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-heading); transition: 0.2s;}
@@ -285,7 +285,7 @@
 
         .api-loader { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; align-items:center; justify-content:center; z-index:10; border-radius:5px;}
 
-        /* MOBILE TOGGLE STYLES */
+        /* MOBILE TOGGLE STYLES - FIXED FOOTER VISIBILITY */
         .mobile-only-btn { display: none; }
         @media (max-width: 900px) {
             .mobile-only-btn { display: inline-flex; }
@@ -297,12 +297,15 @@
             .layout-split.show-mushaf-mobile .sidebar-panel { display: none; }
             .layout-split.show-mushaf-mobile .main-panel { display: flex; width: 100%; height: 100%; order: 1; border-top: none; }
             
-            .mushaf-page-container { padding: 5px; }
+            .mushaf-page-container { padding: 5px; padding-bottom: 20px; }
             .mushaf-content-box { padding: 15px 10px; }
             
-            /* Make footer sticky on mobile */
-            .mushaf-nav-footer { position: absolute; bottom: 0; width: 100%; left: 0; }
-            .mushaf-page-container { padding-bottom: 70px; } /* Space for footer */
+            /* Sticky Footer for Mobile */
+            .mushaf-nav-footer { 
+                position: relative; 
+                z-index: 100;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
         }
 
         /* Detailed Progress UI */
@@ -579,7 +582,6 @@
                     <button class="big-btn btn-red mobile-only-btn" style="position:absolute; bottom:80px; left:50%; transform:translateX(-50%); width:90%; z-index:30; font-size:14px; opacity:0.9;" onclick="window.toggleMobileMushaf('recorder-layout', false)">⬇ ފޯމަށް އެނބުރިދިއުން</button>
 
                     <div class="mushaf-nav-footer">
-                        <!-- In RTL, First element is Right -->
                         <button class="nav-btn-dark" onclick="window.changeRecPage(-1)">ފަހަތަށް</button>
                         <span class="page-display-text" id="recPageDisplay">Page 1</span>
                         <button class="nav-btn-dark" onclick="window.changeRecPage(1)">ކުރިއަށް</button>
@@ -831,9 +833,9 @@
         let currentMistakes = []; let isViewMode = false;
         let editingRecordIndex = -1, editingStudentIndex = -1;
         let currentRecViewPage = 1; let pendingUserIndex = -1;
-        let isPeerExam = false; // New flag for peer exam mode
-        let currentPendingExamData = null; // To store data for teacher review
-        let currentPendingExamIndices = null; // {cIdx, sIdx, pIdx}
+        let isPeerExam = false; 
+        let currentPendingExamData = null; 
+        let currentPendingExamIndices = null; 
 
         let activeHistorySemesterIdx = -1; 
 
@@ -1574,7 +1576,7 @@
             }).from(slip).save().then(() => { document.body.removeChild(slip); });
         };
 
-        // --- CORE RECORDER & EXAM FUNCTIONS ---
+        // --- RECORDER LOGIC ---
         window.openRecorder = (type) => { 
             editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type; 
             document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; 
@@ -1889,7 +1891,7 @@
                 if(!s.pendingData) s.pendingData = [];
                 s.pendingData.push(entry);
                 updateFirebase();
-                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); 
+                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!");
                 window.closeJuzExam();
 
             } else {
