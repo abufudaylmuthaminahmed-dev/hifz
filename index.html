@@ -2,8 +2,8 @@
 <html lang="dv" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إتقان - Hifz Program (Final V4)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>إتقان - Hifz Program (Laptop Nav & UI Fix)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -32,21 +32,44 @@
         }
 
         * { box-sizing: border-box; }
-        body { font-family: var(--font-main); margin: 0; height: 100vh; color: #333; background-color: var(--bg-light); overflow: hidden; display: flex; flex-direction: column; }
+        
+        body { 
+            font-family: var(--font-main); 
+            margin: 0; 
+            height: 100vh; 
+            height: 100dvh; 
+            color: #333; 
+            background-color: var(--bg-light); 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
         body.student-mode { background-color: #e8f6f3; }
         body.student-mode .app-header { border-bottom: 3px solid var(--st-primary); }
         body.student-mode .header-title { color: var(--st-primary); }
 
         .hidden { display: none !important; }
-        .container { width: 100%; padding: 20px; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.3s ease; height: calc(100vh - 65px); overflow-y: auto; flex-grow: 1;}
+        
+        .container { 
+            width: 100%; 
+            padding: 20px; 
+            padding-bottom: 100px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            animation: fadeIn 0.3s ease; 
+            height: calc(100vh - 65px); /* Explicit height */
+            overflow-y: auto; 
+            flex-grow: 1;
+            -webkit-overflow-scrolling: touch;
+        }
 
         .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; flex-shrink: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
         .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
         .logout-btn { background: #fee2e2; color: #b91c1c; }
 
-        .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100vh; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; overflow-y: auto; }
+        .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100%; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; overflow-y: auto; }
         .login-card { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
         
         .logo-container { margin-bottom: 30px; }
@@ -107,9 +130,21 @@
 
         .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
         .hist-card:active { transform: scale(0.99); }
-        .hist-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .hist-title { font-weight: bold; font-size: 20px; color: var(--primary); }
-        .hist-date { font-family: sans-serif; font-size: 14px; color: #555; background: #e0e0e0; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
+        
+        /* UPDATED HIST HEADER FOR BUTTON FIX */
+        .hist-header { 
+            padding: 12px 20px; 
+            background: #f8f9fa; 
+            border-bottom: 1px solid #eee; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .hist-title-group { display: flex; flex-direction: column; gap: 2px; }
+        .hist-actions { display: flex; gap: 8px; align-items: center; }
+
+        .hist-title { font-weight: bold; font-size: 18px; color: var(--primary); }
+        .hist-date { font-family: sans-serif; font-size: 12px; color: #555; background: #e0e0e0; padding: 2px 8px; border-radius: 10px; font-weight: bold; width: fit-content; }
         .hist-body { padding: 20px; }
         
         .hist-detail-row { display:flex; justify-content:space-between; background:#f4f6f8; padding:10px; border-radius:8px; margin-bottom:10px; align-items: center;}
@@ -131,9 +166,7 @@
 
         .btn-edit-hist, .btn-delete-hist, .btn-action-sm { width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-delete-hist { background: #fee2e2; color: #c0392b; } .btn-edit-hist { background: #e3f2fd; color: #2980b9; }
-        .btn-delete-hist.abs-pos { position:absolute; top:15px; left:15px; }
-        .btn-edit-hist.abs-pos { position:absolute; top:15px; left:60px; }
-
+        
         .approval-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; border-right: 5px solid #e67e22; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
         .app-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
         .app-stu-name { font-weight: bold; font-size: 16px; color: var(--primary); }
@@ -143,18 +176,28 @@
         .btn-approve { background: #d4efdf; color: #1e8449; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
         .btn-reject { background: #fadbd8; color: #c0392b; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
 
-        /* FIXED MUSHAF LAYOUT - Compact & Mobile Friendly */
+        /* FIXED MUSHAF LAYOUT - DESKTOP & MOBILE */
         .layout-split { 
             display: flex; 
-            height: calc(100vh - 65px); 
+            flex-direction: column;
+            height: calc(100vh - 65px); /* Ensure it fits exactly */
             overflow: hidden; 
             position: relative;
         }
+
+        /* Desktop Layout */
+        @media (min-width: 901px) {
+            .layout-split { flex-direction: row; }
+            .sidebar-panel { width: 350px; height: 100%; border-right: 1px solid #ddd; order: 1; border-bottom: none; }
+            .main-panel { flex: 1; height: 100%; order: 2; }
+            
+            /* Sticky footer fix for desktop too */
+            .mushaf-nav-footer { position: absolute; bottom: 0; width: 100%; }
+            .mushaf-page-container { padding-bottom: 80px; }
+        }
         
         .sidebar-panel { 
-            width: 350px; 
             background: white; 
-            border-left: 1px solid #ddd; 
             display: flex; 
             flex-direction: column; 
             overflow-y: auto; 
@@ -162,6 +205,7 @@
             padding: 20px; 
             box-shadow: -5px 0 20px rgba(0,0,0,0.05); 
             flex-shrink: 0; 
+            /* On mobile, sidebar is a page, needs to scroll */
         }
         
         .main-panel { 
@@ -198,6 +242,8 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            padding-bottom: 90px; /* Space for footer */
+            -webkit-overflow-scrolling: touch;
         }
 
         .mushaf-content-box { 
@@ -210,10 +256,9 @@
             min-height: fit-content;
         }
 
-        /* INCREASED FONT SIZE */
         .quran-text { 
             font-family: var(--font-arabic); 
-            font-size: clamp(22px, 5vw, 34px); /* Increased size */
+            font-size: clamp(22px, 5vw, 34px); /* Big font */
             line-height: 2.2; 
             text-align: justify;
             text-align-last: center; 
@@ -251,6 +296,7 @@
         .word.mistake { background-color: var(--mistake); color: white; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: var(--font-arabic); display: inline-block; margin: 0 5px; font-size: 0.9em; }
         
+        /* STICKY FOOTER */
         .mushaf-nav-footer { 
             background: #2c3e50;
             color: white;
@@ -259,9 +305,17 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            z-index: 30; 
-            position: relative;
+            
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%;
+            z-index: 100;
+            
+            /* Safe area for iPhone X+ */
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
+        
         .nav-btn-dark { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-heading); transition: 0.2s;}
         .nav-btn-dark:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
         .page-display-text { font-size: 18px; font-weight: bold; font-family: sans-serif; letter-spacing: 1px;}
@@ -285,72 +339,32 @@
 
         .api-loader { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; align-items:center; justify-content:center; z-index:10; border-radius:5px;}
 
-        /* MOBILE TOGGLE STYLES - FIXED FOOTER VISIBILITY */
+        /* MOBILE TOGGLE STYLES - FIXED */
         .mobile-only-btn { display: none; }
         @media (max-width: 900px) {
             .mobile-only-btn { display: inline-flex; }
-            .layout-split { flex-direction: column; height: calc(100vh - 65px); }
             
-            .layout-split:not(.show-mushaf-mobile) .sidebar-panel { display: flex; width: 100%; height: 100%; order: 1; border-bottom: none; }
+            /* Sidebar is a separate full-screen view now */
+            .layout-split:not(.show-mushaf-mobile) .sidebar-panel { 
+                display: flex; 
+                width: 100%; 
+                height: 100%; 
+                order: 1; 
+                border-bottom: none; 
+            }
             .layout-split:not(.show-mushaf-mobile) .main-panel { display: none; }
             
+            /* Mushaf view */
             .layout-split.show-mushaf-mobile .sidebar-panel { display: none; }
-            .layout-split.show-mushaf-mobile .main-panel { display: flex; width: 100%; height: 100%; order: 1; border-top: none; }
-            
-            .mushaf-page-container { padding: 5px; padding-bottom: 20px; }
-            .mushaf-content-box { padding: 15px 10px; }
-            
-            /* Sticky Footer for Mobile */
-            .mushaf-nav-footer { 
-                position: relative; 
-                z-index: 100;
-                padding-bottom: env(safe-area-inset-bottom);
+            .layout-split.show-mushaf-mobile .main-panel { 
+                display: flex; 
+                width: 100%; 
+                height: 100%; 
+                order: 1; 
+                border-top: none; 
             }
         }
 
-        /* Detailed Progress UI */
-        .prog-stat-box { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px; padding:15px; text-align:center; }
-        .prog-stat-val { font-size:24px; font-weight:bold; color:var(--primary); font-family:var(--font-arabic);}
-        .prog-stat-lbl { font-size:12px; color:#777; margin-top:5px; }
-        .passed-juz-list { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:10px; }
-        .passed-badge { background:#d4efdf; color:#1e8449; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; }
-        
-        /* New Table Styles */
-        .styled-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 14px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); }
-        .styled-table thead tr { background-color: var(--primary); color: #ffffff; text-align: right; font-family: var(--font-heading); }
-        .styled-table th, .styled-table td { padding: 12px 15px; border: 1px solid #eee; }
-        .styled-table tbody tr { border-bottom: 1px solid #dddddd; }
-        .styled-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }
-        .styled-table tbody tr:last-of-type { border-bottom: 2px solid var(--primary); }
-        .styled-table .ar-txt { font-family: var(--font-arabic); font-size: 16px; }
-        .styled-table td { font-family: var(--font-main); } 
-
-        .sem-tag {
-            padding: 8px 15px;
-            background: #e0e0e0;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-right: 5px;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-        .sem-tag.active {
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Checkbox Grid */
-        .checkbox-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; direction: ltr; margin-bottom: 20px; }
-        .checkbox-grid label { display: block; background: #f8f9fa; padding: 10px; border: 1px solid #eee; text-align: center; border-radius: 5px; cursor: pointer; user-select: none; }
-        .checkbox-grid label:hover { background: #e2e6ea; }
-        .checkbox-grid input[type="checkbox"] { display: none; }
-        .checkbox-grid input[type="checkbox"]:checked + span { color: var(--accent); font-weight: bold; }
-        .checkbox-grid input[type="checkbox"]:checked + span::before { content: '✔ '; }
-        .checkbox-grid label.checked { border-color: var(--accent); background: #d4efdf; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -582,6 +596,7 @@
                     <button class="big-btn btn-red mobile-only-btn" style="position:absolute; bottom:80px; left:50%; transform:translateX(-50%); width:90%; z-index:30; font-size:14px; opacity:0.9;" onclick="window.toggleMobileMushaf('recorder-layout', false)">⬇ ފޯމަށް އެނބުރިދިއުން</button>
 
                     <div class="mushaf-nav-footer">
+                        <!-- In RTL, First element is Right -->
                         <button class="nav-btn-dark" onclick="window.changeRecPage(-1)">ފަހަތަށް</button>
                         <span class="page-display-text" id="recPageDisplay">Page 1</span>
                         <button class="nav-btn-dark" onclick="window.changeRecPage(1)">ކުރިއަށް</button>
@@ -950,15 +965,10 @@
             window.renderSemesterTabs(); 
             window.renderHistory(s, 'categoryHistoryList', type); 
             
-            if(type === 'juz_exam' && currentUserType === 'student') {
-                document.getElementById('pastJuzBtn').style.display = 'none';
-                document.getElementById('peerExamBtn').style.display = 'inline-block'; // Show for students
-            } else if(type === 'juz_exam' && currentUserType === 'teacher') {
-                 document.getElementById('pastJuzBtn').style.display = 'inline-block';
-                 document.getElementById('peerExamBtn').style.display = 'none';
+            if(type === 'juz_exam' && currentUserType === 'teacher') {
+                document.getElementById('pastJuzBtn').style.display = 'inline-block';
             } else {
                 document.getElementById('pastJuzBtn').style.display = 'none';
-                document.getElementById('peerExamBtn').style.display = 'none';
             }
 
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
@@ -998,6 +1008,7 @@
 
         window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup('teacher'); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
 
+        // --- JUZ MANAGEMENT LOGIC ---
         window.openPastJuzModal = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
             const grid = document.getElementById('pastJuzGrid');
@@ -1026,8 +1037,11 @@
             
             alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!");
             document.getElementById('pastJuzModal').style.display = 'none';
+            // Refresh view
+            window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', 'juz_exam');
         }
 
+        // PROGRESS
         window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
         window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
@@ -1384,40 +1398,6 @@
             document.getElementById('externalRecModal').style.display='none'; 
         }
 
-        // TEACHER APPROVAL
-        window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : "ދިގު މުރާޖަޢާ"); let detailsHtml = ""; if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`; else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; } list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"><button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button><button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
-        
-        window.approveEntry = async (cIdx, sIdx, pIdx) => { 
-            const student = classesData[cIdx].students[sIdx]; 
-            const entry = student.pendingData[pIdx]; 
-            
-            if(entry.type === 'juz_update') {
-                student.juzCount = entry.value; 
-            } else { 
-                if(!student.history) student.history = []; 
-                student.history.push({ 
-                    type: entry.type, 
-                    date: entry.date, 
-                    page: entry.page, 
-                    endPage: entry.endPage, 
-                    startDetails: entry.startDetails, 
-                    endDetails: entry.endDetails, 
-                    mistakesCount: 0, 
-                    mistakeDetails: [], 
-                    recitedTo: entry.recitedTo || null 
-                }); 
-            } 
-            student.pendingData.splice(pIdx, 1); 
-            updateFirebase(); 
-            window.renderPendingApprovals(); 
-        }
-
-        window.rejectEntry = (cIdx, sIdx, pIdx) => { 
-            classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); 
-            updateFirebase(); 
-            window.renderPendingApprovals(); 
-        }
-
         // HISTORY & SLIP DOWNLOAD WITH SEMESTER FILTER
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); 
@@ -1449,34 +1429,44 @@
             records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec); 
                 let html = '';
-                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist abs-pos" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
-                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist abs-pos" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
                 
+                // Using Flexbox for buttons instead of absolute positioning to fix overlap
+                let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
+                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
+                
+                let headerContent = `
+                    <div class="hist-header">
+                        <div class="hist-title-group">
+                            <span class="hist-title">${rec.type === 'juz_exam' ? 'Juz ' + rec.juz : 'Page ' + rec.page}</span>
+                            <span class="hist-date">${rec.date}</span>
+                        </div>
+                        <div class="hist-actions">
+                            ${editBtn} ${deleteBtn}
+                        </div>
+                    </div>
+                `;
+
                 if(rec.type === 'juz_exam') { 
                     let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending" style="background:#f1c40f;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete" style="background:#2ecc71;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފުރިހަމަ</span>'; 
                     let dlBtn = `<button style="background:none; border:none; cursor:pointer; font-size:20px;" title="Download Slip" onclick="event.stopPropagation(); window.downloadExamSlip('${encodeURIComponent(student.name)}', '${encodeURIComponent(JSON.stringify(rec))}')">📥</button>`;
                     html = `
                         <div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>
-                            <div class="hist-header"><span class="hist-title">Juz ${rec.juz} Exam</span>${status}</div>
+                            ${headerContent}
                             <div class="hist-body">
                                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                                    <div><span style="font-size:12px;color:#777;display:block;">ތާރީޚް</span><b>${rec.date}</b></div>
+                                    <div><span style="font-size:12px;color:#777;display:block;">Status</span>${status}</div>
                                     <div style="text-align:left;"><span style="font-size:12px;color:#777;display:block;">ވަގުތު</span><b>${rec.duration}</b></div>
                                 </div>
                                 <div class="hist-grid" style="grid-template-columns: 1fr 1fr;">
-                                    <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0} <span style="font-size:12px;">(-${(rec.details?.teacherMistakes||0)*2})</span></span></div>
-                                    <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val" style="color:#e67e22">${rec.details?.selfMistakes||0} <span style="font-size:12px;">(-${(rec.details?.selfMistakes||0)*1})</span></span></div>
-                                    <div class="hist-item"><span class="hist-label">ތަޖުވީދު</span><span class="hist-val">${rec.details?.tajweed||10} / 10</span></div>
-                                    <div class="hist-item"><span class="hist-label">ފަރިތަކަން</span><span class="hist-val">${rec.details?.fluency||5} / 5</span></div>
-                                    <div class="hist-item" style="grid-column: span 2;"><span class="hist-label">މުތަޝާބިހް ސުވާލު</span><span class="hist-val">${rec.details?.mutashabihMarks||0} / 5</span></div>
+                                    <div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0}</span></div>
+                                    <div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val" style="color:#e67e22">${rec.details?.selfMistakes||0}</span></div>
                                 </div>
                             </div>
                             <div class="hist-footer exam-score"><span>ނަތީޖާ: ${rec.score}%</span> ${dlBtn}</div>
-                            ${deleteBtn}
                         </div>`; 
                 } 
                 else if(rec.type === 'final_exam') { 
-                    html = `<div class="hist-card type-final_exam"><div class="hist-header"><span class="hist-title">Final Exam</span></div><div class="hist-body"><div style="text-align:center; padding:10px;"><span style="font-size:14px; color:#777;">ކުށް: ${rec.mistakesCount}</span></div></div><div class="hist-footer exam-score" style="justify-content:center;">${rec.score}%</div>${deleteBtn}</div>`; 
+                    html = `<div class="hist-card type-final_exam">${headerContent}<div class="hist-body"><div style="text-align:center; padding:10px;"><span style="font-size:14px; color:#777;">ކުށް: ${rec.mistakesCount}</span></div></div><div class="hist-footer exam-score" style="justify-content:center;">${rec.score}%</div></div>`; 
                 } 
                 else { 
                     const sInfo = rec.startDetails ? `سورة ${rec.startDetails.surah}، آية ${rec.startDetails.ayah}` : '-'; 
@@ -1484,13 +1474,12 @@
                     const extBadge = rec.recitedTo ? `<div class="hist-badge-external">👤 ކިޔައިދިނީ: ${rec.recitedTo}</div>` : ''; 
                     
                     html = `<div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'>
-                                <div class="hist-header"><span class="hist-title">Page ${rec.page} - ${rec.endPage||rec.page}</span><span class="hist-date">${rec.date}</span></div>
+                                ${headerContent}
                                 <div class="hist-body">${extBadge}
                                     <div class="hist-detail-row"><span class="hist-detail-lbl">ފެށުނީ</span><span class="hist-detail-val">${sInfo}</span><span class="hist-detail-pg">ޞ ${rec.page}</span></div>
                                     <div class="hist-detail-row"><span class="hist-detail-lbl">ނިމުނީ</span><span class="hist-detail-val">${eInfo}</span><span class="hist-detail-pg">ޞ ${rec.endPage || rec.page}</span></div>
                                 </div>
                                 <div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount||0}</div>
-                                ${deleteBtn} ${editBtn}
                             </div>`; 
                 }
                 list.innerHTML += html;
@@ -1891,7 +1880,7 @@
                 if(!s.pendingData) s.pendingData = [];
                 s.pendingData.push(entry);
                 updateFirebase();
-                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!");
+                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); 
                 window.closeJuzExam();
 
             } else {
