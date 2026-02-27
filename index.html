@@ -1090,12 +1090,16 @@
             classesData.forEach((c, i) => sel.add(new Option(c.name, i)));
         }
 
+       // --- NEW IMPROVED PROGRESS TABLE LOGIC ---
         window.showClassProgressTable = (cIdx) => {
             const container = document.getElementById('classProgressTableContainer');
             const dlBtn = document.getElementById('btnDownloadExcel');
             
             if(cIdx === "") {
-                container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ކްލާހެއް ޚިޔާރުކުރައްވާ</p>`;
+                container.innerHTML = `<div style="text-align:center; padding:40px; color:#999;">
+                    <div style="font-size:40px; margin-bottom:10px;">🏫</div>
+                    ކްލާހެއް ޚިޔާރުކުރައްވާ
+                </div>`;
                 dlBtn.style.display = 'none';
                 return;
             }
@@ -1108,53 +1112,106 @@
 
             dlBtn.style.display = 'inline-block';
             
-            const currentSem = semesters[semesters.length - 1]; // Use current semester
+            const currentSem = semesters[semesters.length - 1]; 
             const startDate = new Date(currentSem.startDate);
             const endDate = new Date(currentSem.endDate);
             endDate.setHours(23, 59, 59, 999);
 
+            const students = classesData[cIdx].students || [];
+            
+            if(students.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ދަރިވަރުން ނެތް</p>`;
+                return;
+            }
+
+            // 1. GENERATE DESKTOP TABLE
             let tableHtml = `
-            <table id="progressTable" class="styled-table">
+            <table id="progressTable" class="desktop-view-table">
                 <thead>
                     <tr>
-                        <th rowspan="2">ނަން</th>
+                        <th rowspan="2" style="text-align:right;">ނަން</th>
                         <th rowspan="2">ލެވެލް</th>
-                        <th colspan="2" style="text-align:center;">މި ސެމިސްޓަރ</th>
-                        <th rowspan="2">ޞަފްޙާ ޢަދަދު</th>
+                        <th colspan="2" style="text-align:center; background:rgba(0,0,0,0.1);">މި ސެމިސްޓަރ</th>
+                        <th rowspan="2">ޞަފްޙާ</th>
                         <th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th>
                         <th rowspan="2">ޖުމްލަ ޖުޒުއު</th>
                     </tr>
                     <tr>
-                        <th>ފެށި ހިސާބު</th>
-                        <th>ނިންމި ހިސާބު</th>
+                        <th style="background:rgba(0,0,0,0.05);">ފެށި ހިސާބު</th>
+                        <th style="background:rgba(0,0,0,0.05);">ނިންމި ހިސާބު</th>
                     </tr>
                 </thead>
                 <tbody>
             `;
 
-            const students = classesData[cIdx].students || [];
-            
-            if(students.length === 0) {
-                tableHtml += `<tr><td colspan="7" style="text-align:center;">No students</td></tr>`;
-            } else {
-                students.forEach(s => {
-                    const stats = window.calculateSemesterStats(s, startDate, endDate);
-                    tableHtml += `
-                        <tr>
-                            <td style="font-weight:bold;">${s.name}</td>
-                            <td>${s.level || '-'}</td>
-                            <td class="ar-txt">${stats.startPoint}</td>
-                            <td class="ar-txt">${stats.endPoint}</td>
-                            <td style="font-weight:bold; color:var(--primary); text-align:center;">${stats.balancePages}</td>
-                            <td style="text-align:center; color:#e67e22;">${stats.semJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.semJuzDetails})</span></td>
-                            <td style="text-align:center; color:#27ae60; font-weight:bold;">${stats.totalJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.totalJuzDetails})</span></td>
-                        </tr>
-                    `;
-                });
-            }
+            // 2. GENERATE MOBILE CARDS
+            let cardsHtml = `<div class="mobile-view-cards">`;
+
+            students.forEach(s => {
+                const stats = window.calculateSemesterStats(s, startDate, endDate);
+                
+                // Add to Table
+                tableHtml += `
+                    <tr>
+                        <td style="font-weight:bold; text-align:right;">
+                            <span style="font-family:var(--font-heading); font-size:16px;">${s.name}</span><br>
+                            <span style="font-size:11px; color:#777;">ID: ${s.id}</span>
+                        </td>
+                        <td><span class="tbl-badge bg-blue">${s.level || '-'}</span></td>
+                        <td class="ar-txt" style="color:#555;">${stats.startPoint}</td>
+                        <td class="ar-txt" style="color:#555;">${stats.endPoint}</td>
+                        <td><span style="font-weight:bold; font-size:16px; color:var(--primary);">${stats.balancePages}</span></td>
+                        <td>
+                            <div class="tbl-badge bg-orange">${stats.semJuzCount}</div>
+                            ${stats.semJuzDetails ? `<div style="font-size:10px; color:#999; margin-top:2px;">(${stats.semJuzDetails})</div>` : ''}
+                        </td>
+                        <td>
+                            <div class="tbl-badge bg-green">${stats.totalJuzCount}</div>
+                            ${stats.totalJuzDetails ? `<div style="font-size:10px; color:#999; margin-top:2px;">(${stats.totalJuzDetails})</div>` : ''}
+                        </td>
+                    </tr>
+                `;
+
+                // Add to Cards
+                cardsHtml += `
+                    <div class="prog-card">
+                        <div class="prog-card-header">
+                            <div class="prog-card-name">${s.name}</div>
+                            <div class="prog-card-level">Level ${s.level || '-'}</div>
+                        </div>
+                        <div class="prog-grid">
+                            <div class="prog-box" style="grid-column: span 2;">
+                                <span class="prog-box-label">މި ސެމިސްޓަރގައި ކިޔެވުނު މިންވަރު</span>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; color:#555;">
+                                    <span>${stats.startPoint}</span>
+                                    <span>➡</span>
+                                    <span>${stats.endPoint}</span>
+                                </div>
+                            </div>
+                            <div class="prog-box highlight">
+                                <span class="prog-box-label">ސެމިސްޓަރ ޞަފްޙާ</span>
+                                <span class="prog-box-val">${stats.balancePages}</span>
+                            </div>
+                            <div class="prog-box">
+                                <span class="prog-box-label">ސެމިސްޓަރ ޖުޒުއު</span>
+                                <span class="prog-box-val" style="color:#e67e22">${stats.semJuzCount}</span>
+                                ${stats.semJuzDetails ? `<div style="font-size:10px;">(${stats.semJuzDetails})</div>` : ''}
+                            </div>
+                            <div class="prog-box" style="grid-column: span 2; background:#e8f8f5; border-color:#d4efdf;">
+                                <span class="prog-box-label">ޖުމްލަ ޙިފްޡް (ޖުޒުއު)</span>
+                                <span class="prog-box-val" style="color:#27ae60; font-size:20px;">${stats.totalJuzCount}</span>
+                                ${stats.totalJuzDetails ? `<div style="font-size:11px; color:#27ae60;">(${stats.totalJuzDetails})</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
 
             tableHtml += `</tbody></table>`;
-            container.innerHTML = tableHtml;
+            cardsHtml += `</div>`;
+
+            // Combine both into container
+            container.innerHTML = tableHtml + cardsHtml;
         }
 
         window.calculateSemesterStats = (student, startDate, endDate) => {
@@ -2003,7 +2060,153 @@
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
         window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
+/* --- PROGRESS TABLE & MOBILE CARD STYLES --- */
 
+/* Desktop Table Styling */
+.desktop-view-table {
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 20px 0;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.desktop-view-table thead tr {
+    background: linear-gradient(135deg, var(--primary), #34495e);
+    color: #ffffff;
+    text-align: center;
+}
+
+.desktop-view-table th {
+    padding: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #ddd;
+}
+
+.desktop-view-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.desktop-view-table tbody tr:hover {
+    background-color: #f1f9f5;
+    transition: 0.2s;
+}
+
+.desktop-view-table tbody tr:last-of-type td {
+    border-bottom: none;
+}
+
+/* Badges inside table */
+.tbl-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+.bg-green { background: #e8f8f5; color: #27ae60; }
+.bg-orange { background: #fef5e7; color: #e67e22; }
+.bg-blue { background: #ebf5fb; color: #2980b9; }
+
+/* Mobile Card Styling */
+.mobile-view-cards {
+    display: none; /* Hidden by default on desktop */
+    margin-top: 20px;
+}
+
+.prog-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.prog-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--accent);
+}
+
+.prog-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f5f5f5;
+    padding-bottom: 10px;
+}
+
+.prog-card-name {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.prog-card-level {
+    background: #34495e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.prog-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.prog-box {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.prog-box-label {
+    font-size: 11px;
+    color: #7f8c8d;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.prog-box-val {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: var(--font-arabic);
+    color: #333;
+}
+
+.prog-box.highlight {
+    background: #eafaf1;
+    border-color: #d5f5e3;
+}
+.prog-box.highlight .prog-box-val { color: var(--accent); }
+
+/* Responsive Switch */
+@media (max-width: 900px) {
+    .desktop-view-table { display: none; }
+    .mobile-view-cards { display: block; }
+}
     </script>
 </body>
 </html>
