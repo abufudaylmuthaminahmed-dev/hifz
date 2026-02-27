@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>إتقان - Hifz Program (Laptop Nav & UI Fix)</title>
+    <title>إتقان - Hifz Program (Mobile Nav Fixed)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -58,7 +58,7 @@
             max-width: 1200px; 
             margin: 0 auto; 
             animation: fadeIn 0.3s ease; 
-            height: calc(100vh - 65px); /* Explicit height */
+            height: calc(100vh - 65px); 
             overflow-y: auto; 
             flex-grow: 1;
             -webkit-overflow-scrolling: touch;
@@ -66,8 +66,12 @@
 
         .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; flex-shrink: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+
         .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
         .logout-btn { background: #fee2e2; color: #b91c1c; }
+        .nav-stud-btn { background: #e8f6f3; color: var(--st-primary); border: 1px solid var(--st-primary); }
 
         .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100%; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; overflow-y: auto; }
         .login-card { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
@@ -131,7 +135,6 @@
         .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
         .hist-card:active { transform: scale(0.99); }
         
-        /* UPDATED HIST HEADER FOR BUTTON FIX */
         .hist-header { 
             padding: 12px 20px; 
             background: #f8f9fa; 
@@ -205,7 +208,8 @@
             padding: 20px; 
             box-shadow: -5px 0 20px rgba(0,0,0,0.05); 
             flex-shrink: 0; 
-            /* On mobile, sidebar is a page, needs to scroll */
+            /* Fix: ensure bottom content not hidden */
+            padding-bottom: 100px;
         }
         
         .main-panel { 
@@ -242,7 +246,8 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding-bottom: 90px; /* Space for footer */
+            /* CRITICAL FIX: Add plenty of padding so text isn't behind fixed footer */
+            padding-bottom: 120px; 
             -webkit-overflow-scrolling: touch;
         }
 
@@ -256,6 +261,7 @@
             min-height: fit-content;
         }
 
+        /* INCREASED FONT SIZE */
         .quran-text { 
             font-family: var(--font-arabic); 
             font-size: clamp(22px, 5vw, 34px); /* Big font */
@@ -296,7 +302,7 @@
         .word.mistake { background-color: var(--mistake); color: white; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: var(--font-arabic); display: inline-block; margin: 0 5px; font-size: 0.9em; }
         
-        /* STICKY FOOTER */
+        /* FIXED STICKY FOOTER FOR MOBILE & DESKTOP */
         .mushaf-nav-footer { 
             background: #2c3e50;
             color: white;
@@ -306,11 +312,13 @@
             align-items: center;
             flex-shrink: 0;
             
-            position: absolute; 
+            /* KEY FIX: Fixed position relative to viewport */
+            position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%;
-            z-index: 100;
+            z-index: 9999;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
             
             /* Safe area for iPhone X+ */
             padding-bottom: max(10px, env(safe-area-inset-bottom));
@@ -521,7 +529,13 @@
             <div id="gradingStudentList" class="grid-container"></div>
         </div>
         <div id="grading-menu-page" class="container hidden">
-            <div class="app-header"><div class="header-title" id="gradingStudentName">Student</div><button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button></div>
+            <div class="app-header">
+                <div class="header-title" id="gradingStudentName">Student</div>
+                <div class="header-actions">
+                    <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+                    <button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button>
+                </div>
+            </div>
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
@@ -535,7 +549,10 @@
         <div id="category-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="catPageTitle">Title</div>
-                <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+                <div class="header-actions">
+                    <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+                    <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+                </div>
             </div>
             
             <!-- Semester Tags Container -->
@@ -560,7 +577,10 @@
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
                 <div style="display:flex; align-items:center; gap:10px;"><button class="icon-btn" onclick="window.closeRecorder()">⬅</button><span class="header-title" id="recorderTitle">ރެކޯޑް</span></div>
-                <span id="viewModeBadge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:4px; font-size:12px; display:none;">View Mode</span>
+                <div class="header-actions">
+                    <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+                    <span id="viewModeBadge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:4px; font-size:12px; display:none;">View Mode</span>
+                </div>
             </div>
             <div class="layout-split" id="recorder-layout">
                 <div class="sidebar-panel">
@@ -609,7 +629,10 @@
         <div id="juz-exam-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
                 <div style="display:flex; align-items:center; gap:10px;"><button class="icon-btn" onclick="window.closeJuzExam()">⬅</button><span class="header-title" id="juzExamTitle">ޖުޒުއު އިމްތިޙާން</span></div>
-                <div id="partBadge" style="background:#2c3e50; color:white; padding:5px 15px; border-radius:20px; font-size:12px;"></div>
+                <div class="header-actions">
+                     <div id="partBadge" style="background:#2c3e50; color:white; padding:5px 15px; border-radius:20px; font-size:12px;"></div>
+                     <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+                </div>
             </div>
             <div class="layout-split" id="juz-layout">
                 <div class="sidebar-panel">
@@ -927,6 +950,17 @@
         window.loginSuccessStudent = () => { currentUserType = 'student'; document.body.classList.add('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('studentDashName').innerText = currentStudentObj.name; window.calculateStudentProgress(currentStudentObj); window.openPage('student-dashboard'); };
         window.logout = () => location.reload();
         
+        // --- NEW NAVIGATION FUNCTION ---
+        window.goToStudentList = () => {
+             // If we have a class context, go to that class list
+             if (currentClassIdx !== -1) {
+                 window.openGradingStudentList(currentClassIdx);
+             } else {
+                 // Fallback to class selection
+                 window.openGradingClassList();
+             }
+        };
+
         window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); ['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); } } };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
 
@@ -965,10 +999,15 @@
             window.renderSemesterTabs(); 
             window.renderHistory(s, 'categoryHistoryList', type); 
             
-            if(type === 'juz_exam' && currentUserType === 'teacher') {
-                document.getElementById('pastJuzBtn').style.display = 'inline-block';
+            if(type === 'juz_exam' && currentUserType === 'student') {
+                document.getElementById('pastJuzBtn').style.display = 'none';
+                document.getElementById('peerExamBtn').style.display = 'inline-block'; // Show for students
+            } else if(type === 'juz_exam' && currentUserType === 'teacher') {
+                 document.getElementById('pastJuzBtn').style.display = 'inline-block';
+                 document.getElementById('peerExamBtn').style.display = 'none';
             } else {
                 document.getElementById('pastJuzBtn').style.display = 'none';
+                document.getElementById('peerExamBtn').style.display = 'none';
             }
 
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
@@ -1398,6 +1437,40 @@
             document.getElementById('externalRecModal').style.display='none'; 
         }
 
+        // TEACHER APPROVAL
+        window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : "ދިގު މުރާޖަޢާ"); let detailsHtml = ""; if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`; else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; } list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"><button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">✓ Approve</button><button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
+        
+        window.approveEntry = async (cIdx, sIdx, pIdx) => { 
+            const student = classesData[cIdx].students[sIdx]; 
+            const entry = student.pendingData[pIdx]; 
+            
+            if(entry.type === 'juz_update') {
+                student.juzCount = entry.value; 
+            } else { 
+                if(!student.history) student.history = []; 
+                student.history.push({ 
+                    type: entry.type, 
+                    date: entry.date, 
+                    page: entry.page, 
+                    endPage: entry.endPage, 
+                    startDetails: entry.startDetails, 
+                    endDetails: entry.endDetails, 
+                    mistakesCount: 0, 
+                    mistakeDetails: [], 
+                    recitedTo: entry.recitedTo || null 
+                }); 
+            } 
+            student.pendingData.splice(pIdx, 1); 
+            updateFirebase(); 
+            window.renderPendingApprovals(); 
+        }
+
+        window.rejectEntry = (cIdx, sIdx, pIdx) => { 
+            classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); 
+            updateFirebase(); 
+            window.renderPendingApprovals(); 
+        }
+
         // HISTORY & SLIP DOWNLOAD WITH SEMESTER FILTER
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); 
@@ -1430,7 +1503,6 @@
                 const realIndex = student.history.indexOf(rec); 
                 let html = '';
                 
-                // Using Flexbox for buttons instead of absolute positioning to fix overlap
                 let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
                 let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
                 
