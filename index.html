@@ -73,20 +73,6 @@
         .st-remarks-box { margin-top: 10px; background: #fffcf2; padding: 8px; border-radius: 5px; font-size: 12px; border: 1px solid #fae5d3; color: #d35400; }
         .st-footer-actions { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Student Stats & Target */
-        .student-stat-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e0e0e0; }
-        .st-stats-grid { display: flex; justify-content: space-around; align-items: center; margin-bottom: 15px; }
-        .st-stat-item { text-align: center; flex: 1; border-left: 1px solid #eee; }
-        .st-stat-item:last-child { border-left: none; }
-        .st-stat-val { font-size: 28px; font-weight: bold; line-height: 1; margin-bottom: 5px; font-family: var(--font-arabic); }
-        .st-stat-lbl { font-size: 13px; color: #777; font-weight: 500; }
-        
-        .target-box { background: #fdfefe; border-top: 1px solid #eee; padding-top: 15px; }
-        .target-header { display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px; font-weight:bold; color:#555; }
-        .progress-bar-bg { background:#eee; height:15px; border-radius:10px; overflow:hidden; }
-        .progress-bar-fill { height:100%; background: linear-gradient(90deg, #f1c40f, #2ecc71); width:0%; transition: width 1s ease-in-out; border-radius:10px; }
-        .target-msg { font-size:12px; color:#777; text-align:center; margin-top:5px; }
-
         .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
         .big-btn:hover { transform: scale(1.05); }
         .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
@@ -154,24 +140,38 @@
         .prog-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #f5f5f5; padding-bottom: 10px; }
         .prog-card-name { font-family: var(--font-heading); font-size: 18px; color: var(--primary); font-weight: bold; }
         .prog-card-level { background: #34495e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
-        .prog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .prog-box { background: #f8f9fa; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
-        .prog-box-label { font-size: 11px; color: #7f8c8d; display: block; margin-bottom: 3px; }
-        .prog-box-val { font-size: 16px; font-weight: bold; font-family: var(--font-arabic); color: #333; }
+        .prog-grid { display: flex; flex-direction: column; gap: 10px; }
+        .prog-box { background: #f8f9fa; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
+        .prog-box-label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 5px; font-weight:bold; }
+        .prog-box-val { font-size: 18px; font-weight: bold; font-family: var(--font-arabic); color: #333; }
+        .prog-flow-row { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 15px; color: #555; background: #fffcf2; padding: 15px; border-radius: 10px; border: 1px solid #fae5d3; }
+        .prog-flow-point { background: white; padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd; width: 100%; text-align: center; }
+        .prog-flow-arrow { color: var(--accent); font-size: 20px; line-height: 0.5; }
+        .prog-stats-row { display: flex; gap: 10px; }
+        .prog-stats-row .prog-box { flex: 1; }
         .prog-box.highlight { background: #eafaf1; border-color: #d5f5e3; }
         .prog-box.highlight .prog-box-val { color: var(--accent); }
+
+        /* TARGET UI */
+        .student-stat-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e0e0e0; }
+        .st-stats-grid { display: flex; justify-content: space-around; align-items: center; margin-bottom: 15px; }
+        .st-stat-item { text-align: center; flex: 1; border-left: 1px solid #eee; }
+        .st-stat-item:last-child { border-left: none; }
+        .st-stat-val { font-size: 28px; font-weight: bold; line-height: 1; margin-bottom: 5px; font-family: var(--font-arabic); }
+        .st-stat-lbl { font-size: 13px; color: #777; font-weight: 500; }
+        .target-box { background: #fdfefe; border-top: 1px solid #eee; padding-top: 15px; }
+        .target-header { display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px; font-weight:bold; color:#555; }
+        .progress-bar-bg { background:#eee; height:15px; border-radius:10px; overflow:hidden; }
+        .progress-bar-fill { height:100%; background: linear-gradient(90deg, #f1c40f, #2ecc71); width:0%; transition: width 1s ease-in-out; border-radius:10px; }
+        .target-msg { font-size:12px; color:#777; text-align:center; margin-top:5px; }
 
         @media (max-width: 900px) {
             .desktop-view-table { display: none; }
             .mobile-view-cards { display: block; }
         }
 
-        /* MUSHAF LAYOUT - DESKTOP & MOBILE */
-        .layout-split { 
-            display: flex; flex-direction: column;
-            height: calc(100vh - 65px); height: calc(100dvh - 65px);
-            overflow: hidden; position: relative;
-        }
+        /* FIXED MUSHAF LAYOUT - DESKTOP & MOBILE */
+        .layout-split { display: flex; flex-direction: column; height: calc(100vh - 65px); height: calc(100dvh - 65px); overflow: hidden; position: relative; }
 
         @media (min-width: 901px) {
             .layout-split { flex-direction: row; }
@@ -181,69 +181,29 @@
             .mushaf-page-container { padding-bottom: 80px; }
         }
         
-        .sidebar-panel { 
-            background: white; display: flex; flex-direction: column; 
-            overflow-y: auto; z-index: 10; padding: 20px; 
-            box-shadow: -5px 0 20px rgba(0,0,0,0.05); flex-shrink: 0; padding-bottom: 100px;
-        }
-        
-        .main-panel { 
-            flex: 1; background: var(--mushaf-paper); position: relative; 
-            display: flex; flex-direction: column; height: 100%; overflow: hidden; 
-        }
+        .sidebar-panel { background: white; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.05); flex-shrink: 0; padding-bottom: 100px; }
+        .main-panel { flex: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 
-        .mushaf-header-sticky {
-            background: white; padding: 8px 15px; border-bottom: 1px solid #ddd;
-            text-align: center; font-family: var(--font-arabic); font-size: 16px;
-            color: var(--primary); font-weight: bold; display: flex;
-            justify-content: space-between; align-items: center; flex-shrink: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 20;
-        }
+        .mushaf-header-sticky { background: white; padding: 8px 15px; border-bottom: 1px solid #ddd; text-align: center; font-family: var(--font-arabic); font-size: 16px; color: var(--primary); font-weight: bold; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 20; }
+        .mushaf-page-container { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; justify-content: center; align-items: flex-start; padding-bottom: 120px; -webkit-overflow-scrolling: touch; }
+        .mushaf-content-box { background: white; padding: 10px 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border-radius: 5px; width: 100%; max-width: 800px; min-height: fit-content; }
 
-        .mushaf-page-container { 
-            flex-grow: 1; overflow-y: auto; padding: 10px; 
-            display: flex; justify-content: center; align-items: flex-start;
-            padding-bottom: 120px; -webkit-overflow-scrolling: touch;
-        }
-
-        .mushaf-content-box { 
-            background: white; padding: 15px 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
-            border-radius: 5px; width: 100%; max-width: 800px; min-height: fit-content;
-        }
-
-        .quran-text { 
-            font-family: var(--font-arabic); font-size: clamp(22px, 5vw, 34px); 
-            line-height: 2.2; text-align: justify; text-align-last: center; direction: rtl;
-        }
-        
+        /* Fit to screen font size */
+        .quran-text { font-family: var(--font-arabic); font-size: clamp(20px, 3.5vw, 26px); line-height: 2.1; text-align: justify; text-align-last: center; direction: rtl; }
         .quran-block { margin-bottom: 15px; }
-        
-        .surah-header-box {
-            border: 2px solid #d4ac6e; background: #fffcf2;
-            background-image: linear-gradient(to right, #fffcf2, #fdf2d0, #fffcf2);
-            padding: 3px 10px; margin: 15px auto 8px auto; border-radius: 5px;
-            text-align: center; width: 95%;
-        }
+        .surah-header-box { border: 2px solid #d4ac6e; background: #fffcf2; background-image: linear-gradient(to right, #fffcf2, #fdf2d0, #fffcf2); padding: 3px 10px; margin: 15px auto 8px auto; border-radius: 5px; text-align: center; width: 95%; }
         .surah-title { font-family: 'Reem Kufi', var(--font-arabic); font-size: 24px; color: #5d4037; text-shadow: 1px 1px 0 #fff; }
         .bismillah-box { text-align: center; font-family: var(--font-arabic); font-size: 20px; margin: 8px 0 15px 0; color: #555; }
-
         .word { cursor: pointer; border-radius: 4px; padding: 2px 1px; transition: background 0.1s; }
         .word:hover { background: rgba(0,0,0,0.05); }
         .word.mistake { background-color: var(--mistake); color: white; }
         .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: var(--font-arabic); display: inline-block; margin: 0 5px; font-size: 0.9em; }
         
-        .mushaf-nav-footer { 
-            background: #2c3e50; color: white; padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0; position: fixed; bottom: 0; left: 0; width: 100%;
-            z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
-        }
-        
+        /* FOOTER IS FIXED FOR BOTH DESKTOP & MOBILE */
+        .mushaf-nav-footer { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
         .nav-btn-dark { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-heading); transition: 0.2s;}
         .nav-btn-dark:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
         .page-display-text { font-size: 18px; font-weight: bold; font-family: sans-serif; letter-spacing: 1px;}
-
         .mobile-return-btn { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 9998; font-size: 14px; opacity: 0.95; }
 
         .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
@@ -256,7 +216,6 @@
         .form-sec { border: 1px solid #eee; padding: 10px; border-radius: 8px; position: relative; margin-top: 10px; }
         .sec-title { position: absolute; top: -10px; right: 10px; background: white; padding: 0 5px; font-size: 12px; font-weight: bold; color: #777; }
         .rec-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: var(--font-main); text-align: right; margin-bottom: 5px; }
-
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 95%; max-width: 550px; max-height: 95vh; overflow-y: auto; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -271,7 +230,7 @@
             .layout-split:not(.show-mushaf-mobile) .main-panel { display: none; }
             .layout-split.show-mushaf-mobile .sidebar-panel { display: none; }
             .layout-split.show-mushaf-mobile .main-panel { display: flex; width: 100%; height: 100%; order: 1; border-top: none; }
-            .mushaf-page-container { padding: 5px; padding-bottom: 120px; }
+            .mushaf-page-container { padding: 5px; padding-bottom: 130px; }
             .mushaf-content-box { padding: 10px; }
         }
 
@@ -290,6 +249,7 @@
 </head>
 <body>
 
+    <!-- LOGIN -->
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
             <div class="logo-container">
@@ -316,8 +276,10 @@
         </div>
     </div>
 
+    <!-- APP CONTAINER -->
     <div id="app-container" class="hidden">
         
+        <!-- TEACHER DASHBOARD -->
         <div id="teacher-dashboard" class="container hidden">
             <div class="app-header">
                 <div class="header-title">މުދައްރިސް ޕެނަލް</div>
@@ -342,6 +304,7 @@
             </div>
         </div>
 
+        <!-- Admin Only -->
         <div id="teacher-mgmt-page" class="container hidden">
             <div class="app-header"><div class="header-title">މުދައްރިސުންގެ މަޢުލޫމާތު</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px;">
@@ -357,20 +320,25 @@
             <div id="teacherList" class="grid-container"></div>
         </div>
 
+        <!-- PROGRESS REPORT -->
         <div id="progress-page" class="container hidden">
             <div class="app-header"><div class="header-title">ޕްރޮގްރެސް ރިޕޯޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
+            
             <div class="action-card" style="margin-top:20px; background:#fff; border-top: 5px solid var(--st-primary); max-width:100%;">
                 <h4 style="color:var(--primary); margin-bottom:15px; text-align:right;">ކްލާސް ޕްރޮގްރެސް ރިޕޯޓް (މި ސެމިސްޓަރ)</h4>
+                
                 <div style="display:flex; gap:10px; margin-bottom:20px; justify-content: space-between;">
                     <button id="btnDownloadExcel" class="big-btn btn-green" style="font-size:14px; padding:8px 15px; width:auto; display:none;" onclick="window.downloadProgressExcel()">📥 Excel ޑައުންލޯޑް</button>
                     <select id="progClassSelect" class="form-input" style="margin-bottom:0; max-width:300px;" onchange="window.showClassProgressTable(this.value)">
                         <option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>
                     </select>
                 </div>
+
                 <div id="classProgressTableContainer" style="overflow-x:auto;">
                     <p style="text-align:center; color:#999; padding:20px;">ކްލާހެއް ޚިޔާރުކުރައްވާ</p>
                 </div>
             </div>
+
             <div class="action-card" style="margin-top:20px; border-top: 5px solid var(--accent-rev);">
                 <h4>އާ ސެމިސްޓަރ ހެދުން</h4>
                 <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
@@ -380,14 +348,17 @@
                 </div>
                 <button class="big-btn" onclick="window.createSemester()">ސެމިސްޓަރ ހަދާ</button>
             </div>
+            
             <div id="pendingApprovalsSection" style="margin-top:30px;">
                 <h4 style="color:#e67e22; border-bottom: 2px solid #e67e22; padding-bottom:10px;">އެޕްރޫވް ކުރަން ހުރި ރެކޯޑްތައް (Pending)</h4>
                 <div id="pendingApprovalsList"></div>
             </div>
+
             <h4 style="margin-top:20px;">ސެމިސްޓަރތައް</h4>
             <div id="semesterList" class="grid-container"></div>
         </div>
 
+        <!-- MANAGEMENT PAGES -->
         <div id="management-page" class="container hidden">
             <div class="app-header"><div class="header-title">ކްލާސް މެނޭޖްމަންޓް</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px; text-align:right;">
@@ -452,7 +423,9 @@
                     <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
                 </div>
             </div>
+            
             <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
+
             <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
                 <div style="display:flex; gap:10px;">
@@ -464,7 +437,7 @@
             <div id="categoryHistoryList"></div>
         </div>
 
-        <!-- UNIVERSAL RECORDER -->
+        <!-- UNIVERSAL RECORDER (MUSHAF VIEW) -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
                 <div style="display:flex; align-items:center; gap:10px;"><button class="icon-btn" onclick="window.closeRecorder()">⬅</button><span class="header-title" id="recorderTitle">ރެކޯޑް</span></div>
@@ -476,6 +449,7 @@
             <div class="layout-split" id="recorder-layout">
                 <div class="sidebar-panel">
                     <button class="big-btn btn-orange mobile-only-btn" style="width:100%; margin-bottom:15px; font-size:14px;" onclick="window.toggleMobileMushaf('recorder-layout', true)">📖 މުޞްޙަފް ހުޅުވާ</button>
+
                     <div style="margin-bottom:15px;"><label class="form-label">ތާރީޚް</label><input type="date" id="recDate" class="rec-input" style="text-align:center;"></div>
                     <div class="form-sec" style="border-top:3px solid var(--accent);">
                         <span class="sec-title">ފަށާ ހިސާބު</span>
@@ -502,7 +476,9 @@
                             <div id="mushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p></div>
                         </div>
                     </div>
+                    
                     <button class="big-btn btn-red mobile-only-btn mobile-return-btn" onclick="window.toggleMobileMushaf('recorder-layout', false)">⬇ ފޯމަށް އެނބުރިދިއުން</button>
+
                     <div class="mushaf-nav-footer">
                         <button class="nav-btn-dark" onclick="window.changeRecPage(-1)">ފަހަތަށް</button>
                         <span class="page-display-text" id="recPageDisplay">Page 1</span>
@@ -707,6 +683,7 @@
                 <div class="full-span"><label class="form-label">ކިޔައިދިން ފަރާތުގެ ނަން</label><input type="text" id="extPerson" class="form-input" placeholder="މިސާލު: މަންމަ / އުސްތާޛް ޢަލީ"></div>
                 <div><label class="form-label">ތާރީޚް</label><input type="date" id="extDate" class="form-input"></div>
                 <div><label class="form-label">ބާވަތް</label><select id="extType" class="form-input"><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select></div>
+                <div class="full-span"><label class="form-label">ކުށުގެ ޢަދަދު</label><input type="number" id="extMistakes" class="form-input" min="0" value="0"></div>
                 <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;"><label class="form-label">ފެށޭ ޞަފްޙާ</label><input type="number" id="extStartPage" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"><div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select></div></div>
                 <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #e0e0e0;"><label class="form-label">ނިމޭ ޞަފްޙާ</label><input type="number" id="extEndPage" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"><div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:60px; padding:5px; margin:0; font-size:13px;"></select></div></div>
             </div>
@@ -714,6 +691,7 @@
         </div>
     </div>
 
+    <!-- BACKUP MODAL -->
     <div id="backupModal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <h3 style="color:var(--primary); margin-bottom:15px;">ޑޭޓާ ބެކަޕް / ރިސްޓޯ</h3>
@@ -732,6 +710,7 @@
         </div>
     </div>
 
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -753,69 +732,28 @@
         let isPeerExam = false; 
         let currentPendingExamData = null; 
         let currentPendingExamIndices = null; 
-
         let activeHistorySemesterIdx = -1; 
 
-        window.getFormattedDate = () => {
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
+        window.getFormattedDate = () => { const d = new Date(); const year = d.getFullYear(); const month = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; };
 
         const dbRef = ref(db, 'hifz_system_v1');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
             classesData = data?.classes ||[]; hifzUsers = data?.users || []; semesters = data?.semesters ||[];
             if(!hifzUsers.length) { hifzUsers.push({username:'admin', password:'1234', role:'admin', name:'Administrator'}); updateFirebase(); }
-
             if(!document.getElementById('management-page').classList.contains('hidden')) window.renderManageClassList();
             if(!document.getElementById('teacher-mgmt-page').classList.contains('hidden')) window.renderTeacherList();
             if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
-            
-            if(currentUserType === 'student' && currentStudentObj) {
-                let sId = currentStudentObj.id;
-                for(let c of classesData) { let found = c.students?.find(x=>x.id===sId); if(found) { currentStudentObj=found; break;} }
-                window.calculateStudentProgress(currentStudentObj);
-            }
+            if(currentUserType === 'student' && currentStudentObj) { let sId = currentStudentObj.id; for(let c of classesData) { let found = c.students?.find(x=>x.id===sId); if(found) { currentStudentObj=found; break;} } window.calculateStudentProgress(currentStudentObj); }
         });
 
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
         window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
 
         window.openBackupModal = () => document.getElementById('backupModal').style.display = 'flex';
-        window.backupData = () => {
-            const data = { classes: classesData, users: hifzUsers, semesters: semesters };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        };
-
-        window.restoreData = (input) => {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) {
-                        classesData = data.classes || [];
-                        hifzUsers = data.users ||[];
-                        semesters = data.semesters ||[];
-                        updateFirebase();
-                        alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!");
-                        location.reload();
-                    }
-                } catch (err) { alert("Invalid Backup File"); }
-            };
-            reader.readAsText(file);
-        };
+        window.backupData = () => { const data = { classes: classesData, users: hifzUsers, semesters: semesters }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); };
+        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users || []; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
 
         window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
         window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(!user.password) { pendingUserIndex = uIdx; currentUserType = 'teacher'; document.getElementById('passModalUserText').innerText = `މުދައްރިސް: ${user.name}`; document.getElementById('createPassModal').style.display = 'flex'; return; } if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
@@ -833,13 +771,12 @@
         window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="cls-act-btn btn-edit-cls" onclick="event.stopPropagation(); window.editClass(${i})">✏️</button><button class="cls-act-btn btn-del-cls" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; window.editClass = (i) => { let name = prompt("New Name:", classesData[i].name), teach = prompt("New Teacher:", classesData[i].teacher); if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); } }; window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
 
         window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Module:</span> <b>${s.module || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Direction:</span> <b>${s.direction==='bottom_up'?'ތިރިން މަތިއަށް':'މަތިން ތިރިއަށް'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button><button class="btn-action-sm btn-edit-hist" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; window.resetPass = (idx) => { if(confirm("Reset password?")) { classesData[currentClassIdx].students[idx].password = ""; updateFirebase(); window.renderStudentList(); } }
-
-        window.openAddStudentModal = () => { editingStudentIndex = -1;['m_module','m_id','m_name','m_remarks'].forEach(id => document.getElementById(id).value = ''); document.getElementById('btnSaveStudent').innerText = "ސޭވް"; document.getElementById('addStudentModal').style.display='flex'; }
+        window.openAddStudentModal = () => { editingStudentIndex = -1; ['m_module','m_id','m_name','m_remarks'].forEach(id => document.getElementById(id).value = ''); document.getElementById('btnSaveStudent').innerText = "ސޭވް"; document.getElementById('addStudentModal').style.display='flex'; }
         window.openEditStudentModal = (idx) => { editingStudentIndex = idx; const s = classesData[currentClassIdx].students[idx]; document.getElementById('m_module').value=s.module||''; document.getElementById('m_id').value=s.id; document.getElementById('m_name').value=s.name; document.getElementById('m_level').value=s.level||'1'; document.getElementById('m_direction').value=s.direction||'top_down'; document.getElementById('m_remarks').value=s.remarks||''; document.getElementById('btnSaveStudent').innerText="އަޕްޑޭޓް"; document.getElementById('addStudentModal').style.display='flex'; }
-        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Name & ID Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; if(editingStudentIndex > -1) { let s=classesData[currentClassIdx].students[editingStudentIndex]; s.name=name; s.id=id; s.module=document.getElementById('m_module').value; s.level=document.getElementById('m_level').value; s.direction=document.getElementById('m_direction').value; s.remarks=document.getElementById('m_remarks').value; } else { classesData[currentClassIdx].students.push({name, id, module:document.getElementById('m_module').value, level:document.getElementById('m_level').value, direction:document.getElementById('m_direction').value, remarks:document.getElementById('m_remarks').value, history:[], juzExams:{}, pendingData:[], password:"" }); } updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
+        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Name & ID Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students =[]; if(editingStudentIndex > -1) { let s=classesData[currentClassIdx].students[editingStudentIndex]; s.name=name; s.id=id; s.module=document.getElementById('m_module').value; s.level=document.getElementById('m_level').value; s.direction=document.getElementById('m_direction').value; s.remarks=document.getElementById('m_remarks').value; } else { classesData[currentClassIdx].students.push({name, id, module:document.getElementById('m_module').value, level:document.getElementById('m_level').value, direction:document.getElementById('m_direction').value, remarks:document.getElementById('m_remarks').value, history:[], juzExams:{}, pendingData:[], password:"" }); } updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
         window.deleteStudent = (idx) => { if(confirm("Delete Student?")) { classesData[currentClassIdx].students.splice(idx, 1); updateFirebase(); window.renderStudentList(); } }
         window.downloadTemplate = () => { const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet([["Name", "ID", "Module", "Level", "Direction", "Juz Count", "Remarks"]]); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, "Student_Template.xlsx"); };
-        window.handleExcelUpload = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { const data = new Uint8Array(e.target.result), workbook = XLSX.read(data, {type: 'array'}), jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students =[]; jsonData.forEach(row => { const name = row['Name'] || row['Student Name'], id = row['ID'] || row['Student ID']; if(name && id) classesData[currentClassIdx].students.push({name, id, module:row['Module']||'', level:row['Level']||'1', direction:row['Direction']||'top_down', remarks:row['Remarks']||'', history:[], juzExams:{}, pendingData:[]}); }); updateFirebase(); window.renderStudentList(); alert("Uploaded!"); input.value = ""; }; reader.readAsArrayBuffer(file); };
+        window.handleExcelUpload = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { const data = new Uint8Array(e.target.result), workbook = XLSX.read(data, {type: 'array'}), jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; jsonData.forEach(row => { const name = row['Name'] || row['Student Name'], id = row['ID'] || row['Student ID']; if(name && id) classesData[currentClassIdx].students.push({name, id, module:row['Module']||'', level:row['Level']||'1', direction:row['Direction']||'top_down', remarks:row['Remarks']||'', history:[], juzExams:{}, pendingData:[]}); }); updateFirebase(); window.renderStudentList(); alert("Uploaded!"); input.value = ""; }; reader.readAsArrayBuffer(file); };
 
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
@@ -851,43 +788,26 @@
             document.getElementById('catPageTitle').innerText = title; 
             
             const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-            if(semesters.length > 0) activeHistorySemesterIdx = semesters.length - 1; else activeHistorySemesterIdx = -1;
+            if(semesters.length > 0) { activeHistorySemesterIdx = semesters.length - 1; } else { activeHistorySemesterIdx = -1; }
             window.renderSemesterTabs(); 
             window.renderHistory(s, 'categoryHistoryList', type); 
             
-            if(type === 'juz_exam' && currentUserType === 'student') {
-                document.getElementById('pastJuzBtn').style.display = 'none';
-                document.getElementById('peerExamBtn').style.display = 'inline-block';
-            } else if(type === 'juz_exam' && currentUserType === 'teacher') {
-                 document.getElementById('pastJuzBtn').style.display = 'inline-block';
-                 document.getElementById('peerExamBtn').style.display = 'none';
-            } else {
-                document.getElementById('pastJuzBtn').style.display = 'none';
-                document.getElementById('peerExamBtn').style.display = 'none';
-            }
+            if(type === 'juz_exam' && currentUserType === 'student') { document.getElementById('pastJuzBtn').style.display = 'none'; document.getElementById('peerExamBtn').style.display = 'inline-block'; } 
+            else if(type === 'juz_exam' && currentUserType === 'teacher') { document.getElementById('pastJuzBtn').style.display = 'inline-block'; document.getElementById('peerExamBtn').style.display = 'none'; } 
+            else { document.getElementById('pastJuzBtn').style.display = 'none'; document.getElementById('peerExamBtn').style.display = 'none'; }
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
             window.openPage('category-page'); 
         }
 
         window.renderSemesterTabs = () => {
-            const container = document.getElementById('historySemesterTabs');
-            container.innerHTML = '';
+            const container = document.getElementById('historySemesterTabs'); container.innerHTML = '';
             if(semesters.length === 0) { container.style.display = 'none'; return; }
             container.style.display = 'block';
             semesters.forEach((sem, i) => {
-                const isCurrent = (i === semesters.length - 1);
-                const isActive = (i === activeHistorySemesterIdx);
-                let btnClass = isActive ? 'sem-tag active' : 'sem-tag';
-                let label = sem.name;
-                if(isCurrent) label += " (Current)";
-                const btn = document.createElement('button');
-                btn.className = btnClass; btn.innerText = label;
-                btn.onclick = () => {
-                    activeHistorySemesterIdx = i;
-                    window.renderSemesterTabs();
-                    const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-                    window.renderHistory(s, 'categoryHistoryList', currentSessionType);
-                };
+                const isCurrent = (i === semesters.length - 1); const isActive = (i === activeHistorySemesterIdx);
+                let btnClass = isActive ? 'sem-tag active' : 'sem-tag'; let label = sem.name; if(isCurrent) label += " (Current)";
+                const btn = document.createElement('button'); btn.className = btnClass; btn.innerText = label;
+                btn.onclick = () => { activeHistorySemesterIdx = i; window.renderSemesterTabs(); const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; window.renderHistory(s, 'categoryHistoryList', currentSessionType); };
                 container.appendChild(btn);
             });
         }
@@ -896,53 +816,43 @@
 
         window.openPastJuzModal = () => {
             const s = classesData[currentClassIdx].students[currentStudentIdx];
-            const grid = document.getElementById('pastJuzGrid');
-            grid.innerHTML = '';
-            let passedJuz = s.manualPassedJuz ||[];
-            for(let i=1; i<=30; i++) {
-                const isChecked = passedJuz.includes(i);
-                grid.innerHTML += `<label class="${isChecked?'checked':''}"><input type="checkbox" value="${i}" ${isChecked?'checked':''} onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>Juz ${i}</span></label>`;
-            }
+            const grid = document.getElementById('pastJuzGrid'); grid.innerHTML = ''; let passedJuz = s.manualPassedJuz ||[];
+            for(let i=1; i<=30; i++) { const isChecked = passedJuz.includes(i); grid.innerHTML += `<label class="${isChecked?'checked':''}"><input type="checkbox" value="${i}" ${isChecked?'checked':''} onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>Juz ${i}</span></label>`; }
             document.getElementById('pastJuzModal').style.display = 'flex';
         }
+
         window.savePastJuz = () => {
             const checkboxes = document.querySelectorAll('#pastJuzGrid input[type="checkbox"]:checked');
             const selectedJuz = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            classesData[currentClassIdx].students[currentStudentIdx].manualPassedJuz = selectedJuz;
-            updateFirebase();
-            alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!");
-            document.getElementById('pastJuzModal').style.display = 'none';
+            classesData[currentClassIdx].students[currentStudentIdx].manualPassedJuz = selectedJuz; updateFirebase();
+            alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!"); document.getElementById('pastJuzModal').style.display = 'none';
         }
 
         window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
         window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
-        
-        window.populateProgClassSelect = () => {
-            const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>';
-            classesData.forEach((c, i) => sel.add(new Option(c.name, i)));
-        }
+        window.populateProgClassSelect = () => { const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>'; classesData.forEach((c, i) => sel.add(new Option(c.name, i))); }
 
         window.showClassProgressTable = (cIdx) => {
-            const container = document.getElementById('classProgressTableContainer');
-            const dlBtn = document.getElementById('btnDownloadExcel');
+            const container = document.getElementById('classProgressTableContainer'); const dlBtn = document.getElementById('btnDownloadExcel');
             if(cIdx === "") { container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ކްލާހެއް ޚިޔާރުކުރައްވާ</p>`; dlBtn.style.display = 'none'; return; }
             if(semesters.length === 0) { container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ސެމިސްޓަރއެއް ނެތް</p>`; dlBtn.style.display = 'none'; return; }
             dlBtn.style.display = 'inline-block';
-            
-            const currentSem = semesters[semesters.length - 1]; 
-            const startDate = new Date(currentSem.startDate); const endDate = new Date(currentSem.endDate); endDate.setHours(23, 59, 59, 999);
-            let tableHtml = `<table id="progressTable" class="styled-table"><thead><tr><th rowspan="2">ނަން</th><th rowspan="2">ލެވެލް</th><th colspan="2" style="text-align:center;">މި ސެމިސްޓަރ</th><th rowspan="2">ޞަފްޙާ ޢަދަދު</th><th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th><th rowspan="2">ޖުމްލަ ޖުޒުއު</th></tr><tr><th>ފެށި ހިސާބު</th><th>ނިންމި ހިސާބު</th></tr></thead><tbody>`;
+            const currentSem = semesters[semesters.length - 1]; const startDate = new Date(currentSem.startDate); const endDate = new Date(currentSem.endDate); endDate.setHours(23, 59, 59, 999);
             const students = classesData[cIdx].students ||[];
-            if(students.length === 0) { tableHtml += `<tr><td colspan="7" style="text-align:center;">No students</td></tr>`; } 
-            else {
-                students.forEach(s => {
-                    const stats = window.calculateSemesterStats(s, startDate, endDate);
-                    tableHtml += `<tr><td style="font-weight:bold;">${s.name}</td><td>${s.level || '-'}</td><td class="ar-txt">${stats.startPoint}</td><td class="ar-txt">${stats.endPoint}</td><td style="font-weight:bold; color:var(--primary); text-align:center;">${stats.balancePages}</td><td style="text-align:center; color:#e67e22;">${stats.semJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.semJuzDetails})</span></td><td style="text-align:center; color:#27ae60; font-weight:bold;">${stats.totalJuzCount} <br><span style="font-size:11px; color:#777;">(${stats.totalJuzDetails})</span></td></tr>`;
-                });
-            }
-            tableHtml += `</tbody></table>`;
-            container.innerHTML = tableHtml;
+            if(students.length === 0) { container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ދަރިވަރުން ނެތް</p>`; return; }
+
+            let tableHtml = `<table id="progressTable" class="desktop-view-table"><thead><tr><th rowspan="2" style="text-align:right;">ނަން</th><th rowspan="2">ލެވެލް</th><th colspan="2" style="text-align:center; background:rgba(0,0,0,0.1);">މި ސެމިސްޓަރ</th><th rowspan="2">ޞަފްޙާ</th><th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th><th rowspan="2">ޖުމްލަ ޖުޒުއު</th></tr><tr><th style="background:rgba(0,0,0,0.05);">ފެށި ހިސާބު</th><th style="background:rgba(0,0,0,0.05);">ނިންމި ހިސާބު</th></tr></thead><tbody>`;
+            let cardsHtml = `<div class="mobile-view-cards">`;
+
+            students.forEach(s => {
+                const stats = window.calculateSemesterStats(s, startDate, endDate);
+                tableHtml += `<tr><td style="font-weight:bold; text-align:right;"><span style="font-family:var(--font-heading); font-size:16px;">${s.name}</span><br><span style="font-size:11px; color:#777;">ID: ${s.id}</span></td><td><span class="tbl-badge bg-blue">${s.level || '-'}</span></td><td class="ar-txt" style="color:#555;">${stats.startPoint}</td><td class="ar-txt" style="color:#555;">${stats.endPoint}</td><td><span style="font-weight:bold; font-size:16px; color:var(--primary);">${stats.balancePages}</span></td><td><div class="tbl-badge bg-orange">${stats.semJuzCount}</div>${stats.semJuzDetails ? `<div style="font-size:10px; color:#999; margin-top:2px;">(${stats.semJuzDetails})</div>` : ''}</td><td><div class="tbl-badge bg-green">${stats.totalJuzCount}</div>${stats.totalJuzDetails ? `<div style="font-size:10px; color:#999; margin-top:2px;">(${stats.totalJuzDetails})</div>` : ''}</td></tr>`;
+                
+                cardsHtml += `<div class="prog-card"><div class="prog-card-header"><div class="prog-card-name">${s.name}</div><div class="prog-card-level">Level ${s.level || '-'}</div></div><div class="prog-grid"><div class="prog-flow-row" style="grid-column: span 2;"><div class="prog-flow-point">${stats.startPoint}</div><div class="prog-flow-arrow">⬇</div><div class="prog-flow-point">${stats.endPoint}</div></div><div class="prog-box highlight"><span class="prog-box-label">ސެމިސްޓަރ ޞަފްޙާ</span><span class="prog-box-val">${stats.balancePages}</span></div><div class="prog-box"><span class="prog-box-label">ސެމިސްޓަރ ޖުޒުއު</span><span class="prog-box-val" style="color:#e67e22">${stats.semJuzCount}</span>${stats.semJuzDetails ? `<div style="font-size:10px;">(${stats.semJuzDetails})</div>` : ''}</div><div class="prog-box" style="grid-column: span 2; background:#e8f8f5; border-color:#d4efdf;"><span class="prog-box-label">ޖުމްލަ ޙިފްޡް (ޖުޒުއު)</span><span class="prog-box-val" style="color:#27ae60; font-size:20px;">${stats.totalJuzCount}</span>${stats.totalJuzDetails ? `<div style="font-size:11px; color:#27ae60;">(${stats.totalJuzDetails})</div>` : ''}</div></div></div>`;
+            });
+            tableHtml += `</tbody></table>`; cardsHtml += `</div>`;
+            container.innerHTML = tableHtml + cardsHtml;
         }
 
         window.calculateSemesterStats = (student, startDate, endDate) => {
@@ -961,7 +871,7 @@
                      const recDate = new Date(h.date); const score = parseFloat(h.score || 0);
                      if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
                          allTimePassedJuz.add(h.juz);
-                         if (recDate >= startDate && recDate <= endDate) passedJuzSet.add(h.juz);
+                         if (recDate >= startDate && recDate <= endDate) { passedJuzSet.add(h.juz); }
                      }
                 });
             }
@@ -976,17 +886,10 @@
             if(!semesters.length) return; 
             const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate); const end = new Date(latestSem.endDate); 
             const stats = window.calculateSemesterStats(student, start, end);
-            document.getElementById('studentSemPages').innerText = stats.balancePages; 
-            document.getElementById('studentSemJuz').innerText = stats.semJuzCount; 
-            document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
-
-            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount;
-            let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
-
+            document.getElementById('studentSemPages').innerText = stats.balancePages; document.getElementById('studentSemJuz').innerText = stats.semJuzCount; document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
+            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount; let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
             document.getElementById('targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`; document.getElementById('targetPercent').innerText = `${Math.round(percent)}%`; document.getElementById('targetProgress').style.width = `${percent}%`;
-            
-            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!";
-            document.getElementById('targetMsg').innerText = msg;
+            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!"; document.getElementById('targetMsg').innerText = msg;
         }
 
         window.populateSurahSelects = () => {
@@ -1015,16 +918,59 @@
             const surahSelects = container.querySelectorAll('.start-surah-sel, .end-surah-sel');
             surahSelects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => sel.add(new Option(n, i + 1))); const prefix = sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'; window.updateLocalAyahOptions(sel, prefix); });
         };
-        window.updateLocalAyahOptions = (surahSel, targetClass) => { const parent = surahSel.closest('div'); if(!parent) return; const ayahSel = parent.querySelector('.' + targetClass); if(!ayahSel) return; const surahIdx = surahSel.value - 1; ayahSel.innerHTML = ''; if(surahIdx >= 0 && surahIdx < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIdx]; for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i)); } };
 
+        window.updateLocalAyahOptions = (surahSel, targetClass) => {
+            const parent = surahSel.closest('div'); if(!parent) return; const ayahSel = parent.querySelector('.' + targetClass); if(!ayahSel) return;
+            const surahIdx = surahSel.value - 1; ayahSel.innerHTML = '';
+            if(surahIdx >= 0 && surahIdx < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIdx]; for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i)); }
+        };
+
+        // --- BULK ENTRY & EXTERNAL REC LOGIC ---
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
-        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; margin:0; font-size:13px;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
-        window.saveBulkData = async () => { const rows = document.querySelectorAll('#bulkEntriesList .b-row'); let pendingEntries =[]; for (let row of rows) { const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; if(date && startP && endP) { if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }); } } if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } }
-        window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
-        window.saveExternalRecitation = () => { const container = document.querySelector('.ext-form-container'); const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value; const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value; if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ"); const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value; const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value; if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }; classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData =[]; c.students[sIdx].pendingData.push(entry); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none'; }
+        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
+        window.saveBulkData = async () => { 
+            const rows = document.querySelectorAll('#bulkEntriesList .b-row'); let pendingEntries =[]; 
+            for (let row of rows) { 
+                const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; 
+                if(date && startP && endP) { 
+                    if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } 
+                    pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }); 
+                } 
+            } 
+            if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } 
+        }
+
+        window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; document.getElementById('extMistakes').value = '0'; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
+        window.saveExternalRecitation = () => { 
+            const container = document.querySelector('.ext-form-container'); const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value; const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value; const mistakes = parseInt(document.getElementById('extMistakes').value) || 0;
+            if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ"); 
+            const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value; const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value; 
+            if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); 
+            const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, mistakesCount: mistakes, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }; 
+            classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(entry); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none'; 
+        }
 
         // TEACHER APPROVAL
-        window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let isJuzUpdate = p.type === 'juz_update'; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : (p.type === 'long_rev' ? "ދިގު މުރާޖަޢާ" : "ޖުޒުއު އިމްތިޙާން")); let detailsHtml = ""; if(isJuzUpdate) detailsHtml = `<strong style="color:var(--accent);">Update Total Juz to: ${p.value}</strong>`; else if(p.type === 'juz_exam') { detailsHtml = `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 އިމްތިޙާންކުރީ: ${p.recitedTo}</div><br><strong style="color:var(--primary); font-size:16px;">${typeLabel} (Juz ${p.juz})</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">މާކްސް: ${p.score}%<br>މުދައްރިސް ކުށް: ${p.details.teacherMistakes} | އަމިއްލަ ކުށް: ${p.details.selfMistakes}</div>`; } else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})</div>`; } list.innerHTML += `<div class="approval-card" style="${isJuzUpdate ? 'border-right-color:#2ecc71;' : (p.isExternal ? 'border-right-color:#8e44ad;' : '')}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"> <button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">${p.type === 'juz_exam' ? '📝 ސުވާލުކުރުން & އެޕްރޫވް' : '✓ Approve'}</button> <button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
+        window.renderPendingApprovals = () => { 
+            const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; 
+            classesData.forEach((c, cIdx) => { 
+                c.students?.forEach((s, sIdx) => { 
+                    if(s.pendingData && s.pendingData.length > 0) { 
+                        s.pendingData.forEach((p, pIdx) => { 
+                            hasPending = true; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : (p.type === 'long_rev' ? "ދިގު މުރާޖަޢާ" : "ޖުޒުއު އިމްތިޙާން")); let detailsHtml = ""; 
+                            if(p.type === 'juz_exam') { 
+                                detailsHtml = `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 އިމްތިޙާންކުރީ: ${p.recitedTo}</div><br><strong style="color:var(--primary); font-size:16px;">${typeLabel} (Juz ${p.juz})</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">މާކްސް: ${p.score}%<br>މުދައްރިސް ކުށް: ${p.details.teacherMistakes} | އަމިއްލަ ކުށް: ${p.details.selfMistakes}</div>`; 
+                            } else { 
+                                let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; 
+                                detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})<br><strong style="color:#e74c3c;">ކުށް: ${p.mistakesCount || 0}</strong></div>`; 
+                            } 
+                            list.innerHTML += `<div class="approval-card" style="${p.isExternal ? 'border-right-color:#8e44ad;' : ''}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"> <button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">${p.type === 'juz_exam' ? '📝 ސުވާލުކުރުން & އެޕްރޫވް' : '✓ Approve'}</button> <button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; 
+                        }); 
+                    } 
+                }); 
+            }); 
+            if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; 
+        }
         
         window.approveEntry = async (cIdx, sIdx, pIdx) => { 
             const student = classesData[cIdx].students[sIdx]; const entry = student.pendingData[pIdx]; 
@@ -1036,7 +982,8 @@
                 const btn = document.getElementById('saveExamBtn'); btn.innerText = "އެޕްރޫވްކުރޭ"; btn.onclick = window.savePendingMutashabih;
                 isViewMode = false; window.loadExamPage(entry.page || ((entry.juz-1)*20)+2); document.getElementById('juz-exam-page').classList.remove('hidden');
             } else {
-                if(entry.type === 'juz_update') { student.juzCount = entry.value; } else { if(!student.history) student.history =[]; student.history.push({ type: entry.type, date: entry.date, page: entry.page, endPage: entry.endPage, startDetails: entry.startDetails, endDetails: entry.endDetails, mistakesCount: 0, mistakeDetails:[], recitedTo: entry.recitedTo || null }); } 
+                if(!student.history) student.history =[]; 
+                student.history.push({ type: entry.type, date: entry.date, page: entry.page, endPage: entry.endPage, startDetails: entry.startDetails, endDetails: entry.endDetails, mistakesCount: entry.mistakesCount || 0, mistakeDetails:[], recitedTo: entry.recitedTo || null });  
                 student.pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); 
             }
         }
@@ -1055,6 +1002,7 @@
 
         window.rejectEntry = (cIdx, sIdx, pIdx) => { classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
 
+        // HISTORY & SLIP DOWNLOAD
         window.renderHistory = (student, listId, filterType) => {
             const list = document.getElementById(listId); list.innerHTML = ''; if(!student.history) student.history =[];
             let records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
@@ -1094,9 +1042,24 @@
                 document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; 
                 currentRecViewPage = parseInt(rec.page); 
                 window.loadSmartPage(true).then(() => { 
-                    document.getElementById('endPage').value = rec.endPage; window.populateSurahSelects();
-                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
-                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
+                    document.getElementById('endPage').value = rec.endPage; 
+                    
+                    window.populateSurahSelects(); // Call directly without await
+
+                    // Set using static data directly
+                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah);
+                    if(sIndex > -1) {
+                        document.getElementById('startSurah').value = sIndex + 1;
+                        window.updateAyahOptions('startAyah', sIndex);
+                        document.getElementById('startAyah').value = rec.startDetails.ayah;
+                    }
+
+                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah);
+                    if(eIndex > -1) {
+                        document.getElementById('endSurah').value = eIndex + 1;
+                        window.updateAyahOptions('endAyah', eIndex);
+                        document.getElementById('endAyah').value = rec.endDetails.ayah;
+                    }
                 }); 
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); 
             } 
@@ -1127,12 +1090,18 @@
             let currentSurah = null; let html = ''; const BISMILLAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
 
             ayahs.forEach(a => {
-                if (currentSurah !== a.surah.number) {
+                // HIDE REPEATING SURAH BOX: ONLY SHOW ON AYAH 1
+                if (a.numberInSurah === 1) {
                     if (currentSurah !== null) html += '</div>'; currentSurah = a.surah.number;
                     html += `<div class="surah-header-box"><div class="surah-title">سورة ${a.surah.name}</div></div>`;
-                    if (a.numberInSurah === 1 && a.surah.number !== 9) { html += `<div class="bismillah-box">${BISMILLAH}</div>`; }
+                    if (a.surah.number !== 9) { html += `<div class="bismillah-box">${BISMILLAH}</div>`; }
+                    html += '<div class="quran-block" dir="rtl">';
+                } else if (currentSurah === null) {
+                    // First ayah on page is not Ayah 1
+                    currentSurah = a.surah.number;
                     html += '<div class="quran-block" dir="rtl">';
                 }
+
                 let ayahText = a.text; if(a.numberInSurah === 1 && a.surah.number !== 9) { ayahText = ayahText.replace(BISMILLAH, '').trim(); }
                 const words = ayahText.split(' ');
                 words.forEach((w, i) => { const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`; let cls = highlights.includes(id) ? 'word mistake' : 'word'; let fn = isExam ? `window.clickExamWord('${id}')` : `window.clickRecWord('${id}')`; html += `<span id="${id}" class="${cls}" onclick="${fn}">${w}</span> `; });
