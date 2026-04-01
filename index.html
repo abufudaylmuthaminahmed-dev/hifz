@@ -2,7 +2,7 @@
 <html lang="dv" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>إتقان - Hifz Program (Master)</title>
+<title>إتقان - Hifz Program (Master Build)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
@@ -45,13 +45,16 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
 .hist-detail-row{display:flex;justify-content:space-between;background:#f4f6f8;padding:10px;border-radius:8px;margin-bottom:10px;align-items:center;} .hist-detail-lbl{font-size:14px;font-weight:bold;color:var(--primary);min-width:60px;} .hist-detail-val{font-family:var(--font-arabic);font-size:18px;color:#333;text-align:left;direction:rtl;flex:1;} .hist-detail-pg{font-size:16px;font-weight:bold;background:var(--accent);color:white;padding:3px 10px;border-radius:15px;margin-right:10px;} .hist-badge-external{background:#8e44ad;color:white;padding:5px 15px;border-radius:20px;font-size:13px;text-align:center;margin-bottom:15px;font-weight:bold;}
 .hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;} .hist-item{text-align:center;background:#fff;padding:10px;border-radius:8px;border:1px solid #f0f0f0;} .hist-label{font-size:12px;color:#7f8c8d;display:block;margin-bottom:2px;} .hist-val{font-size:16px;font-weight:bold;color:#333;font-family:var(--font-arabic);}
 .hist-footer{padding:15px;background:#eafaf1;text-align:center;border-top:1px solid #d5f5e3;font-size:20px;font-weight:bold;color:var(--accent);position:relative;} .hist-footer.exam-score{background:#ebf5fb;border-top:1px solid #d6eaf8;color:#2980b9;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;}
-.hist-card.type-new_lesson{border-right:5px solid var(--accent);} .hist-card.type-juz_exam{border-right:5px solid #2980b9;} .hist-card.type-final_exam{border-right:5px solid #c0392b;}
 .btn-edit-hist,.btn-delete-hist,.btn-action-sm{width:35px;height:35px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);} .btn-delete-hist{background:#fee2e2;color:#c0392b;} .btn-edit-hist{background:#e3f2fd;color:#2980b9;}
 .approval-card{background:white;border-radius:12px;border:1px solid #e0e0e0;border-right:5px solid #e67e22;padding:15px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:10px;} .app-card-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f0f0;padding-bottom:8px;} .app-stu-name{font-weight:bold;font-size:16px;color:var(--primary);} .app-date{background:#f0f2f5;color:#555;font-size:12px;padding:3px 8px;border-radius:10px;} .app-details{background:#fffcf2;padding:10px;border-radius:8px;text-align:center;font-size:15px;color:#333;line-height:1.6;} .app-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:5px;} .btn-approve{background:#d4efdf;color:#1e8449;padding:8px 15px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;} .btn-reject{background:#fadbd8;color:#c0392b;padding:8px 15px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;}
+
+/* Desktop Table & Mobile Cards */
 .desktop-view-table{display:table;width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;font-size:14px;box-shadow:0 4px 15px rgba(0,0,0,0.05);border-radius:12px;overflow:hidden;border:1px solid #e0e0e0;} .desktop-view-table thead tr{background:linear-gradient(135deg,var(--primary),#34495e);color:#ffffff;text-align:center;} .desktop-view-table th{padding:15px;font-weight:600;border-bottom:2px solid #ddd;font-family:var(--font-heading);} .desktop-view-table td{padding:12px 15px;border-bottom:1px solid #f0f0f0;text-align:center;vertical-align:middle;font-family:var(--font-main);} .desktop-view-table tbody tr:hover{background-color:#f1f9f5;transition:0.2s;} .desktop-view-table tbody tr:last-of-type td{border-bottom:none;}
 .tbl-badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;display:inline-block;} .bg-green{background:#e8f8f5;color:#27ae60;} .bg-orange{background:#fef5e7;color:#e67e22;} .bg-blue{background:#ebf5fb;color:#2980b9;}
 .mobile-view-cards{display:none;margin-top:20px;} .prog-card{background:white;border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid #f0f0f0;position:relative;overflow:hidden;} .prog-card::before{content:'';position:absolute;top:0;right:0;width:6px;height:100%;background:var(--accent);} .prog-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid #f5f5f5;padding-bottom:10px;} .prog-card-name{font-family:var(--font-heading);font-size:18px;color:var(--primary);font-weight:bold;} .prog-card-level{background:#34495e;color:white;padding:2px 8px;border-radius:6px;font-size:11px;} .prog-grid{display:flex;flex-direction:column;gap:10px;} .prog-box{background:#f8f9fa;padding:12px;border-radius:10px;text-align:center;border:1px solid #eee;} .prog-box-label{font-size:12px;color:#7f8c8d;display:block;margin-bottom:5px;font-weight:bold;} .prog-box-val{font-size:18px;font-weight:bold;font-family:var(--font-arabic);color:#333;} .prog-flow-row{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:15px;color:#555;background:#fffcf2;padding:15px;border-radius:10px;border:1px solid #fae5d3;} .prog-flow-point{background:white;padding:5px 15px;border-radius:20px;border:1px solid #ddd;width:100%;text-align:center;} .prog-flow-arrow{color:var(--accent);font-size:20px;line-height:0.5;} .prog-box.highlight{background:#eafaf1;border-color:#d5f5e3;} .prog-box.highlight .prog-box-val{color:var(--accent);}
 @media(max-width:900px){.desktop-view-table{display:none;} .mobile-view-cards{display:block;}}
+
+/* FIXED MUSHAF LAYOUT */
 .layout-split{display:flex;flex-direction:column;height:calc(100vh - 65px);height:calc(100dvh - 65px);overflow:hidden;position:relative;}
 @media(min-width:901px){.layout-split{flex-direction:row;} .sidebar-panel{width:350px;height:100%;border-right:1px solid #ddd;order:1;border-bottom:none;} .main-panel{flex:1;height:100%;order:2;} .mushaf-nav-footer{position:absolute;bottom:0;width:100%;} .mushaf-page-container{padding-bottom:80px;}}
 .sidebar-panel{background:white;display:flex;flex-direction:column;overflow-y:auto;z-index:10;padding:20px;box-shadow:-5px 0 20px rgba(0,0,0,0.05);flex-shrink:0;padding-bottom:100px;}
@@ -59,7 +62,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
 .mushaf-header-sticky{background:white;padding:8px 15px;border-bottom:1px solid #ddd;text-align:center;font-family:var(--font-arabic);font-size:16px;color:var(--primary);font-weight:bold;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);z-index:20;}
 .mushaf-page-container{flex-grow:1;overflow-y:auto;padding:10px;display:flex;justify-content:center;align-items:flex-start;padding-bottom:120px;-webkit-overflow-scrolling:touch;}
 .mushaf-content-box{background:white;padding:15px 20px;box-shadow:0 3px 10px rgba(0,0,0,0.05);border-radius:5px;width:100%;max-width:800px;min-height:fit-content;}
-.quran-text{font-family:var(--font-arabic);font-size:clamp(22px,5vw,34px);line-height:2.2;text-align:justify;text-align-last:center;direction:rtl;}
+.quran-text{font-family:var(--font-arabic);font-size:clamp(20px,3.5vw,26px);line-height:2.1;text-align:justify;text-align-last:center;direction:rtl;}
 .quran-block{margin-bottom:15px;}
 .surah-header-box{border:2px solid #d4ac6e;background:#fffcf2;background-image:linear-gradient(to right,#fffcf2,#fdf2d0,#fffcf2);padding:3px 10px;margin:15px auto 8px auto;border-radius:5px;text-align:center;width:95%;}
 .surah-title{font-family:'Reem Kufi',var(--font-arabic);font-size:24px;color:#5d4037;text-shadow:1px 1px 0 #fff;}
@@ -70,14 +73,14 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
 .nav-btn-dark{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;font-family:var(--font-heading);transition:0.2s;} .nav-btn-dark:active{background:rgba(255,255,255,0.4);transform:scale(0.95);}
 .page-display-text{font-size:18px;font-weight:bold;font-family:sans-serif;letter-spacing:1px;}
 .mobile-return-btn{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:90%;max-width:400px;z-index:9998;font-size:14px;opacity:0.95;}
+
 .score-header{background:#2c3e50;color:white;padding:20px;text-align:center;border-radius:12px;margin-bottom:15px;} .big-score{font-size:40px;font-weight:bold;}
 .score-control{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;background:#f8f9fa;padding:10px;border-radius:10px;}
 .ctrl-btn{width:35px;height:35px;border-radius:50%;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;} .btn-minus{background:#ffcdd2;color:#c62828;} .btn-plus{background:#c8e6c9;color:#2e7d32;}
-.stopwatch-box{font-family:monospace;font-size:32px;text-align:center;color:#e67e22;font-weight:bold;background:#fffbf0;padding:10px;border-radius:10px;border:1px solid #ffeeba;margin-bottom:15px;}
+.stopwatch-box{display:flex;flex-direction:column;align-items:center;background:#fffbf0;padding:10px;border-radius:10px;border:1px solid #ffeeba;margin-bottom:15px;}
 .form-sec{border:1px solid #eee;padding:10px;border-radius:8px;position:relative;margin-top:10px;} .sec-title{position:absolute;top:-10px;right:10px;background:white;padding:0 5px;font-size:12px;font-weight:bold;color:#777;}
 .rec-input{width:100%;padding:8px;border:1px solid #ccc;border-radius:5px;font-family:var(--font-main);text-align:right;margin-bottom:5px;}
-.modal{display:none;position:fixed;z-index:3000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;}
-.modal-content{background:white;padding:30px;border-radius:15px;width:95%;max-width:550px;max-height:95vh;overflow-y:auto;position:relative;}
+.modal{display:none;position:fixed;z-index:3000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;} .modal-content{background:white;padding:30px;border-radius:15px;width:95%;max-width:550px;max-height:95vh;overflow-y:auto;position:relative;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;} .full-span{grid-column:span 2;} .form-label{font-size:14px;font-weight:bold;display:block;margin-bottom:5px;color:#555;}
 .api-loader{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:none;align-items:center;justify-content:center;z-index:10;border-radius:5px;}
 .mobile-only-btn{display:none;}
@@ -92,49 +95,26 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
 .sem-tag{padding:8px 15px;background:#e0e0e0;border:none;border-radius:20px;cursor:pointer;margin-right:5px;font-size:14px;transition:0.2s;} .sem-tag.active{background:var(--primary);color:white;font-weight:bold;}
 .checkbox-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;direction:ltr;margin-bottom:20px;} .checkbox-grid label{display:block;background:#f8f9fa;padding:10px;border:1px solid #eee;text-align:center;border-radius:5px;cursor:pointer;user-select:none;} .checkbox-grid label:hover{background:#e2e6ea;} .checkbox-grid input[type="checkbox"]{display:none;} .checkbox-grid input[type="checkbox"]:checked + span{color:var(--accent);font-weight:bold;} .checkbox-grid input[type="checkbox"]:checked + span::before{content:'✔ ';} .checkbox-grid label.checked{border-color:var(--accent);background:#d4efdf;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-/* Teacher Side Nav */
-.side-nav{position:fixed;top:50%;right:15px;transform:translateY(-50%);background:white;padding:15px 10px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1);display:flex;flex-direction:column;gap:15px;z-index:1500;border:1px solid #f0f0f0;}
-.side-nav button{background:#f8f9fa;border:none;font-size:22px;width:45px;height:45px;border-radius:50%;cursor:pointer;transition:0.2s;color:var(--primary);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
-.side-nav button:hover{background:var(--accent);color:white;transform:scale(1.1);}
-@media(max-width:900px){.side-nav{top:auto;bottom:80px;right:50%;transform:translateX(50%);flex-direction:row;border-radius:40px;padding:10px 15px;}}
 </style>
 </head>
 <body>
 
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
-            <div class="logo-container">
-                <div class="logo-arabic">إتقان</div><div class="logo-eng">Hifz Program</div><div class="logo-dv">ޙިފްޡް ޕްރޮގްރާމް</div>
-            </div>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="window.switchLogin('teacher')">މުދައްރިސް</button>
-                <button class="tab-btn" onclick="window.switchLogin('student')">ދަރިވަރު</button>
-            </div>
+            <div class="logo-container"><div class="logo-arabic">إتقان</div><div class="logo-eng">Hifz Program</div><div class="logo-dv">ޙިފްޡް ޕްރޮގްރާމް</div></div>
+            <div class="tabs"><button class="tab-btn active" onclick="window.switchLogin('teacher')">މުދައްރިސް</button><button class="tab-btn" onclick="window.switchLogin('student')">ދަރިވަރު</button></div>
             <div id="teacher-login-form">
-                <input type="text" id="teacherUsername" class="form-input" placeholder="ޔޫސަރ ނޭމް">
-                <input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
-                <button class="btn-primary" onclick="window.loginTeacher()">ލޮގިން</button>
+                <input type="text" id="teacherUsername" class="form-input" placeholder="ޔޫސަރ ނޭމް"><input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް"><button class="btn-primary" onclick="window.loginTeacher()">ލޮގިން</button>
             </div>
             <div id="student-login-form" class="hidden">
-                <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު">
-                <div id="stuPassField" class="hidden" style="margin-top:10px;"><input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް"></div>
-                <button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
+                <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު"><div id="stuPassField" class="hidden" style="margin-top:10px;"><input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް"></div><button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
             </div>
         </div>
     </div>
 
-    <!-- TEACHER FLOATING SIDE NAV -->
-    <div id="teacher-side-nav" class="side-nav hidden">
-        <button onclick="window.openPage('teacher-dashboard')" title="ޑޭޝްބޯޑް">🏠</button>
-        <button onclick="window.openPage('management-page')" title="ކްލާސް މެނޭޖްމަންޓް">⚙️</button>
-        <button onclick="window.openGradingClassList()" title="ފިލާވަޅު ނެގުން">📚</button>
-        <button onclick="window.openProgressPage()" title="ޕްރޮގްރެސް">📈</button>
-        <button id="nav-admin-btn" class="hidden" onclick="window.openTeacherManagement()" title="މުދައްރިސުން">👤</button>
-        <button onclick="window.openBackupModal()" title="ޑޭޓާ ބެކަޕް">💾</button>
-    </div>
-
     <div id="app-container" class="hidden">
         
+        <!-- TEACHER DASHBOARD -->
         <div id="teacher-dashboard" class="container hidden">
             <div class="app-header"><div class="header-title">މުދައްރިސް ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div class="dashboard-center">
@@ -150,12 +130,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             <div class="app-header"><div class="header-title">މުދައްރިސުންގެ މަޢުލޫމާތު</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div class="action-card" style="margin-top:20px;">
                 <h4>މުދައްރިސް އިތުރުކުރުން</h4>
-                <div style="display:flex; gap:10px; max-width:600px; margin:0 auto;">
-                    <input type="text" id="newTeachName" class="form-input" placeholder="ނަން" style="margin:0; flex:1;">
-                    <input type="text" id="newTeachUser" class="form-input" placeholder="ޔޫސަރ ނޭމް" style="margin:0; flex:1;">
-                    <input type="text" id="newTeachPass" class="form-input" placeholder="ޕާސްވޯޑް" style="margin:0; flex:1;">
-                    <button class="big-btn" style="width:auto;" onclick="window.createTeacher()">އިތުރުކުރޭ</button>
-                </div>
+                <div style="display:flex; gap:10px; max-width:600px; margin:0 auto;"><input type="text" id="newTeachName" class="form-input" placeholder="ނަން" style="margin:0; flex:1;"><input type="text" id="newTeachUser" class="form-input" placeholder="ޔޫސަރ ނޭމް" style="margin:0; flex:1;"><input type="text" id="newTeachPass" class="form-input" placeholder="ޕާސްވޯޑް" style="margin:0; flex:1;"><button class="big-btn" style="width:auto;" onclick="window.createTeacher()">އިތުރުކުރޭ</button></div>
             </div>
             <h4 style="margin-top:20px;">މުދައްރިސުންގެ ލިސްޓް</h4><div id="teacherList" class="grid-container"></div>
         </div>
@@ -269,9 +244,9 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <div class="mushaf-page-container"><div class="mushaf-content-box"><div id="mushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p></div></div></div>
                     <button class="big-btn btn-red mobile-only-btn mobile-return-btn" onclick="window.toggleMobileMushaf('recorder-layout', false)">⬇ ފޯމަށް އެނބުރިދިއުން</button>
                     <div class="mushaf-nav-footer">
-                        <button class="nav-btn-dark" onclick="window.changeRecPage(-1)">ފަހަތަށް</button>
-                        <span class="page-display-text" id="recPageDisplay">Page 1</span>
                         <button class="nav-btn-dark" onclick="window.changeRecPage(1)">ކުރިއަށް</button>
+                        <span class="page-display-text" id="recPageDisplay">Page 1</span>
+                        <button class="nav-btn-dark" onclick="window.changeRecPage(-1)">ފަހަތަށް</button>
                     </div>
                 </div>
             </div>
@@ -288,22 +263,18 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <button class="big-btn btn-orange mobile-only-btn" style="width:100%; margin-bottom:15px; font-size:14px;" onclick="window.toggleMobileMushaf('juz-layout', true)">📖 މުޞްޙަފް ހުޅުވާ</button>
                     <div id="examinerNameField" style="display:none; margin-bottom:20px;"><label class="form-label">އިމްތިޙާން ކުރާ ފަރާތުގެ ނަން</label><input type="text" id="examinerName" class="form-input" style="text-align:right;"></div>
                     <div class="score-header"><div class="big-score" id="liveScore">100%</div></div>
-                    <div class="exam-section"><div class="stopwatch-box"><span id="stopwatchDisplay">00:00:00</span><div style="font-size:12px;"><button onclick="window.startTimer()" style="border:none; color:green; background:none;">▶</button> <button onclick="window.stopTimer()" style="border:none; color:red; background:none;">⏹</button></div></div></div>
                     <div class="exam-section">
-                        <div class="score-control"><span>އުސްތާޛް (-2)</span>
-                            <div style="display:flex;gap:5px;align-items:center;">
-                                <button class="ctrl-btn btn-plus" onclick="window.updateScore('teacher', -1)">-</button>
-                                <input type="number" id="countTeacher" class="form-input" style="width:60px; margin:0; text-align:center;" value="0" onchange="window.manualUpdateScore('teacher', this.value)">
-                                <button class="ctrl-btn btn-minus" onclick="window.updateScore('teacher', 1)">+</button>
+                        <div class="stopwatch-box" style="display:flex; flex-direction:column; align-items:center;">
+                            <input type="text" id="stopwatchDisplay" value="00:00:00" style="width:160px; border:none; background:transparent; text-align:center; font-family:monospace; font-size:32px; color:#e67e22; font-weight:bold; outline:none; margin-bottom:5px;">
+                            <div style="font-size:20px; display:flex; gap:15px;">
+                                <button onclick="window.startTimer()" style="border:none; color:#27ae60; background:none; cursor:pointer;" title="Start">▶</button> 
+                                <button onclick="window.stopTimer()" style="border:none; color:#c0392b; background:none; cursor:pointer;" title="Stop">⏹</button>
                             </div>
                         </div>
-                        <div class="score-control"><span>އަމިއްލައަށް (-1)</span>
-                            <div style="display:flex;gap:5px;align-items:center;">
-                                <button class="ctrl-btn btn-plus" onclick="window.updateScore('self', -1)">-</button>
-                                <input type="number" id="countSelf" class="form-input" style="width:60px; margin:0; text-align:center;" value="0" onchange="window.manualUpdateScore('self', this.value)">
-                                <button class="ctrl-btn btn-minus" onclick="window.updateScore('self', 1)">+</button>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="exam-section">
+                        <div class="score-control"><span>އުސްތާޛް (-2)</span><div style="display:flex;gap:5px;align-items:center;"><button class="ctrl-btn btn-plus" onclick="window.updateScore('teacher', -1)">-</button><input type="number" id="countTeacher" class="form-input" style="width:60px; margin:0; text-align:center;" value="0" onchange="window.manualUpdateScore('teacher', this.value)"><button class="ctrl-btn btn-minus" onclick="window.updateScore('teacher', 1)">+</button></div></div>
+                        <div class="score-control"><span>އަމިއްލައަށް (-1)</span><div style="display:flex;gap:5px;align-items:center;"><button class="ctrl-btn btn-plus" onclick="window.updateScore('self', -1)">-</button><input type="number" id="countSelf" class="form-input" style="width:60px; margin:0; text-align:center;" value="0" onchange="window.manualUpdateScore('self', this.value)"><button class="ctrl-btn btn-minus" onclick="window.updateScore('self', 1)">+</button></div></div>
                         <div class="score-control"><span>ތަޖުވީދު (10)</span><input type="number" id="scoreTajweed" class="form-input" style="width:60px;" value="10" max="10" onchange="window.calcScore()"></div>
                         <div class="score-control"><span>ފަރިތަކަން (5)</span><input type="number" id="scoreFluency" class="form-input" style="width:60px;" value="5" max="5" onchange="window.calcScore()"></div>
                     </div>
@@ -319,9 +290,9 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <div class="mushaf-page-container"><div class="mushaf-content-box"><div id="examMushafContent" class="quran-text"><p style="color:#999; margin-top:100px;">...</p></div></div></div>
                     <button class="big-btn btn-red mobile-only-btn mobile-return-btn" onclick="window.toggleMobileMushaf('juz-layout', false)">⬇ ފޯމަށް އެނބުރިދިއުން</button>
                     <div class="mushaf-nav-footer">
-                        <button class="nav-btn-dark" onclick="window.changeExamPage(-1)">ފަހަތަށް</button>
-                        <span class="page-display-text" id="currentPageDisplay">Page 1</span>
                         <button class="nav-btn-dark" onclick="window.changeExamPage(1)">ކުރިއަށް</button>
+                        <span class="page-display-text" id="currentPageDisplay">Page 1</span>
+                        <button class="nav-btn-dark" onclick="window.changeExamPage(-1)">ފަހަތަށް</button>
                     </div>
                 </div>
             </div>
@@ -338,7 +309,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <label class="form-label">ޖުޒުއު ނަންގަވާ</label><select id="finalJuzSelect" class="form-input"></select>
                     <button class="big-btn btn-orange" style="padding:10px; font-size:14px; margin-top:5px;" onclick="window.loadFinalQuestion()">ސުވާލު ފަށާ</button>
                     <div style="margin-top:20px;">
-                        <div class="score-control"><span>ރަނގަޅުކޮށްދިން (-5)</span><strong id="finalTeacherCountDisplay" style="color:var(--mistake);">0</strong></div>
+                        <div class="score-control"><span>ރަނގަޅުކޮށްދިން (-5)</span><strong id="finalTeacherCount" style="color:var(--mistake);">0</strong></div>
                         <div class="score-control"><span>އަމިއްލައަށް (-2)</span><div style="display:flex;gap:5px;"><button class="ctrl-btn btn-minus" onclick="window.updateFinalScore('self',1)">+</button><span id="finalSelfCount" class="ctrl-val">0</span><button class="ctrl-btn btn-plus" onclick="window.updateFinalScore('self',-1)">-</button></div></div>
                     </div>
                     <div style="padding:20px; margin-top:auto;"><button id="nextQBtn" class="big-btn" onclick="window.nextFinalQuestion()">ދެންޖެހޭ ސުވާލު ➡</button><button id="finishExamBtn" class="big-btn btn-green hidden" onclick="window.saveFinalExam()">ނިންމާ 💾</button></div>
@@ -378,6 +349,34 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
     </div>
 
     <!-- MODALS -->
+    <div id="createPassModal" class="modal">
+        <div class="modal-content" style="text-align:center;"><h3 style="color:var(--primary);">ޕާސްވޯޑް ހައްދަވާ</h3><p id="passModalUserText" style="color:#777; margin-bottom:10px;"></p><input type="password" id="newStuPass" class="form-input" placeholder="އާ ޕާސްވޯޑް"><button class="big-btn" onclick="window.saveNewPassword()">ސޭވް & ލޮގިން</button></div>
+    </div>
+    
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:20px; color:var(--primary);">ދަރިވަރަކު އިތުރުކުރުން/އެޑިޓްކުރުން</h3>
+            <div class="form-grid">
+                <div class="full-span"><label class="form-label">ކޯސް މޮޑިއުލް</label><input type="text" id="m_module" class="form-input"></div>
+                <div><label class="form-label">އައިޑީ</label><input type="text" id="m_id" class="form-input"></div>
+                <div><label class="form-label">ނަން</label><input type="text" id="m_name" class="form-input"></div>
+                <div><label class="form-label">ލެވެލް</label><select id="m_level" class="form-input"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
+                <div><label class="form-label">ކިޔަވާ ގޮތް</label><select id="m_direction" class="form-input"><option value="top_down">މަތިން ތިރިއަށް</option><option value="bottom_up">ތިރިން މަތިއަށް</option></select></div>
+                <div class="full-span"><label class="form-label">އިތުރު މަޢުލޫމާތު</label><input type="text" id="m_remarks" class="form-input"></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;"><button id="btnSaveStudent" class="big-btn" onclick="window.confirmAddStudent()">ސޭވް</button><button class="big-btn btn-orange" onclick="document.getElementById('addStudentModal').style.display='none'">ކެންސަލް</button></div>
+        </div>
+    </div>
+    
+    <div id="pastJuzModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <h3 style="color:var(--primary); text-align:center; margin-bottom:20px;">ކުރިން ފާސްވެފައިވާ ޖުޒުއުތައް</h3>
+            <p style="text-align:center; font-size:13px; color:#777; margin-bottom:15px;">ކުރީގެ ސެމިސްޓަރ ތަކުގައި ދަރިވަރު ފާސްވެފައިވާ ޖުޒުއުތައް ފާހަގަކުރައްވާ</p>
+            <div id="pastJuzGrid" class="checkbox-grid"></div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;"><button class="big-btn" onclick="window.savePastJuz()">ސޭވް</button><button class="big-btn btn-red" onclick="document.getElementById('pastJuzModal').style.display='none'">ކެންސަލް</button></div>
+        </div>
+    </div>
+    
     <div id="juzSetupModal" class="modal">
         <div class="modal-content" style="text-align:center;">
             <h3>ޖުޒުއު އިމްތިޙާން</h3>
@@ -415,7 +414,23 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         </div>
     </div>
 
-    <!-- MAIN FIREBASE LOGIC -->
+    <!-- BACKUP MODAL -->
+    <div id="backupModal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="color:var(--primary); margin-bottom:15px;">ޑޭޓާ ބެކަޕް / ރިސްޓޯ</h3>
+            <div style="border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px;">
+                <p style="color:#555;">މިހާރު ހުރި ހުރިހާ ޑޭޓާއެއް (ކުދިން، މާކްސް، ހިސްޓްރީ) ފައިލްއެއްގެ ގޮތުގައި ޑައުންލޯޑްކުރައްވާ.</p>
+                <button class="big-btn" style="width:100%;" onclick="window.backupData()">📥 ޑޭޓާ ޑައުންލޯޑް</button>
+            </div>
+            <div>
+                <p style="color:#c0392b;">⚠️ ސަމާލުވޭ: ކުރީގެ ފައިލްއެއް އަޕްލޯޑްކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ.</p>
+                <label class="big-btn btn-orange" style="width:100%; cursor:pointer;">📂 ޑޭޓާ އަޕްލޯޑް (Restore)<input type="file" id="backupFileInp" hidden onchange="window.restoreData(this)"></label>
+            </div>
+            <button class="btn-action-sm btn-delete-hist" style="position:absolute; top:15px; right:15px;" onclick="document.getElementById('backupModal').style.display='none'">✕</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -423,7 +438,6 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         const firebaseConfig = { apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU", authDomain: "hifz-cde3b.firebaseapp.com", databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com", projectId: "hifz-cde3b", storageBucket: "hifz-cde3b.firebasestorage.app", messagingSenderId: "566754658580", appId: "1:566754658580:web:d63d0f167960f53bab9a01" };
         const app = initializeApp(firebaseConfig); const db = getDatabase(app);
 
-        // Arrays condensed for size limit
         const SURAH_NAMES_AR =["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الإنفطار","المطففين","الإنشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
         const AYAH_COUNTS =[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
 
@@ -433,8 +447,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         let currentStudentObj = null; let currentSessionType = '';
         let examState = {}, finalExamState = {};
         let currentMistakes =[]; let isViewMode = false;
-        let editingRecordIndex = -1, editingStudentIndex = -1;
-        let currentRecViewPage = 1; let pendingUserIndex = -1;
+        let editingRecordIndex = -1; let currentRecViewPage = 1; let pendingUserIndex = -1;
         let isPeerExam = false; let currentPendingExamData = null; let currentPendingExamIndices = null; 
         let activeHistorySemesterIdx = -1; 
 
@@ -453,25 +466,25 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
         window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
 
+        window.openBackupModal = () => document.getElementById('backupModal').style.display = 'flex';
+        window.backupData = () => { const data = { classes: classesData, users: hifzUsers, semesters: semesters }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); };
+        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users || []; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
+
         window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
         window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
         window.handleStudentLoginStep = () => { const id = document.getElementById('stuIdInput').value.trim(); if(!id) return alert("ID Required"); let found = null, cIdx = -1, sIdx = -1; classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } })); if(!found) return alert("Not Found"); currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found; if(!found.password) { currentUserType = 'student'; document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`; document.getElementById('createPassModal').style.display = 'flex'; } else { const passField = document.getElementById('stuPassField'); if(passField.classList.contains('hidden')) passField.classList.remove('hidden'); else { if(document.getElementById('stuPassInput').value === found.password) window.loginSuccessStudent(); else alert("Wrong Password"); } } };
         window.saveNewPassword = () => { const pass = document.getElementById('newStuPass').value; if(!pass) return alert("Enter a password"); if(currentUserType === 'student') { classesData[currentClassIdx].students[currentStudentIdx].password = pass; updateFirebase(); document.getElementById('createPassModal').style.display='none'; window.loginSuccessStudent(); } };
-        function proceedLogin() { document.body.classList.remove('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('admin-panel-btn').classList.toggle('hidden', currentUserRole !== 'admin'); if(currentUserType==='teacher'){ document.getElementById('teacher-side-nav').classList.remove('hidden'); document.getElementById('nav-admin-btn').classList.toggle('hidden', currentUserRole !== 'admin'); } window.openPage('teacher-dashboard'); }
-        window.loginSuccessStudent = () => { currentUserType = 'student'; document.body.classList.add('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('teacher-side-nav').classList.add('hidden'); document.getElementById('studentDashName').innerText = currentStudentObj.name; window.calculateStudentProgress(currentStudentObj); window.openPage('student-dashboard'); };
+        function proceedLogin() { document.body.classList.remove('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('admin-panel-btn').classList.toggle('hidden', currentUserRole !== 'admin'); window.openPage('teacher-dashboard'); }
+        window.loginSuccessStudent = () => { currentUserType = 'student'; document.body.classList.add('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('studentDashName').innerText = currentStudentObj.name; window.calculateStudentProgress(currentStudentObj); window.openPage('student-dashboard'); };
         window.logout = () => location.reload();
         
         window.goToStudentList = () => { if (currentClassIdx !== -1) window.openGradingStudentList(currentClassIdx); else window.openGradingClassList(); };
         window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); } } };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
 
-        // MGMT
-        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page'); 
-        window.createTeacher = () => { const name = document.getElementById('newTeachName').value, user = document.getElementById('newTeachUser').value, pass = document.getElementById('newTeachPass').value; if(name&&user&&pass) { hifzUsers.push({name,username:user,password:pass,role:'teacher'}); updateFirebase(); window.renderTeacherList(); document.getElementById('newTeachName').value=''; document.getElementById('newTeachUser').value=''; document.getElementById('newTeachPass').value=''; } }; 
-        window.renderTeacherList = () => { const div = document.getElementById('teacherList'); div.innerHTML=''; hifzUsers.forEach((u, i) => { if(u.role !== 'admin') div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><div style="display:flex; gap:5px; margin-top:5px;"><button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button></div></div>`; }); }; 
+        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page'); window.createTeacher = () => { const name = document.getElementById('newTeachName').value, user = document.getElementById('newTeachUser').value, pass = document.getElementById('newTeachPass').value; if(name&&user&&pass) { hifzUsers.push({name,username:user,password:pass,role:'teacher'}); updateFirebase(); window.renderTeacherList(); document.getElementById('newTeachName').value=''; document.getElementById('newTeachUser').value=''; document.getElementById('newTeachPass').value=''; } }; window.renderTeacherList = () => { const div = document.getElementById('teacherList'); div.innerHTML=''; hifzUsers.forEach((u, i) => { if(u.role !== 'admin') div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><div style="display:flex; gap:5px; margin-top:5px;"><button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button></div></div>`; }); }; 
         window.deleteTeacher = (i) => { if(confirm("Delete?")) { hifzUsers.splice(i, 1); updateFirebase(); window.renderTeacherList(); } };
-        window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; 
-        window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="btn-delete-hist btn-action-sm abs-pos" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
+        window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="btn-delete-hist btn-action-sm abs-pos" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
         window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
 
         window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
@@ -479,7 +492,6 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; classesData[currentClassIdx].students.push({name, id, level:document.getElementById('m_level').value, history:[], pendingData:[], password:"" }); updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
         window.deleteStudent = (idx) => { if(confirm("Delete Student?")) { classesData[currentClassIdx].students.splice(idx, 1); updateFirebase(); window.renderStudentList(); } }
 
-        // GRADING & CATEGORIES
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
         window.openStudentMenu = (i) => { currentStudentIdx = i; document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; window.openPage('grading-menu-page'); }
@@ -521,10 +533,9 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             const checkboxes = document.querySelectorAll('#pastJuzGrid input[type="checkbox"]:checked');
             const selectedJuz = Array.from(checkboxes).map(cb => parseInt(cb.value));
             classesData[currentClassIdx].students[currentStudentIdx].manualPassedJuz = selectedJuz; updateFirebase();
-            alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!"); document.getElementById('pastJuzModal').style.display = 'none';
+            alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!"); document.getElementById('pastJuzModal').style.display = 'none'; window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', 'juz_exam');
         }
 
-        // PROGRESS
         window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
         window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
@@ -554,16 +565,21 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.calculateSemesterStats = (student, startDate, endDate) => {
             let startPoint = "-"; let endPoint = "-"; let balancePages = 0; let semJuzCount = 0; let semJuzDetails = ""; let passedJuzSet = new Set(); let allTimePassedJuz = new Set();
             if(student.manualPassedJuz && Array.isArray(student.manualPassedJuz)) { student.manualPassedJuz.forEach(j => allTimePassedJuz.add(j)); }
+
             if (student.history) {
                 let lessonRecs = student.history.filter(h => { const d = new Date(h.date); return h.type === 'new_lesson' && d >= startDate && d <= endDate; }).sort((a,b) => new Date(a.date) - new Date(b.date));
                 if (lessonRecs.length > 0) {
                     const first = lessonRecs[0]; startPoint = `ޞ ${first.page} (${first.startDetails?.surah}:${first.startDetails?.ayah})`;
                     const last = lessonRecs[lessonRecs.length - 1]; endPoint = `ޞ ${last.endPage || last.page} (${last.endDetails?.surah}:${last.endDetails?.ayah})`;
-                    let startPageNum = parseInt(first.page); let endPageNum = parseInt(last.endPage || last.page); if(endPageNum >= startPageNum) { balancePages = (endPageNum - startPageNum) + 1; }
+                    let startPageNum = parseInt(first.page); let endPageNum = parseInt(last.endPage || last.page);
+                    if(endPageNum >= startPageNum) { balancePages = (endPageNum - startPageNum) + 1; }
                 }
                 student.history.forEach(h => {
                      const recDate = new Date(h.date); const score = parseFloat(h.score || 0);
-                     if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') { allTimePassedJuz.add(h.juz); if (recDate >= startDate && recDate <= endDate) { passedJuzSet.add(h.juz); } }
+                     if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
+                         allTimePassedJuz.add(h.juz);
+                         if (recDate >= startDate && recDate <= endDate) passedJuzSet.add(h.juz);
+                     }
                 });
             }
             semJuzCount = passedJuzSet.size; semJuzDetails = Array.from(passedJuzSet).sort((a,b)=>a-b).join(', ');
@@ -574,54 +590,54 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.downloadProgressExcel = () => { const table = document.getElementById("progressTable"); if(!table) return; const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"}); XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx"); }
 
         window.calculateStudentProgress = (student) => { 
-            if(!semesters.length) return; const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate); const end = new Date(latestSem.endDate); 
+            if(!semesters.length) return; 
+            const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate); const end = new Date(latestSem.endDate); 
             const stats = window.calculateSemesterStats(student, start, end);
             document.getElementById('studentSemPages').innerText = stats.balancePages; document.getElementById('studentSemJuz').innerText = stats.semJuzCount; document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
-            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount; let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
+
+            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount;
+            let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
+
             document.getElementById('targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`; document.getElementById('targetPercent').innerText = `${Math.round(percent)}%`; document.getElementById('targetProgress').style.width = `${percent}%`;
-            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!"; document.getElementById('targetMsg').innerText = msg;
+            
+            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!";
+            document.getElementById('targetMsg').innerText = msg;
         }
 
-        // POPULATE & VALIDATE SELECTS
-        window.populateSurahSelects = () => { const sSel = document.getElementById('startSurah'); const eSel = document.getElementById('endSurah'); if(!sSel || !eSel) return; sSel.innerHTML = ''; eSel.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => { sSel.add(new Option(n, i + 1)); eSel.add(new Option(n, i + 1)); }); sSel.onchange = () => window.updateAyahOptions('startAyah', sSel.selectedIndex); eSel.onchange = () => window.updateAyahOptions('endAyah', eSel.selectedIndex); window.updateAyahOptions('startAyah', 0); window.updateAyahOptions('endAyah', 0); }
-        window.updateAyahOptions = (targetId, surahIndex) => { const target = document.getElementById(targetId); if(!target) return; target.innerHTML = ''; if (surahIndex >= 0 && surahIndex < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIndex]; for(let i=1; i<=count; i++) target.add(new Option(i, i)); } }
+        window.populateSurahSelects = () => {
+            const sSel = document.getElementById('startSurah'); const eSel = document.getElementById('endSurah');
+            if(!sSel || !eSel) return;
+            sSel.innerHTML = ''; eSel.innerHTML = '';
+            SURAH_NAMES_AR.forEach((n, i) => { sSel.add(new Option(n, i + 1)); eSel.add(new Option(n, i + 1)); });
+            sSel.onchange = () => window.updateAyahOptions('startAyah', sSel.selectedIndex);
+            eSel.onchange = () => window.updateAyahOptions('endAyah', eSel.selectedIndex);
+            window.updateAyahOptions('startAyah', 0); window.updateAyahOptions('endAyah', 0);
+        }
+
+        window.updateAyahOptions = (targetId, surahIndex) => {
+            const target = document.getElementById(targetId); if(!target) return; target.innerHTML = '';
+            if (surahIndex >= 0 && surahIndex < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIndex]; for(let i=1; i<=count; i++) target.add(new Option(i, i)); }
+        }
+
+        window.fetchPageDetailsForInput = async (pageInput, prefix) => { 
+            const page = parseInt(pageInput.value); if(!page || page < 1 || page > 604) return; const container = pageInput.parentElement; 
+            if(prefix === 'end') { const startInp = container.parentElement.querySelector('.p-start'); if(startInp && startInp.value && parseInt(page) < parseInt(startInp.value)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); pageInput.value = startInp.value; return window.fetchPageDetailsForInput(pageInput, 'end'); } } 
+            if(prefix === 'start') { const endInp = container.parentElement.querySelector('.p-end'); if(endInp && endInp.value && parseInt(endInp.value) < parseInt(page)) { alert("ފެށޭ ޞަފްޙާ ނިމޭ ޞަފްޙާއަށްވުރެ ބޮޑު ނުކުރެވޭނެއެވެ."); pageInput.value = endInp.value; return window.fetchPageDetailsForInput(pageInput, 'start'); } } 
+            try { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); if(data.code === 200 && data.data.ayahs.length > 0) { const targetAyah = prefix === 'start' ? data.data.ayahs[0] : data.data.ayahs[data.data.ayahs.length-1]; const surahSel = container.querySelector(`.${prefix}-surah-sel`); const ayahSel = container.querySelector(`.${prefix}-ayah-sel`); if(surahSel && ayahSel) { surahSel.value = targetAyah.surah.number; window.updateLocalAyahOptions(surahSel, `${prefix}-ayah-sel`); ayahSel.value = targetAyah.numberInSurah; } } } catch(e) {} 
+        }
+
+        window.populateSurahsForElement = (container) => {
+            const surahSelects = container.querySelectorAll('.start-surah-sel, .end-surah-sel');
+            surahSelects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => sel.add(new Option(n, i + 1))); const prefix = sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'; window.updateLocalAyahOptions(sel, prefix); });
+        };
         window.updateLocalAyahOptions = (surahSel, targetClass) => { const parent = surahSel.closest('div'); if(!parent) return; const ayahSel = parent.querySelector('.' + targetClass); if(!ayahSel) return; const surahIdx = surahSel.value - 1; ayahSel.innerHTML = ''; if(surahIdx >= 0 && surahIdx < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIdx]; for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i)); } };
 
-        // BULK & EXTERNAL
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
-        window.addBulkRow = () => { 
-            const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; 
-            div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> `; 
-            document.getElementById('bulkEntriesList').appendChild(div); 
-            const surahSelects = div.querySelectorAll('.start-surah-sel, .end-surah-sel'); surahSelects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => sel.add(new Option(n, i + 1))); const prefix = sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'; window.updateLocalAyahOptions(sel, prefix); });
-        }
-        
-        window.saveBulkData = async () => { 
-            const rows = document.querySelectorAll('#bulkEntriesList .b-row'); let pendingEntries =[]; 
-            for (let row of rows) { 
-                const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; 
-                if(date && startP && endP) { 
-                    if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } 
-                    pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }); 
-                } 
-            } 
-            if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } 
-        }
+        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; margin:0; font-size:13px;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
+        window.saveBulkData = async () => { const rows = document.querySelectorAll('#bulkEntriesList .b-row'); let pendingEntries =[]; for (let row of rows) { const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; if(date && startP && endP) { if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }); } } if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } }
 
-        window.openExternalRecModal = () => { 
-            document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; document.getElementById('extMistakes').value = '0'; 
-            const container = document.querySelector('.ext-form-container'); const surahSelects = container.querySelectorAll('.start-surah-sel, .end-surah-sel'); surahSelects.forEach(sel => { sel.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => sel.add(new Option(n, i + 1))); const prefix = sel.classList.contains('start-surah-sel') ? 'start-ayah-sel' : 'end-ayah-sel'; window.updateLocalAyahOptions(sel, prefix); });
-            document.getElementById('externalRecModal').style.display='flex'; 
-        }
-        
-        window.saveExternalRecitation = () => { 
-            const container = document.querySelector('.ext-form-container'); const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value; const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value; const mistakes = parseInt(document.getElementById('extMistakes').value) || 0;
-            if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ"); 
-            const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value; const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value; 
-            if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); 
-            const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, mistakesCount: mistakes, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }; 
-            classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(entry); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none'; 
-        }
+        window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; document.getElementById('extMistakes').value = '0'; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
+        window.saveExternalRecitation = () => { const container = document.querySelector('.ext-form-container'); const person = document.getElementById('extPerson').value; const date = document.getElementById('extDate').value; const type = document.getElementById('extType').value; const startP = document.getElementById('extStartPage').value; const endP = document.getElementById('extEndPage').value; const mistakes = parseInt(document.getElementById('extMistakes').value) || 0; if(!person || !startP || !endP) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ"); const sSurahIdx = container.querySelector('.start-surah-sel').value - 1; const sAyah = container.querySelector('.start-ayah-sel').value; const eSurahIdx = container.querySelector('.end-surah-sel').value - 1; const eAyah = container.querySelector('.end-ayah-sel').value; if(parseInt(endP) < parseInt(startP)) return alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); const entry = { type: type, date: date, page: startP, endPage: endP, status: 'pending', recitedTo: person, isExternal: true, mistakesCount: mistakes, timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }; classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(entry); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('externalRecModal').style.display='none'; }
 
         // TEACHER APPROVAL
         window.renderPendingApprovals = () => { const list = document.getElementById('pendingApprovalsList'); list.innerHTML = ''; let hasPending = false; classesData.forEach((c, cIdx) => { c.students?.forEach((s, sIdx) => { if(s.pendingData && s.pendingData.length > 0) { s.pendingData.forEach((p, pIdx) => { hasPending = true; let typeLabel = p.type === 'new_lesson' ? "އާ ފިލާވަޅު" : (p.type === 'short_rev' ? "ކުރު މުރާޖަޢާ" : (p.type === 'long_rev' ? "ދިގު މުރާޖަޢާ" : "ޖުޒުއު އިމްތިޙާން")); let detailsHtml = ""; if(p.type === 'juz_exam') { detailsHtml = `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 އިމްތިޙާންކުރީ: ${p.recitedTo}</div><br><strong style="color:var(--primary); font-size:16px;">${typeLabel} (Juz ${p.juz})</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">މާކްސް: ${p.score}%<br>މުދައްރިސް ކުށް: ${p.details.teacherMistakes} | އަމިއްލަ ކުށް: ${p.details.selfMistakes}</div>`; } else { let extBadge = p.isExternal ? `<div style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:12px; display:inline-block; margin-bottom:5px;">👤 ކިޔައިދިނީ: ${p.recitedTo}</div><br>` : ''; detailsHtml = `${extBadge}<strong style="color:var(--primary); font-size:16px;">${typeLabel}</strong><br><div style="font-size:13px; text-align:right; margin-top:5px; background:#fff; padding:8px; border-radius:5px; border:1px solid #eee;">ފެށުނީ: ޞ <b>${p.page}</b> (ސޫރަތް ${p.startDetails?.surah} - އާޔަތް ${p.startDetails?.ayah})<br>ނިމުނީ: ޞ <b>${p.endPage}</b> (ސޫރަތް ${p.endDetails?.surah} - އާޔަތް ${p.endDetails?.ayah})<br><strong style="color:#e74c3c;">ކުށް: ${p.mistakesCount || 0}</strong></div>`; } list.innerHTML += `<div class="approval-card" style="${p.isExternal ? 'border-right-color:#8e44ad;' : ''}"><div class="app-card-header"><div class="app-stu-name">${s.name} <span style="font-size:12px; font-weight:normal; color:#777;">(${c.name})</span></div><div class="app-date">${p.date}</div></div><div class="app-details">${detailsHtml}</div><div class="app-actions"> <button class="btn-approve" onclick="window.approveEntry(${cIdx}, ${sIdx}, ${pIdx})">${p.type === 'juz_exam' ? '📝 ސުވާލުކުރުން & އެޕްރޫވް' : '✓ Approve'}</button> <button class="btn-reject" onclick="window.rejectEntry(${cIdx}, ${sIdx}, ${pIdx})">✕ Reject</button></div></div>`; }); } }); }); if(!hasPending) list.innerHTML = '<p style="text-align:center; color:#999;">No pending approvals</p>'; }
@@ -691,51 +707,33 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             const rec = student.history[index]; isViewMode = false; editingRecordIndex = index; 
             if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') { 
                 currentMistakes = rec.mistakeDetails ||[]; currentSessionType = rec.type; 
-                document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage;
+                document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; 
                 currentRecViewPage = parseInt(rec.page); 
-                
-                // Static direct set - avoids async delays completely
-                document.getElementById('startSurah').innerHTML = ''; document.getElementById('endSurah').innerHTML = '';
-                SURAH_NAMES_AR.forEach((n, i) => { document.getElementById('startSurah').add(new Option(n, i + 1)); document.getElementById('endSurah').add(new Option(n, i + 1)); });
-                
-                let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; const ayahSel = document.getElementById('startAyah'); ayahSel.innerHTML=''; for(let i=1; i<=AYAH_COUNTS[sIndex]; i++) ayahSel.add(new Option(i, i)); document.getElementById('startAyah').value = rec.startDetails.ayah; }
-                let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; const ayahSel2 = document.getElementById('endAyah'); ayahSel2.innerHTML=''; for(let i=1; i<=AYAH_COUNTS[eIndex]; i++) ayahSel2.add(new Option(i, i)); document.getElementById('endAyah').value = rec.endDetails.ayah; }
-
-                window.loadSmartPage(true); 
+                window.loadSmartPage(true).then(() => { 
+                    document.getElementById('endPage').value = rec.endPage; window.populateSurahSelects();
+                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
+                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
+                }); 
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); 
             } 
         }
 
-        window.downloadExamSlip = (encName, encRec) => {
-            const name = decodeURIComponent(encName); const rec = JSON.parse(decodeURIComponent(encRec)); const slip = document.createElement('div');
-            slip.style.cssText = "width:600px; padding:30px; background:white; font-family:'MV Waheed', sans-serif; direction:rtl; text-align:right; color:#333;";
-            slip.innerHTML = `<div style="text-align:center; border-bottom:3px solid #2c3e50; padding-bottom:15px; margin-bottom:20px;"><h1 style="margin:0; color:#2c3e50; font-size:32px;">إتقان - ޙިފްޡް ޕްރޮގްރާމް</h1><h2 style="margin:5px 0 0 0; color:#27ae60; font-size:24px;">ޖުޒުއު އިމްތިޙާން ރިޕޯޓް</h2></div><div style="font-size:20px; margin-bottom:10px;"><strong>ދަރިވަރު:</strong> ${name}</div><div style="font-size:20px; margin-bottom:20px;"><strong>ޖުޒުއު:</strong> ${rec.juz} (${rec.status === 'partial' ? 'ފަހުބައި ނުނިމޭ' : 'ފުރިހަމަ'})</div><table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:18px;"><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9; width:60%;">ތާރީޚް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.date}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ހޭދަވި ވަގުތު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.duration}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުދައްރިސް ކުށް (-2)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.teacherMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (-1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr></table><div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;"><span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span><span style="font-size:32px; font-weight:bold; color:#27ae60; margin-right:15px;">${rec.score}%</span></div>`;
-            document.body.appendChild(slip); html2pdf().set({ margin: 10, filename: `Juz_${rec.juz}_Slip_${name}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(slip).save().then(() => { document.body.removeChild(slip); });
-        };
-
         // RECORDER LOGIC
-        window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(false, false, true); document.getElementById('recorder-page').classList.remove('hidden'); };
+        window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; window.populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
         window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null); else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType); };
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
         window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
         
-        window.loadSmartPage = async (applyHighlights=false, isNavigating=false, forcePopulate=false) => { 
+        window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => { 
             const page = currentRecViewPage; if(!page) return; 
             const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); 
             if(!isViewMode && data.data.ayahs.length > 0) { 
-                if((editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) || forcePopulate) { 
-                    document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
-                    document.getElementById('startSurah').innerHTML = ''; document.getElementById('endSurah').innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => { document.getElementById('startSurah').add(new Option(n, i + 1)); document.getElementById('endSurah').add(new Option(n, i + 1)); });
-                    document.getElementById('startSurah').value = first.surah.number; const ayahSel = document.getElementById('startAyah'); ayahSel.innerHTML=''; for(let i=1; i<=AYAH_COUNTS[first.surah.number-1]; i++) ayahSel.add(new Option(i, i)); document.getElementById('startAyah').value = first.numberInSurah;
-                    document.getElementById('endSurah').value = last.surah.number; const ayahSel2 = document.getElementById('endAyah'); ayahSel2.innerHTML=''; for(let i=1; i<=AYAH_COUNTS[last.surah.number-1]; i++) ayahSel2.add(new Option(i, i)); document.getElementById('endAyah').value = last.numberInSurah;
-                } else if(isNavigating) { 
-                    document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; 
-                    document.getElementById('endSurah').value = last.surah.number; const ayahSel2 = document.getElementById('endAyah'); ayahSel2.innerHTML=''; for(let i=1; i<=AYAH_COUNTS[last.surah.number-1]; i++) ayahSel2.add(new Option(i, i)); document.getElementById('endAyah').value = last.numberInSurah;
-                } 
+                if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; window.populateSurahSelects(); document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1); document.getElementById('startAyah').value = first.numberInSurah; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
+                else if(isNavigating) { document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
             } 
         };
         
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; document.getElementById('recPageDisplay').innerText = `Page ${p}`; window.loadSmartPage(false, true); } }
+        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
         
         window.renderMushafText = (ayahs, target, highlights, isExam) => { 
             const container = document.getElementById(target); container.innerHTML = ''; if(ayahs.length === 0) return;
@@ -751,6 +749,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     if (a.surah.number !== 9) { html += `<div class="bismillah-box">${BISMILLAH}</div>`; }
                     html += '<div class="quran-block" dir="rtl">';
                 } else if (currentSurah === null) { currentSurah = a.surah.number; html += '<div class="quran-block" dir="rtl">'; }
+
                 let ayahText = a.text; if(a.numberInSurah === 1 && a.surah.number !== 9) { ayahText = ayahText.replace(BISMILLAH, '').trim(); }
                 const words = ayahText.split(' ');
                 words.forEach((w, i) => { const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`; let cls = highlights.includes(id) ? 'word mistake' : 'word'; let fn = isExam ? `window.clickExamWord('${id}')` : `window.clickRecWord('${id}')`; html += `<span id="${id}" class="${cls}" onclick="${fn}">${w}</span> `; });
@@ -771,7 +770,9 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); alert("ސޭވް ކުރެވިއްޖެ"); window.closeRecorder(); 
         };
 
-        // EXAMS
+        window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails ||[]; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
+        
+        // JUZ EXAM LOGIC
         window.manualUpdateScore = (type, val) => { let num = parseInt(val) || 0; if(num < 0) num = 0; if(type === 'teacher') examState.mistakesTeacher = num; else examState.mistakesSelf = num; document.getElementById(type === 'teacher' ? 'countTeacher' : 'countSelf').value = num; window.calcScore(); };
         window.openJuzExamSetup = (role) => { isPeerExam = (role === 'peer'); const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = ''; for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('juzSetupModal').style.display='flex'; };
         window.startJuzExam = () => { 
@@ -782,12 +783,12 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); 
         };
         window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
-        window.loadExamPage = async (page) => { document.getElementById('currentPageDisplay').innerText = `Page ${page}`; const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); const first = data.data.ayahs[0]; document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`; window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true); };
+        window.loadExamPage = async (page) => { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); const first = data.data.ayahs[0]; document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`; window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true); };
         window.changeExamPage = (dir) => { let newPage = examState.currentPage + dir; if(newPage < 1 || newPage > 604) return; examState.currentPage = newPage; window.loadExamPage(newPage); };
         window.clickExamWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id); if(!examState.isMutashabih) window.updateScore('teacher', -1); } else { el.classList.add('mistake'); examState.mistakesList.push(id); if(!examState.isMutashabih) window.updateScore('teacher', 1); } };
         window.updateScore = (type, delta) => { if(type==='teacher') examState.mistakesTeacher = Math.max(0, examState.mistakesTeacher+delta); else examState.mistakesSelf = Math.max(0, examState.mistakesSelf+delta); document.getElementById('countTeacher').value = examState.mistakesTeacher; document.getElementById('countSelf').value = examState.mistakesSelf; window.calcScore(); };
         window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(!isPeerExam && examState.mode !== 'part1') deduct += (2.5 - parseFloat(document.getElementById('q1_score').value||0)) + (2.5 - parseFloat(document.getElementById('q2_score').value||0)); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
-        window.startTimer = () => { if(examState.timer) return; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').value = d.toISOString().substr(11,8); }, 1000); };
+        window.startTimer = () => { if(examState.timer) return; let pts = document.getElementById('stopwatchDisplay').value.split(':'); if(pts.length===3) examState.seconds = (+pts[0])*3600+(+pts[1])*60+(+pts[2]); else examState.seconds = 0; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').value = d.toISOString().substr(11,8); }, 1000); };
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
         window.saveJuzExamPart = () => { 
