@@ -503,7 +503,7 @@
             <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px;">
                 <button class="big-btn" onclick="window.openBulkEntryModal()" style="background:var(--st-primary); font-size:14px;">📜 ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</button>
                 <button class="big-btn btn-orange" onclick="window.openExternalRecModal()" style="font-size:14px;">🗣 އެހެން ފަރާތަކަށް ކިޔައިދިނުން</button>
-                <button class="big-btn btn-green" onclick="window.downloadStudentIndividualExcel(currentStudentObj)" style="font-size:14px;">📥 ރެކޯޑް ޝީޓް ޑައުންލޯޑް</button>
+                <button class="big-btn btn-green" onclick="window.downloadIndividualExcel(currentStudentObj)" style="font-size:14px;">📥 ރެކޯޑް ޝީޓް ޑައުންލޯޑް</button>
             </div>
             <div class="grid-container">
                 <div class="card-btn" onclick="window.openCategoryPage('new_lesson')"><span class="card-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
@@ -660,7 +660,7 @@
         window.editClass = (i) => { let name = prompt("New Name:", classesData[i].name), teach = prompt("New Teacher:", classesData[i].teacher); if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); } }; 
         window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
 
-        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Module:</span> <b>${s.module || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Direction:</span> <b>${s.direction==='bottom_up'?'ތިރިން މަތިއަށް':'މަތިން ތިރިއަށް'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static; display:flex; gap:5px;"><button class="btn-action-sm" style="background:#e8f8f5; color:#1e8449;" onclick="event.stopPropagation(); window.downloadStudentIndividualExcel(classesData[currentClassIdx].students[${idx}])">📊</button><button class="btn-action-sm" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button><button class="btn-action-sm btn-edit-hist" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
+        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Module:</span> <b>${s.module || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Direction:</span> <b>${s.direction==='bottom_up'?'ތިރިން މަތިއަށް':'މަތިން ތިރިއަށް'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static; display:flex; gap:5px;"><button class="btn-action-sm" style="background:#e8f8f5; color:#1e8449;" onclick="event.stopPropagation(); window.downloadIndividualExcel(classesData[currentClassIdx].students[${idx}])">📊</button><button class="btn-action-sm" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button><button class="btn-action-sm btn-edit-hist" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
         window.resetPass = (idx) => { if(confirm("Reset password?")) { classesData[currentClassIdx].students[idx].password = ""; updateFirebase(); window.renderStudentList(); } }
         window.openAddStudentModal = () => { editingStudentIndex = -1;['m_module','m_id','m_name','m_remarks'].forEach(id => document.getElementById(id).value = ''); document.getElementById('btnSaveStudent').innerText = "ސޭވް"; document.getElementById('addStudentModal').style.display='flex'; }
         window.openEditStudentModal = (idx) => { editingStudentIndex = idx; const s = classesData[currentClassIdx].students[idx]; document.getElementById('m_module').value=s.module||''; document.getElementById('m_id').value=s.id; document.getElementById('m_name').value=s.name; document.getElementById('m_level').value=s.level||'1'; document.getElementById('m_direction').value=s.direction||'top_down'; document.getElementById('m_remarks').value=s.remarks||''; document.getElementById('btnSaveStudent').innerText="އަޕްޑޭޓް"; document.getElementById('addStudentModal').style.display='flex'; }
@@ -765,76 +765,70 @@
         
         window.downloadProgressExcel = () => { const table = document.getElementById("progressTable"); if(!table) return; const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"}); XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx"); }
 
-        // --- NEW: INDIVIDUAL RECORD SHEET EXCEL ---
-        window.downloadStudentIndividualExcel = (student) => {
+        // --- NEW: INDIVIDUAL RECORD SHEET EXCEL (NAIFARU FORMAT) ---
+        window.downloadIndividualExcel = (student) => {
             if (!student) return;
             const wb = XLSX.utils.book_new();
             
-            // Layout AOAs
+            // Header information matching the template
             let aoa = [
                 ["", "", "", "", "", "", "", "QMP ޙިފްޒު ކުލާހުގެ ރެކޯޑް ޝީޓު", "", "", "", "", "", "", ""],
                 ["", "", "ދަރިވަރުގެ ނަން", student.name, "", "ފަށާ ޞަފްޙާ", "", "", "", "", "", "", "", "", ""],
-                ["", "", "ސްޓޫޑަންޓް އައިޑީ", student.id, "", "ކްލާސް:", (classesData[currentClassIdx]?.name || ""), "", "", "", "", "", "", "", ""],
+                ["", "", "ސްޓޫޑަންޓް އައިޑީ", student.id, "", "ކްލާސް:", (classesData[currentClassIdx]?.name || "Hifz Class"), "", "", "", "", "", "", "", ""],
                 ["", "ފިލާވަޅު", "", "", "", "ކުރު މުރާޖަޢާ", "", "", "", "ދިގު މުރާޖަޢާ", "", "", "", "", ""],
                 ["ތާރީޚު", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ކުށް", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ކުށް", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ޖުމްލަ ޞަފްޙާ", "ކުށް", "ނޯޓު"]
             ];
 
             const history = student.history || [];
-            // Group by date to handle multiple entries on one day
+            // Group data by date
             const groupedByDate = {};
             history.forEach(rec => {
-                const d = rec.date;
-                if (!groupedByDate[d]) groupedByDate[d] = { new_lesson: null, short_rev: null, long_rev: null };
-                if (rec.type === 'new_lesson') groupedByDate[d].new_lesson = rec;
-                if (rec.type === 'short_rev') groupedByDate[d].short_rev = rec;
-                if (rec.type === 'long_rev') groupedByDate[d].long_rev = rec;
+                const dateKey = rec.date;
+                if (!groupedByDate[dateKey]) groupedByDate[dateKey] = { new_lesson: null, short_rev: null, long_rev: null };
+                if (rec.type === 'new_lesson') groupedByDate[dateKey].new_lesson = rec;
+                else if (rec.type === 'short_rev') groupedByDate[dateKey].short_rev = rec;
+                else if (rec.type === 'long_rev') groupedByDate[dateKey].long_rev = rec;
             });
 
             const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
 
             sortedDates.forEach(date => {
-                const day = groupedByDate[date];
+                const data = groupedByDate[date];
                 let row = [date];
 
-                // Lesson columns (1-4)
-                if (day.new_lesson) {
-                    const nl = day.new_lesson;
+                // New Lesson columns (B-E)
+                if (data.new_lesson) {
+                    const nl = data.new_lesson;
                     row.push(nl.page, nl.endPage || nl.page, `${nl.startDetails?.surah || ''} (${nl.startDetails?.ayah || ''})`, nl.mistakesCount);
-                } else {
-                    row.push("", "", "", "");
-                }
+                } else { row.push("", "", "", ""); }
 
-                // Short Rev columns (5-8)
-                if (day.short_rev) {
-                    const sr = day.short_rev;
+                // Short Rev columns (F-I)
+                if (data.short_rev) {
+                    const sr = data.short_rev;
                     row.push(sr.page, sr.endPage || sr.page, `${sr.startDetails?.surah || ''} (${sr.startDetails?.ayah || ''})`, sr.mistakesCount);
-                } else {
-                    row.push("", "", "", "");
-                }
+                } else { row.push("", "", "", ""); }
 
-                // Long Rev columns (9-14)
-                if (day.long_rev) {
-                    const lr = day.long_rev;
-                    const tp = (parseInt(lr.endPage) - parseInt(lr.page) + 1) || 1;
-                    row.push(lr.page, lr.endPage || lr.page, `${lr.startDetails?.surah || ''} (${lr.startDetails?.ayah || ''})`, tp, lr.mistakesCount, (lr.recitedTo || ""));
-                } else {
-                    row.push("", "", "", "", "", "");
-                }
+                // Long Rev columns (J-N)
+                if (data.long_rev) {
+                    const lr = data.long_rev;
+                    const totalPages = (parseInt(lr.endPage) - parseInt(lr.page) + 1) || 1;
+                    row.push(lr.page, lr.endPage || lr.page, `${lr.startDetails?.surah || ''} (${lr.startDetails?.ayah || ''})`, totalPages, lr.mistakesCount, (lr.recitedTo || ""));
+                } else { row.push("", "", "", "", "", ""); }
 
                 aoa.push(row);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
             
-            // Apply Merges for the header
+            // Apply Merges for styling
             ws['!merges'] = [
-                { s: { r: 0, c: 7 }, e: { r: 0, c: 14 } }, // Title
-                { s: { r: 3, c: 1 }, e: { r: 3, c: 4 } },  // Lesson Header
-                { s: { r: 3, c: 5 }, e: { r: 3, c: 8 } },  // Short Rev Header
-                { s: { r: 3, c: 9 }, e: { r: 3, c: 13 } }  // Long Rev Header
+                { s: { r: 0, c: 7 }, e: { r: 0, c: 14 } }, 
+                { s: { r: 3, c: 1 }, e: { r: 3, c: 4 } },  
+                { s: { r: 3, c: 5 }, e: { r: 3, c: 8 } },  
+                { s: { r: 3, c: 9 }, e: { r: 3, c: 13 } } 
             ];
 
-            XLSX.utils.book_append_sheet(wb, ws, "Individual Record");
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
             XLSX.writeFile(wb, `Record_Sheet_${student.name}.xlsx`);
         };
 
@@ -877,7 +871,7 @@
         window.updateLocalAyahOptions = (surahSel, targetClass) => { const parent = surahSel.closest('div'); if(!parent) return; const ayahSel = parent.querySelector('.' + targetClass); if(!ayahSel) return; const surahIdx = surahSel.value - 1; ayahSel.innerHTML = ''; if(surahIdx >= 0 && surahIdx < AYAH_COUNTS.length) { const count = AYAH_COUNTS[surahIdx]; for(let i=1; i<=count; i++) ayahSel.add(new Option(i, i)); } };
 
         window.openBulkEntryModal = () => { document.getElementById('bulkEntriesList').innerHTML = ''; window.addBulkRow(); document.getElementById('bulkEntryModal').style.display='flex'; }
-        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; font-size:13px; margin:0;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
+        window.addBulkRow = () => { const div = document.createElement('div'); div.className = 'form-grid b-row'; div.style.marginBottom = '15px'; div.style.borderBottom = '1px solid #ddd'; div.style.paddingBottom = '15px'; div.innerHTML = ` <input type="date" class="form-input b-date" style="grid-column: span 2; margin-bottom:5px;"> <select class="form-input b-type" style="grid-column: span 2; margin-bottom:10px;"><option value="new_lesson">އާ ފިލާވަޅު</option><option value="short_rev">ކުރު މުރާޖަޢާ</option><option value="long_rev">ދިގު މުރާޖަޢާ</option></select> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ފެށޭ ޞަފްޙާ</label> <input type="number" class="form-input p-start" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'start')"> <div style="display:flex; gap:5px;"><select class="form-input start-surah-sel" style="flex:1; padding:5px; font-size:12px; margin:0;" onchange="window.updateLocalAyahOptions(this, 'start-ayah-sel')"></select><select class="form-input start-ayah-sel" style="width:50px; padding:5px; font-size:12px; margin:0;"></select></div> </div> <div style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;"> <label class="form-label" style="font-size:12px;">ނިމޭ ޞަފްޙާ</label> <input type="number" class="form-input p-end" style="margin-bottom:5px;" onchange="window.fetchPageDetailsForInput(this, 'end')"> <div style="display:flex; gap:5px;"><select class="form-input end-surah-sel" style="flex:1; padding:5px; margin:0; font-size:13px;" onchange="window.updateLocalAyahOptions(this, 'end-ayah-sel')"></select><select class="form-input end-ayah-sel" style="width:50px; padding:5px; margin:0; font-size:13px;"></select></div> </div> `; document.getElementById('bulkEntriesList').appendChild(div); window.populateSurahsForElement(div); }
         window.saveBulkData = async () => { const rows = document.querySelectorAll('#bulkEntriesList .b-row'); let pendingEntries =[]; for (let row of rows) { const date = row.querySelector('.b-date').value; const type = row.querySelector('.b-type').value; const startP = row.querySelector('.p-start').value; const endP = row.querySelector('.p-end').value; const sSurahIdx = row.querySelector('.start-surah-sel').value - 1; const sAyah = row.querySelector('.start-ayah-sel').value; const eSurahIdx = row.querySelector('.end-surah-sel').value - 1; const eAyah = row.querySelector('.end-ayah-sel').value; if(date && startP && endP) { if(parseInt(endP) < parseInt(startP)) { alert("ޞަފްޙާ ނަންބަރުތައް ނުބައި"); return; } pendingEntries.push({ type: type, date: date, page: startP, endPage: endP, status: 'pending', timestamp: new Date().getTime(), startDetails: { surah: SURAH_NAMES_AR[sSurahIdx] || "-", ayah: sAyah }, endDetails: { surah: SURAH_NAMES_AR[eSurahIdx] || "-", ayah: eAyah } }); } } if(pendingEntries.length > 0) { classesData.forEach(c => { let sIdx = c.students?.findIndex(s => s.id === currentStudentObj.id); if(sIdx > -1) { if(!c.students[sIdx].pendingData) c.students[sIdx].pendingData = []; c.students[sIdx].pendingData.push(...pendingEntries); } }); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); document.getElementById('bulkEntryModal').style.display='none'; } }
 
         window.openExternalRecModal = () => { document.getElementById('extPerson').value = ''; document.getElementById('extDate').valueAsDate = new Date(); document.getElementById('extStartPage').value = ''; document.getElementById('extEndPage').value = ''; document.getElementById('extMistakes').value = '0'; window.populateSurahsForElement(document.querySelector('.ext-form-container')); document.getElementById('externalRecModal').style.display='flex'; }
@@ -967,7 +961,7 @@
         window.downloadExamSlip = (encName, encRec) => {
             const name = decodeURIComponent(encName); const rec = JSON.parse(decodeURIComponent(encRec)); const slip = document.createElement('div');
             slip.style.cssText = "width:600px; padding:30px; background:white; font-family:'MV Waheed', sans-serif; direction:rtl; text-align:right; color:#333;";
-            slip.innerHTML = `<div style="text-align:center; border-bottom:3px solid #2c3e50; padding-bottom:15px; margin-bottom:20px;"><h1 style="margin:0; color:#2c3e50; font-size:32px;">إتقان - ޙިފްޡް ޕްރޮގްރާމް</h1><h2 style="margin:5px 0 0 0; color:#27ae60; font-size:24px;">ޖުޒުއު އިމްތިޙާން ރިޕޯޓް</h2></div><div style="font-size:20px; margin-bottom:10px;"><strong>ދަރިވަރު:</strong> ${name}</div><div style="font-size:20px; margin-bottom:20px;"><strong>ޖުޒުއު:</strong> ${rec.juz} (${rec.status === 'partial' ? 'ފަހުބައި ނުނިމޭ' : 'ފުރިހަމަ'})</div><table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:18px;"><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9; width:60%;">ތާރީޚް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.date}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ހޭދަވި ވަގުތު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.duration}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުދައްރިސް ކުށް (-2)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.teacherMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (-1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބِހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr></table><div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;"><span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span><span style="font-size:32px; font-weight:bold; color:#27ae60; margin-right:15px;">${rec.score}%</span></div>`;
+            slip.innerHTML = `<div style="text-align:center; border-bottom:3px solid #2c3e50; padding-bottom:15px; margin-bottom:20px;"><h1 style="margin:0; color:#2c3e50; font-size:32px;">إتقان - ޙިފްޡް ޕްރޮގްރާމް</h1><h2 style="margin:5px 0 0 0; color:#27ae60; font-size:24px;">ޖުޒުއު އިމްތިޙާން ރިޕޯޓް</h2></div><div style="font-size:20px; margin-bottom:10px;"><strong>ދަރިވަރު:</strong> ${name}</div><div style="font-size:20px; margin-bottom:20px;"><strong>ޖުޒުއު:</strong> ${rec.juz} (${rec.status === 'partial' ? 'ފަހުބައި ނުނިމޭ' : 'ފުރިހަމަ'})</div><table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:18px;"><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9; width:60%;">ތާރީޚް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.date}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ހޭދަވި ވަގުތު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.duration}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުދައްރިސް ކުށް (-2)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.teacherMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (-1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr></table><div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;"><span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span><span style="font-size:32px; font-weight:bold; color:#27ae60; margin-right:15px;">${rec.score}%</span></div>`;
             document.body.appendChild(slip); html2pdf().set({ margin: 10, filename: `Juz_${rec.juz}_Slip_${name}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(slip).save().then(() => { document.body.removeChild(slip); });
         };
 
