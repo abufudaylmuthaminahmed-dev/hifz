@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>إتقان - Hifz Program (Master Build)</title>
+    <title>إتقان - Hifz Program (Final Build)</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -615,8 +615,10 @@
         let currentStudentObj = null; let currentSessionType = '';
         let examState = {}, finalExamState = {};
         let currentMistakes =[]; let isViewMode = false;
-        let editingRecordIndex = -1; let currentRecViewPage = 1; let pendingUserIndex = -1;
-        let isPeerExam = false; let currentPendingExamData = null; let currentPendingExamIndices = null; 
+        let editingRecordIndex = -1; 
+        let editingStudentIndex = -1; // Global declaration fixed
+        let isPeerExam = false; 
+        let currentPendingExamData = null; let currentPendingExamIndices = null; 
         let activeHistorySemesterIdx = -1; 
 
         window.getFormattedDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -765,12 +767,11 @@
         
         window.downloadProgressExcel = () => { const table = document.getElementById("progressTable"); if(!table) return; const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"}); XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx"); }
 
-        // --- NEW: INDIVIDUAL RECORD SHEET EXCEL (NAIFARU FORMAT) ---
+        // --- EXCEL EXPORT (NAIFARU FORMAT) ---
         window.downloadIndividualExcel = (student) => {
             if (!student) return;
             const wb = XLSX.utils.book_new();
             
-            // Header information matching the template
             let aoa = [
                 ["", "", "", "", "", "", "", "QMP ޙިފްޒު ކުލާހުގެ ރެކޯޑް ޝީޓު", "", "", "", "", "", "", ""],
                 ["", "", "ދަރިވަރުގެ ނަން", student.name, "", "ފަށާ ޞަފްޙާ", "", "", "", "", "", "", "", "", ""],
@@ -780,7 +781,6 @@
             ];
 
             const history = student.history || [];
-            // Group data by date
             const groupedByDate = {};
             history.forEach(rec => {
                 const dateKey = rec.date;
@@ -795,41 +795,28 @@
             sortedDates.forEach(date => {
                 const data = groupedByDate[date];
                 let row = [date];
-
-                // New Lesson columns (B-E)
                 if (data.new_lesson) {
-                    const nl = data.new_lesson;
-                    row.push(nl.page, nl.endPage || nl.page, `${nl.startDetails?.surah || ''} (${nl.startDetails?.ayah || ''})`, nl.mistakesCount);
+                    row.push(data.new_lesson.page, data.new_lesson.endPage || data.new_lesson.page, `${data.new_lesson.startDetails?.surah || ''} (${data.new_lesson.startDetails?.ayah || ''})`, data.new_lesson.mistakesCount);
                 } else { row.push("", "", "", ""); }
-
-                // Short Rev columns (F-I)
                 if (data.short_rev) {
-                    const sr = data.short_rev;
-                    row.push(sr.page, sr.endPage || sr.page, `${sr.startDetails?.surah || ''} (${sr.startDetails?.ayah || ''})`, sr.mistakesCount);
+                    row.push(data.short_rev.page, data.short_rev.endPage || data.short_rev.page, `${data.short_rev.startDetails?.surah || ''} (${data.short_rev.startDetails?.ayah || ''})`, data.short_rev.mistakesCount);
                 } else { row.push("", "", "", ""); }
-
-                // Long Rev columns (J-N)
                 if (data.long_rev) {
-                    const lr = data.long_rev;
-                    const totalPages = (parseInt(lr.endPage) - parseInt(lr.page) + 1) || 1;
-                    row.push(lr.page, lr.endPage || lr.page, `${lr.startDetails?.surah || ''} (${lr.startDetails?.ayah || ''})`, totalPages, lr.mistakesCount, (lr.recitedTo || ""));
+                    const tp = (parseInt(data.long_rev.endPage) - parseInt(data.long_rev.page) + 1) || 1;
+                    row.push(data.long_rev.page, data.long_rev.endPage || data.long_rev.page, `${data.long_rev.startDetails?.surah || ''} (${data.long_rev.startDetails?.ayah || ''})`, tp, data.long_rev.mistakesCount, (data.long_rev.recitedTo || ""));
                 } else { row.push("", "", "", "", "", ""); }
-
                 aoa.push(row);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
-            
-            // Apply Merges for styling
             ws['!merges'] = [
                 { s: { r: 0, c: 7 }, e: { r: 0, c: 14 } }, 
                 { s: { r: 3, c: 1 }, e: { r: 3, c: 4 } },  
                 { s: { r: 3, c: 5 }, e: { r: 3, c: 8 } },  
                 { s: { r: 3, c: 9 }, e: { r: 3, c: 13 } } 
             ];
-
-            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-            XLSX.writeFile(wb, `Record_Sheet_${student.name}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Records");
+            XLSX.writeFile(wb, `Record_${student.name}.xlsx`);
         };
 
         window.calculateStudentProgress = (student) => { 
@@ -1054,6 +1041,58 @@
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
         window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
+
+        // --- EXCEL EXPORT (NAIFARU FORMAT) ---
+        window.downloadIndividualExcel = (student) => {
+            if (!student) return;
+            const wb = XLSX.utils.book_new();
+            
+            let aoa = [
+                ["", "", "", "", "", "", "", "QMP ޙިފްޒު ކުލާހުގެ ރެކޯޑް ޝީޓު", "", "", "", "", "", "", ""],
+                ["", "", "ދަރިވަރުގެ ނަން", student.name, "", "ފަށާ ޞަފްޙާ", "", "", "", "", "", "", "", "", ""],
+                ["", "", "ސްޓޫޑަންޓް އައިޑީ", student.id, "", "ކްލާސް:", (classesData[currentClassIdx]?.name || "Hifz Class"), "", "", "", "", "", "", "", ""],
+                ["", "ފިލާވަޅު", "", "", "", "ކުރު މުރާޖަޢާ", "", "", "", "ދިގު މުރާޖަޢާ", "", "", "", "", ""],
+                ["ތާރީޚު", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ކުށް", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ކުށް", "ފެށި ޞަފްޙާ", "ނިންމި ޞަފްޙާ", "ސޫރަތާއި އާޔަތް", "ޖުމްލަ ޞަފްޙާ", "ކުށް", "ނޯޓު"]
+            ];
+
+            const history = student.history || [];
+            const groupedByDate = {};
+            history.forEach(rec => {
+                const dateKey = rec.date;
+                if (!groupedByDate[dateKey]) groupedByDate[dateKey] = { new_lesson: null, short_rev: null, long_rev: null };
+                if (rec.type === 'new_lesson') groupedByDate[dateKey].new_lesson = rec;
+                else if (rec.type === 'short_rev') groupedByDate[dateKey].short_rev = rec;
+                else if (rec.type === 'long_rev') groupedByDate[dateKey].long_rev = rec;
+            });
+
+            const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+
+            sortedDates.forEach(date => {
+                const data = groupedByDate[date];
+                let row = [date];
+                if (data.new_lesson) {
+                    row.push(data.new_lesson.page, data.new_lesson.endPage || data.new_lesson.page, `${data.new_lesson.startDetails?.surah || ''} (${data.new_lesson.startDetails?.ayah || ''})`, data.new_lesson.mistakesCount);
+                } else { row.push("", "", "", ""); }
+                if (data.short_rev) {
+                    row.push(data.short_rev.page, data.short_rev.endPage || data.short_rev.page, `${data.short_rev.startDetails?.surah || ''} (${data.short_rev.startDetails?.ayah || ''})`, data.short_rev.mistakesCount);
+                } else { row.push("", "", "", ""); }
+                if (data.long_rev) {
+                    const tp = (parseInt(data.long_rev.endPage) - parseInt(data.long_rev.page) + 1) || 1;
+                    row.push(data.long_rev.page, data.long_rev.endPage || data.long_rev.page, `${data.long_rev.startDetails?.surah || ''} (${data.long_rev.startDetails?.ayah || ''})`, tp, data.long_rev.mistakesCount, (data.long_rev.recitedTo || ""));
+                } else { row.push("", "", "", "", "", ""); }
+                aoa.push(row);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!merges'] = [
+                { s: { r: 0, c: 7 }, e: { r: 0, c: 14 } }, 
+                { s: { r: 3, c: 1 }, e: { r: 3, c: 4 } },  
+                { s: { r: 3, c: 5 }, e: { r: 3, c: 8 } },  
+                { s: { r: 3, c: 9 }, e: { r: 3, c: 13 } } 
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, "Records");
+            XLSX.writeFile(wb, `Record_${student.name}.xlsx`);
+        };
 
     </script>
 </body>
