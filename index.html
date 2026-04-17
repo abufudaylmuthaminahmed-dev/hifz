@@ -1,291 +1,122 @@
 <!DOCTYPE html>
 <html lang="dv" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>إتقان - Hifz Program (Master Build)</title>
-    
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>إتقان - Hifz Program (Master Build)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
+@font-face{font-family:'Faruma';src:local('Faruma'),url('faruma.ttf') format('truetype');font-weight:normal;font-style:normal;}
+@font-face{font-family:'MV Waheed';src:local('MV Waheed'),url('mvwaheed.ttf') format('truetype');font-weight:normal;font-style:normal;}
+:root{--primary:#2c3e50;--accent:#27ae60;--accent-rev:#e67e22;--mistake:#e74c3c;--bg-light:#f8f9fa;--mushaf-paper:#fffcf2;--st-primary:#117a65;--font-main:'Faruma','Noto Sans Thaana',sans-serif;--font-heading:'MV Waheed','Noto Sans Thaana',sans-serif;--font-arabic:'Amiri',serif;}
+*{box-sizing:border-box;}
+body{font-family:var(--font-main);margin:0;height:100vh;height:100dvh;color:#333;background-color:var(--bg-light);overflow:hidden;display:flex;flex-direction:column;}
+body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{border-bottom:3px solid var(--st-primary);} body.student-mode .header-title{color:var(--st-primary);}
+.hidden{display:none !important;}
+.container{width:100%;padding:20px;padding-bottom:120px;max-width:1200px;margin:0 auto;animation:fadeIn 0.3s ease;height:calc(100vh - 65px);overflow-y:auto;flex-grow:1;-webkit-overflow-scrolling:touch;}
+.app-header{background:white;height:65px;padding:0 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e0e0e0;flex-shrink:0;z-index:100;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+.header-title{font-family:var(--font-heading);font-size:24px;color:var(--primary);}
+.header-actions{display:flex;gap:10px;align-items:center;}
+.icon-btn{background:#f0f2f5;border:none;width:42px;height:42px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;color:#333;}
+.logout-btn{background:#fee2e2;color:#b91c1c;} .nav-stud-btn{background:#e8f6f3;color:var(--st-primary);border:1px solid var(--st-primary);}
+.login-wrapper{display:flex;align-items:center;justify-content:center;height:100%;position:fixed;top:0;left:0;width:100%;background:#ecf0f1;z-index:2000;overflow-y:auto;}
+.login-card{background:white;padding:50px 40px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,0.1);width:90%;max-width:400px;text-align:center;border-top:5px solid var(--primary);}
+.logo-container{margin-bottom:30px;} .logo-arabic{font-family:'Amiri','Reem Kufi',serif;font-size:80px;color:var(--primary);line-height:1.1;margin-bottom:5px;text-shadow:2px 2px 0px #eee;font-weight:700;}
+.logo-eng{font-family:sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;font-weight:bold;display:block;margin-bottom:10px;} .logo-dv{font-family:var(--font-heading);font-size:22px;color:#7f8c8d;margin-top:5px;}
+.tabs{display:flex;background:#eee;padding:5px;border-radius:50px;margin:20px 0;} .tab-btn{flex:1;padding:12px;border:none;background:transparent;cursor:pointer;font-family:var(--font-heading);font-size:16px;border-radius:40px;color:#777;transition:0.3s;} .tab-btn.active{background:white;color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,0.05);font-weight:bold;}
+.form-input{width:100%;padding:14px;border:2px solid #eee;border-radius:10px;font-family:var(--font-main);font-size:16px;margin-bottom:15px;text-align:right;outline:none;transition:0.3s;} .btn-primary{width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:10px;font-family:var(--font-heading);font-size:18px;cursor:pointer;transition:0.2s;box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+.grid-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:20px;justify-content:center;}
+.card-btn{background:white;padding:25px;border-radius:15px;box-shadow:0 4px 10px rgba(0,0,0,0.05);text-align:center;border:1px solid #eee;cursor:pointer;transition:0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:160px;position:relative;}
+.card-btn:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 10px 20px rgba(0,0,0,0.08);} .card-icon{font-size:40px;width:70px;height:70px;background:#f4f6f8;border-radius:50%;display:flex;align-items:center;justify-content:center;} .card-title{font-size:18px;font-weight:bold;color:var(--primary);margin:0;} .card-sub{font-size:13px;color:#7f8c8d;}
+.dashboard-center{display:flex;gap:20px;justify-content:center;margin-top:40px;flex-wrap:wrap;} .dashboard-center .card-btn{width:250px;}
+.student-detail-card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #eee;position:relative;transition:0.2s;} .student-detail-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.st-card-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #f0f0f0;padding-bottom:10px;margin-bottom:10px;} .st-name{font-family:var(--font-heading);font-size:18px;color:var(--primary);} .st-id{background:#ecf0f1;padding:2px 8px;border-radius:8px;font-size:12px;color:#7f8c8d;font-weight:bold;}
+.st-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:#555;} .st-info-item{display:flex;justify-content:space-between;} .st-info-label{color:#999;} .st-remarks-box{margin-top:10px;background:#fffcf2;padding:8px;border-radius:5px;font-size:12px;border:1px solid #fae5d3;color:#d35400;} .st-footer-actions{margin-top:15px;display:flex;justify-content:space-between;align-items:center;}
+.student-stat-container{background:white;border-radius:15px;padding:15px;box-shadow:0 4px 15px rgba(0,0,0,0.05);margin-bottom:20px;border:1px solid #e0e0e0;} .st-stats-grid{display:flex;justify-content:space-around;align-items:center;margin-bottom:15px;} .st-stat-item{text-align:center;flex:1;border-left:1px solid #eee;} .st-stat-item:last-child{border-left:none;} .st-stat-val{font-size:28px;font-weight:bold;line-height:1;margin-bottom:5px;font-family:var(--font-arabic);} .st-stat-lbl{font-size:13px;color:#777;font-weight:500;}
+.target-box{background:#fdfefe;border-top:1px solid #eee;padding-top:15px;} .target-header{display:flex;justify-content:space-between;margin-bottom:5px;font-size:14px;font-weight:bold;color:#555;} .progress-bar-bg{background:#eee;height:15px;border-radius:10px;overflow:hidden;} .progress-bar-fill{height:100%;background:linear-gradient(90deg,#f1c40f,#2ecc71);width:0%;transition:width 1s ease-in-out;border-radius:10px;} .target-msg{font-size:12px;color:#777;text-align:center;margin-top:5px;}
+.big-btn{background:var(--primary);color:white;border:none;padding:12px 25px;border-radius:50px;font-size:16px;font-family:var(--font-heading);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);margin:5px;transition:0.2s;} .big-btn:hover{transform:scale(1.05);} .btn-orange{background:#e67e22;} .btn-green{background:#27ae60;} .btn-red{background:#c0392b;}
+.action-card{background:white;padding:25px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.05);text-align:center;border:1px solid #eee;} .menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:20px;} @media(min-width:600px){.menu-grid{grid-template-columns:repeat(3,1fr);}}
+.menu-btn{background:white;padding:25px;border-radius:15px;border:1px solid #eee;box-shadow:0 4px 10px rgba(0,0,0,0.03);cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:15px;transition:0.2s;} .menu-btn:hover{border-color:var(--primary);transform:translateY(-3px);} .menu-icon{font-size:35px;width:70px;height:70px;background:#f4f6f8;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.hist-card{background:white;width:100%;margin-bottom:20px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.05);overflow:hidden;border:1px solid #e0e0e0;cursor:pointer;transition:0.2s;position:relative;} .hist-card:active{transform:scale(0.99);}
+.hist-header{padding:12px 20px;background:#f8f9fa;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;} .hist-title-group{display:flex;flex-direction:column;gap:2px;} .hist-actions{display:flex;gap:8px;align-items:center;} .hist-title{font-weight:bold;font-size:18px;color:var(--primary);} .hist-date{font-family:sans-serif;font-size:12px;color:#555;background:#e0e0e0;padding:2px 8px;border-radius:10px;font-weight:bold;width:fit-content;} .hist-body{padding:20px;}
+.hist-detail-row{display:flex;justify-content:space-between;background:#f4f6f8;padding:10px;border-radius:8px;margin-bottom:10px;align-items:center;} .hist-detail-lbl{font-size:14px;font-weight:bold;color:var(--primary);min-width:60px;} .hist-detail-val{font-family:var(--font-arabic);font-size:18px;color:#333;text-align:left;direction:rtl;flex:1;} .hist-detail-pg{font-size:16px;font-weight:bold;background:var(--accent);color:white;padding:3px 10px;border-radius:15px;margin-right:10px;} .hist-badge-external{background:#8e44ad;color:white;padding:5px 15px;border-radius:20px;font-size:13px;text-align:center;margin-bottom:15px;font-weight:bold;}
+.hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;} .hist-item{text-align:center;background:#fff;padding:10px;border-radius:8px;border:1px solid #f0f0f0;} .hist-label{font-size:12px;color:#7f8c8d;display:block;margin-bottom:2px;} .hist-val{font-size:16px;font-weight:bold;color:#333;font-family:var(--font-arabic);}
+.hist-footer{padding:15px;background:#eafaf1;text-align:center;border-top:1px solid #d5f5e3;font-size:20px;font-weight:bold;color:var(--accent);position:relative;} .hist-footer.exam-score{background:#ebf5fb;border-top:1px solid #d6eaf8;color:#2980b9;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;}
+.btn-edit-hist,.btn-delete-hist,.btn-action-sm{width:35px;height:35px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);} .btn-delete-hist{background:#fee2e2;color:#c0392b;} .btn-edit-hist{background:#e3f2fd;color:#2980b9;}
+.approval-card{background:white;border-radius:12px;border:1px solid #e0e0e0;border-right:5px solid #e67e22;padding:15px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:10px;} .app-card-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f0f0;padding-bottom:8px;} .app-stu-name{font-weight:bold;font-size:16px;color:var(--primary);} .app-date{background:#f0f2f5;color:#555;font-size:12px;padding:3px 8px;border-radius:10px;} .app-details{background:#fffcf2;padding:10px;border-radius:8px;text-align:center;font-size:15px;color:#333;line-height:1.6;} .app-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:5px;} .btn-approve{background:#d4efdf;color:#1e8449;padding:8px 15px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;} .btn-reject{background:#fadbd8;color:#c0392b;padding:8px 15px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@700&display=swap');
+/* Desktop Table & Mobile Cards */
+.desktop-view-table{display:table;width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;font-size:14px;box-shadow:0 4px 15px rgba(0,0,0,0.05);border-radius:12px;overflow:hidden;border:1px solid #e0e0e0;} .desktop-view-table thead tr{background:linear-gradient(135deg,var(--primary),#34495e);color:#ffffff;text-align:center;} .desktop-view-table th{padding:15px;font-weight:600;border-bottom:2px solid #ddd;font-family:var(--font-heading);} .desktop-view-table td{padding:12px 15px;border-bottom:1px solid #f0f0f0;text-align:center;vertical-align:middle;font-family:var(--font-main);} .desktop-view-table tbody tr:hover{background-color:#f1f9f5;transition:0.2s;} .desktop-view-table tbody tr:last-of-type td{border-bottom:none;}
+.tbl-badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;display:inline-block;} .bg-green{background:#e8f8f5;color:#27ae60;} .bg-orange{background:#fef5e7;color:#e67e22;} .bg-blue{background:#ebf5fb;color:#2980b9;}
+.mobile-view-cards{display:none;margin-top:20px;} .prog-card{background:white;border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid #f0f0f0;position:relative;overflow:hidden;} .prog-card::before{content:'';position:absolute;top:0;right:0;width:6px;height:100%;background:var(--accent);} .prog-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid #f5f5f5;padding-bottom:10px;} .prog-card-name{font-family:var(--font-heading);font-size:18px;color:var(--primary);font-weight:bold;} .prog-card-level{background:#34495e;color:white;padding:2px 8px;border-radius:6px;font-size:11px;} .prog-grid{display:flex;flex-direction:column;gap:10px;} .prog-box{background:#f8f9fa;padding:12px;border-radius:10px;text-align:center;border:1px solid #eee;} .prog-box-label{font-size:12px;color:#7f8c8d;display:block;margin-bottom:5px;font-weight:bold;} .prog-box-val{font-size:18px;font-weight:bold;font-family:var(--font-arabic);color:#333;} .prog-flow-row{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:15px;color:#555;background:#fffcf2;padding:15px;border-radius:10px;border:1px solid #fae5d3;} .prog-flow-point{background:white;padding:5px 15px;border-radius:20px;border:1px solid #ddd;width:100%;text-align:center;} .prog-flow-arrow{color:var(--accent);font-size:20px;line-height:0.5;} .prog-box.highlight{background:#eafaf1;border-color:#d5f5e3;} .prog-box.highlight .prog-box-val{color:var(--accent);}
+@media(max-width:900px){.desktop-view-table{display:none;} .mobile-view-cards{display:block;}}
 
-        @font-face { font-family: 'Faruma'; src: local('Faruma'), url('faruma.ttf') format('truetype'); font-weight: normal; font-style: normal; }
-        @font-face { font-family: 'MV Waheed'; src: local('MV Waheed'), url('mvwaheed.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+/* FIXED MUSHAF LAYOUT */
+.layout-split{display:flex;flex-direction:column;height:calc(100vh - 65px);height:calc(100dvh - 65px);overflow:hidden;position:relative;}
+@media(min-width:901px){.layout-split{flex-direction:row;} .sidebar-panel{width:350px;height:100%;border-right:1px solid #ddd;order:1;border-bottom:none;} .main-panel{flex:1;height:100%;order:2;} .mushaf-nav-footer{position:absolute;bottom:0;width:100%;} .mushaf-page-container{padding-bottom:80px;}}
+.sidebar-panel{background:white;display:flex;flex-direction:column;overflow-y:auto;z-index:10;padding:20px;box-shadow:-5px 0 20px rgba(0,0,0,0.05);flex-shrink:0;padding-bottom:100px;}
+.main-panel{flex:1;background:var(--mushaf-paper);position:relative;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.mushaf-header-sticky{background:white;padding:8px 15px;border-bottom:1px solid #ddd;text-align:center;font-family:var(--font-arabic);font-size:16px;color:var(--primary);font-weight:bold;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);z-index:20;}
+.mushaf-page-container{flex-grow:1;overflow-y:auto;padding:10px;display:flex;justify-content:center;align-items:flex-start;padding-bottom:120px;-webkit-overflow-scrolling:touch;}
+.mushaf-content-box{background:white;padding:15px 20px;box-shadow:0 3px 10px rgba(0,0,0,0.05);border-radius:5px;width:100%;max-width:800px;min-height:fit-content;}
+.quran-text{font-family:var(--font-arabic);font-size:clamp(20px,3.5vw,26px);line-height:2.1;text-align:justify;text-align-last:center;direction:rtl;}
+.quran-block{margin-bottom:15px;}
+.surah-header-box{border:2px solid #d4ac6e;background:#fffcf2;background-image:linear-gradient(to right,#fffcf2,#fdf2d0,#fffcf2);padding:3px 10px;margin:15px auto 8px auto;border-radius:5px;text-align:center;width:95%;}
+.surah-title{font-family:'Reem Kufi',var(--font-arabic);font-size:24px;color:#5d4037;text-shadow:1px 1px 0 #fff;}
+.bismillah-box{text-align:center;font-family:var(--font-arabic);font-size:20px;margin:8px 0 15px 0;color:#555;}
+.word{cursor:pointer;border-radius:4px;padding:2px 1px;transition:background 0.1s;} .word:hover{background:rgba(0,0,0,0.05);} .word.mistake{background-color:var(--mistake);color:white;}
+.ayah-marker{color:#d4ac6e;font-weight:bold;font-family:var(--font-arabic);display:inline-block;margin:0 5px;font-size:0.9em;}
+.mushaf-nav-footer{background:#2c3e50;color:white;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:fixed;bottom:0;left:0;width:100%;z-index:9999;box-shadow:0 -2px 10px rgba(0,0,0,0.2);padding-bottom:max(10px,env(safe-area-inset-bottom));}
+.nav-btn-dark{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;font-family:var(--font-heading);transition:0.2s;} .nav-btn-dark:active{background:rgba(255,255,255,0.4);transform:scale(0.95);}
+.page-display-text{font-size:18px;font-weight:bold;font-family:sans-serif;letter-spacing:1px;}
+.mobile-return-btn{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:90%;max-width:400px;z-index:9998;font-size:14px;opacity:0.95;}
 
-        :root {
-            --primary: #2c3e50; --accent: #27ae60; --accent-rev: #e67e22; --mistake: #e74c3c;
-            --bg-light: #f8f9fa; --mushaf-paper: #fffcf2; --st-primary: #117a65;
-            --font-main: 'Faruma', 'Noto Sans Thaana', sans-serif;
-            --font-heading: 'MV Waheed', 'Noto Sans Thaana', sans-serif; 
-            --font-arabic: 'Amiri', serif;
-        }
-
-        * { box-sizing: border-box; }
-        
-        body { font-family: var(--font-main); margin: 0; height: 100vh; height: 100dvh; color: #333; background-color: var(--bg-light); overflow: hidden; display: flex; flex-direction: column; }
-        body.student-mode { background-color: #e8f6f3; }
-        body.student-mode .app-header { border-bottom: 3px solid var(--st-primary); }
-        body.student-mode .header-title { color: var(--st-primary); }
-        .hidden { display: none !important; }
-        
-        .container { width: 100%; padding: 20px; padding-bottom: 100px; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.3s ease; height: calc(100vh - 65px); overflow-y: auto; flex-grow: 1; -webkit-overflow-scrolling: touch; }
-        .app-header { background: white; height: 65px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; flex-shrink: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .header-title { font-family: var(--font-heading); font-size: 24px; color: var(--primary); }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .icon-btn { background: #f0f2f5; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #333; }
-        .logout-btn { background: #fee2e2; color: #b91c1c; }
-        .nav-stud-btn { background: #e8f6f3; color: var(--st-primary); border: 1px solid var(--st-primary); }
-
-        .login-wrapper { display: flex; align-items: center; justify-content: center; height: 100%; position: fixed; top: 0; left: 0; width: 100%; background: #ecf0f1; z-index: 2000; overflow-y: auto; }
-        .login-card { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary); }
-        .logo-container { margin-bottom: 30px; }
-        .logo-arabic { font-family: 'Amiri', 'Reem Kufi', serif; font-size: 80px; color: var(--primary); line-height: 1.1; margin-bottom: 5px; text-shadow: 2px 2px 0px #eee; font-weight: 700; }
-        .logo-eng { font-family: sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 10px; }
-        .logo-dv { font-family: var(--font-heading); font-size: 22px; color: #7f8c8d; margin-top: 5px; }
-
-        .tabs { display: flex; background: #eee; padding: 5px; border-radius: 50px; margin: 20px 0; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-family: var(--font-heading); font-size: 16px; border-radius: 40px; color: #777; transition:0.3s; }
-        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: bold; }
-        .form-input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 10px; font-family: var(--font-main); font-size: 16px; margin-bottom: 15px; text-align: right; outline: none; transition: 0.3s; }
-        .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: var(--font-heading); font-size: 18px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; justify-content: center; }
-        .card-btn { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 160px; position: relative; }
-        .card-btn:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
-        .card-icon { font-size: 40px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .card-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0; }
-        .card-sub { font-size: 13px; color: #7f8c8d; }
-        .dashboard-center { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
-        .dashboard-center .card-btn { width: 250px; }
-
-        .student-detail-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; transition: 0.2s; }
-        .student-detail-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-        .st-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 10px; }
-        .st-name { font-family: var(--font-heading); font-size: 18px; color: var(--primary); }
-        .st-id { background: #ecf0f1; padding: 2px 8px; border-radius: 8px; font-size: 12px; color: #7f8c8d; font-weight: bold; }
-        .st-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: #555; }
-        .st-info-item { display: flex; justify-content: space-between; }
-        .st-info-label { color: #999; }
-        .st-remarks-box { margin-top: 10px; background: #fffcf2; padding: 8px; border-radius: 5px; font-size: 12px; border: 1px solid #fae5d3; color: #d35400; }
-        .st-footer-actions { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-
-        .student-stat-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e0e0e0; }
-        .st-stats-grid { display: flex; justify-content: space-around; align-items: center; margin-bottom: 15px; }
-        .st-stat-item { text-align: center; flex: 1; border-left: 1px solid #eee; }
-        .st-stat-item:last-child { border-left: none; }
-        .st-stat-val { font-size: 28px; font-weight: bold; line-height: 1; margin-bottom: 5px; font-family: var(--font-arabic); }
-        .st-stat-lbl { font-size: 13px; color: #777; font-weight: 500; }
-        
-        .target-box { background: #fdfefe; border-top: 1px solid #eee; padding-top: 15px; }
-        .target-header { display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px; font-weight:bold; color:#555; }
-        .progress-bar-bg { background:#eee; height:15px; border-radius:10px; overflow:hidden; }
-        .progress-bar-fill { height:100%; background: linear-gradient(90deg, #f1c40f, #2ecc71); width:0%; transition: width 1s ease-in-out; border-radius:10px; }
-        .target-msg { font-size:12px; color:#777; text-align:center; margin-top:5px; }
-
-        .big-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 16px; font-family: var(--font-heading); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 5px; transition:0.2s; }
-        .big-btn:hover { transform: scale(1.05); }
-        .btn-orange { background: #e67e22; } .btn-green { background: #27ae60; } .btn-red { background: #c0392b; }
-
-        .action-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        @media (min-width: 600px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
-        .menu-btn { background: white; padding: 25px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; transition: 0.2s; }
-        .menu-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
-        .menu-icon { font-size: 35px; width: 70px; height: 70px; background: #f4f6f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-        .hist-card { background: white; width: 100%; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; transition:0.2s; position: relative; }
-        .hist-card:active { transform: scale(0.99); }
-        .hist-header { padding: 12px 20px; background: #f8f9fa; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .hist-title-group { display: flex; flex-direction: column; gap: 2px; }
-        .hist-actions { display: flex; gap: 8px; align-items: center; }
-        .hist-title { font-weight: bold; font-size: 18px; color: var(--primary); }
-        .hist-date { font-family: sans-serif; font-size: 12px; color: #555; background: #e0e0e0; padding: 2px 8px; border-radius: 10px; font-weight: bold; width: fit-content; }
-        .hist-body { padding: 20px; }
-        
-        .hist-detail-row { display:flex; justify-content:space-between; background:#f4f6f8; padding:10px; border-radius:8px; margin-bottom:10px; align-items: center;}
-        .hist-detail-lbl { font-size:14px; font-weight:bold; color:var(--primary); min-width: 60px;}
-        .hist-detail-val { font-family: var(--font-arabic); font-size:18px; color:#333; text-align:left; direction:rtl; flex:1;}
-        .hist-detail-pg { font-size:16px; font-weight:bold; background:var(--accent); color:white; padding:3px 10px; border-radius:15px; margin-right:10px;}
-        .hist-badge-external { background: #8e44ad; color: white; padding: 5px 15px; border-radius: 20px; font-size: 13px; text-align: center; margin-bottom: 15px; font-weight:bold;}
-
-        .hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .hist-item { text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #f0f0f0; }
-        .hist-label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 2px; }
-        .hist-val { font-size: 16px; font-weight: bold; color: #333; font-family: var(--font-arabic); }
-
-        .hist-footer { padding: 15px; background: #eafaf1; text-align: center; border-top: 1px solid #d5f5e3; font-size: 20px; font-weight: bold; color: var(--accent); position: relative; }
-        .hist-footer.exam-score { background: #ebf5fb; border-top: 1px solid #d6eaf8; color: #2980b9; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;}
-        .hist-card.type-new_lesson { border-right: 5px solid var(--accent); }
-        .hist-card.type-juz_exam { border-right: 5px solid #2980b9; }
-        .hist-card.type-final_exam { border-right: 5px solid #c0392b; }
-
-        .btn-edit-hist,.btn-delete-hist,.btn-action-sm { width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-delete-hist { background: #fee2e2; color: #c0392b; } .btn-edit-hist { background: #e3f2fd; color: #2980b9; }
-
-        .approval-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; border-right: 5px solid #e67e22; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
-        .app-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .app-stu-name { font-weight: bold; font-size: 16px; color: var(--primary); }
-        .app-date { background: #f0f2f5; color: #555; font-size: 12px; padding: 3px 8px; border-radius: 10px; }
-        .app-details { background: #fffcf2; padding: 10px; border-radius: 8px; text-align: center; font-size: 15px; color: #333; line-height: 1.6;}
-        .app-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; }
-        .btn-approve { background: #d4efdf; color: #1e8449; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
-        .btn-reject { background: #fadbd8; color: #c0392b; padding: 8px 15px; border-radius: 20px; border:none; cursor: pointer; font-weight: bold; }
-
-        /* Progress Table & Mobile Cards */
-        .desktop-view-table { display: table; width: 100%; border-collapse: separate; border-spacing: 0; margin: 20px 0; font-size: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; }
-        .desktop-view-table thead tr { background: linear-gradient(135deg, var(--primary), #34495e); color: #ffffff; text-align: center; }
-        .desktop-view-table th { padding: 15px; font-weight: 600; border-bottom: 2px solid #ddd; font-family: var(--font-heading); }
-        .desktop-view-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; text-align: center; vertical-align: middle; font-family: var(--font-main); }
-        .desktop-view-table tbody tr:hover { background-color: #f1f9f5; transition: 0.2s; }
-        .desktop-view-table tbody tr:last-of-type td { border-bottom: none; }
-        .tbl-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .bg-green { background: #e8f8f5; color: #27ae60; }
-        .bg-orange { background: #fef5e7; color: #e67e22; }
-        .bg-blue { background: #ebf5fb; color: #2980b9; }
-
-        .mobile-view-cards { display: none; margin-top: 20px; }
-        .prog-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; position: relative; overflow: hidden; }
-        .prog-card::before { content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: var(--accent); }
-        .prog-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #f5f5f5; padding-bottom: 10px; }
-        .prog-card-name { font-family: var(--font-heading); font-size: 18px; color: var(--primary); font-weight: bold; }
-        .prog-card-level { background: #34495e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
-        
-        .prog-grid { display: flex; flex-direction: column; gap: 10px; }
-        .prog-box { background: #f8f9fa; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
-        .prog-box-label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 5px; font-weight:bold; }
-        .prog-box-val { font-size: 18px; font-weight: bold; font-family: var(--font-arabic); color: #333; }
-        
-        .prog-flow-row { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 15px; color: #555; background: #fffcf2; padding: 15px; border-radius: 10px; border: 1px solid #fae5d3; }
-        .prog-flow-point { background: white; padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd; width: 100%; text-align: center; }
-        .prog-flow-arrow { color: var(--accent); font-size: 20px; line-height: 0.5; }
-
-        .prog-stats-row { display: flex; gap: 10px; }
-        .prog-stats-row .prog-box { flex: 1; }
-
-        .prog-box.highlight { background: #eafaf1; border-color: #d5f5e3; }
-        .prog-box.highlight .prog-box-val { color: var(--accent); }
-
-        @media (max-width: 900px) {
-            .desktop-view-table { display: none; }
-            .mobile-view-cards { display: block; }
-        }
-
-        /* MUSHAF LAYOUT */
-        .layout-split { display: flex; flex-direction: column; height: calc(100vh - 65px); height: calc(100dvh - 65px); overflow: hidden; position: relative; }
-
-        @media (min-width: 901px) {
-            .layout-split { flex-direction: row; }
-            .sidebar-panel { width: 350px; height: 100%; border-right: 1px solid #ddd; order: 1; border-bottom: none; }
-            .main-panel { flex: 1; height: 100%; order: 2; }
-            .mushaf-nav-footer { position: absolute; bottom: 0; width: 100%; }
-            .mushaf-page-container { padding-bottom: 80px; }
-        }
-        
-        .sidebar-panel { background: white; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.05); flex-shrink: 0; padding-bottom: 100px; }
-        .main-panel { flex: 1; background: var(--mushaf-paper); position: relative; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-
-        .mushaf-header-sticky { background: white; padding: 8px 15px; border-bottom: 1px solid #ddd; text-align: center; font-family: var(--font-arabic); font-size: 16px; color: var(--primary); font-weight: bold; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 20; }
-        .mushaf-page-container { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; justify-content: center; align-items: flex-start; padding-bottom: 120px; -webkit-overflow-scrolling: touch; }
-        .mushaf-content-box { background: white; padding: 10px 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border-radius: 5px; width: 100%; max-width: 800px; min-height: fit-content; }
-
-        .quran-text { font-family: var(--font-arabic); font-size: clamp(20px, 3.5vw, 26px); line-height: 2.1; text-align: justify; text-align-last: center; direction: rtl; }
-        .quran-block { margin-bottom: 15px; }
-        
-        .surah-header-box { border: 2px solid #d4ac6e; background: #fffcf2; background-image: linear-gradient(to right, #fffcf2, #fdf2d0, #fffcf2); padding: 3px 10px; margin: 15px auto 8px auto; border-radius: 5px; text-align: center; width: 95%; }
-        .surah-title { font-family: 'Reem Kufi', var(--font-arabic); font-size: 24px; color: #5d4037; text-shadow: 1px 1px 0 #fff; }
-        .bismillah-box { text-align: center; font-family: var(--font-arabic); font-size: 20px; margin: 8px 0 15px 0; color: #555; }
-
-        .word { cursor: pointer; border-radius: 4px; padding: 2px 1px; transition: background 0.1s; }
-        .word:hover { background: rgba(0,0,0,0.05); }
-        .word.mistake { background-color: var(--mistake); color: white; }
-        .ayah-marker { color: #d4ac6e; font-weight: bold; font-family: var(--font-arabic); display: inline-block; margin: 0 5px; font-size: 0.9em; }
-        
-        .mushaf-nav-footer { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
-        .nav-btn-dark { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: var(--font-heading); transition: 0.2s;}
-        .nav-btn-dark:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
-        .page-display-text { font-size: 18px; font-weight: bold; font-family: sans-serif; letter-spacing: 1px;}
-        
-        .mobile-return-btn { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 9998; font-size: 14px; opacity: 0.95; }
-
-        .score-header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
-        .big-score { font-size: 40px; font-weight: bold; }
-        .score-control { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 10px; }
-        .ctrl-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-minus { background: #ffcdd2; color: #c62828; } .btn-plus { background: #c8e6c9; color: #2e7d32; }
-        .stopwatch-box { font-family: monospace; font-size: 32px; text-align: center; color: #e67e22; font-weight: bold; background: #fffbf0; padding: 10px; border-radius: 10px; border: 1px solid #ffeeba; margin-bottom: 15px; }
-        
-        .form-sec { border: 1px solid #eee; padding: 10px; border-radius: 8px; position: relative; margin-top: 10px; }
-        .sec-title { position: absolute; top: -10px; right: 10px; background: white; padding: 0 5px; font-size: 12px; font-weight: bold; color: #777; }
-        .rec-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: var(--font-main); text-align: right; margin-bottom: 5px; }
-
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 95%; max-width: 550px; max-height: 95vh; overflow-y: auto; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .full-span { grid-column: span 2; }
-        .form-label { font-size: 14px; font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
-        .api-loader { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:none; align-items:center; justify-content:center; z-index:10; border-radius:5px;}
-
-        .mobile-only-btn { display: none; }
-        @media (max-width: 900px) {
-            .mobile-only-btn { display: inline-flex; }
-            .layout-split:not(.show-mushaf-mobile) .sidebar-panel { display: flex; width: 100%; height: 100%; order: 1; border-bottom: none; }
-            .layout-split:not(.show-mushaf-mobile) .main-panel { display: none; }
-            .layout-split.show-mushaf-mobile .sidebar-panel { display: none; }
-            .layout-split.show-mushaf-mobile .main-panel { display: flex; width: 100%; height: 100%; order: 1; border-top: none; }
-            .mushaf-page-container { padding: 5px; padding-bottom: 130px; }
-            .mushaf-content-box { padding: 10px; }
-        }
-
-        .sem-tag { padding: 8px 15px; background: #e0e0e0; border: none; border-radius: 20px; cursor: pointer; margin-right: 5px; font-size: 14px; transition: 0.2s; }
-        .sem-tag.active { background: var(--primary); color: white; font-weight: bold; }
-        .checkbox-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; direction: ltr; margin-bottom: 20px; }
-        .checkbox-grid label { display: block; background: #f8f9fa; padding: 10px; border: 1px solid #eee; text-align: center; border-radius: 5px; cursor: pointer; user-select: none; }
-        .checkbox-grid label:hover { background: #e2e6ea; }
-        .checkbox-grid input[type="checkbox"] { display: none; }
-        .checkbox-grid input[type="checkbox"]:checked + span { color: var(--accent); font-weight: bold; }
-        .checkbox-grid input[type="checkbox"]:checked + span::before { content: '✔ '; }
-        .checkbox-grid label.checked { border-color: var(--accent); background: #d4efdf; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+.score-header{background:#2c3e50;color:white;padding:20px;text-align:center;border-radius:12px;margin-bottom:15px;} .big-score{font-size:40px;font-weight:bold;}
+.score-control{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;background:#f8f9fa;padding:10px;border-radius:10px;}
+.ctrl-btn{width:35px;height:35px;border-radius:50%;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;} .btn-minus{background:#ffcdd2;color:#c62828;} .btn-plus{background:#c8e6c9;color:#2e7d32;}
+.stopwatch-box{display:flex;flex-direction:column;align-items:center;background:#fffbf0;padding:10px;border-radius:10px;border:1px solid #ffeeba;margin-bottom:15px;}
+.form-sec{border:1px solid #eee;padding:10px;border-radius:8px;position:relative;margin-top:10px;} .sec-title{position:absolute;top:-10px;right:10px;background:white;padding:0 5px;font-size:12px;font-weight:bold;color:#777;}
+.rec-input{width:100%;padding:8px;border:1px solid #ccc;border-radius:5px;font-family:var(--font-main);text-align:right;margin-bottom:5px;}
+.modal{display:none;position:fixed;z-index:3000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;} .modal-content{background:white;padding:30px;border-radius:15px;width:95%;max-width:550px;max-height:95vh;overflow-y:auto;position:relative;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;} .full-span{grid-column:span 2;} .form-label{font-size:14px;font-weight:bold;display:block;margin-bottom:5px;color:#555;}
+.api-loader{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:none;align-items:center;justify-content:center;z-index:10;border-radius:5px;}
+.mobile-only-btn{display:none;}
+@media(max-width:900px){
+    .mobile-only-btn{display:inline-flex;}
+    .layout-split:not(.show-mushaf-mobile) .sidebar-panel{display:flex;width:100%;height:100%;order:1;border-bottom:none;}
+    .layout-split:not(.show-mushaf-mobile) .main-panel{display:none;}
+    .layout-split.show-mushaf-mobile .sidebar-panel{display:none;}
+    .layout-split.show-mushaf-mobile .main-panel{display:flex;width:100%;height:100%;order:1;border-top:none;}
+    .mushaf-page-container{padding:5px;padding-bottom:130px;} .mushaf-content-box{padding:10px;}
+}
+.sem-tag{padding:8px 15px;background:#e0e0e0;border:none;border-radius:20px;cursor:pointer;margin-right:5px;font-size:14px;transition:0.2s;} .sem-tag.active{background:var(--primary);color:white;font-weight:bold;}
+.checkbox-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;direction:ltr;margin-bottom:20px;} .checkbox-grid label{display:block;background:#f8f9fa;padding:10px;border:1px solid #eee;text-align:center;border-radius:5px;cursor:pointer;user-select:none;} .checkbox-grid label:hover{background:#e2e6ea;} .checkbox-grid input[type="checkbox"]{display:none;} .checkbox-grid input[type="checkbox"]:checked + span{color:var(--accent);font-weight:bold;} .checkbox-grid input[type="checkbox"]:checked + span::before{content:'✔ ';} .checkbox-grid label.checked{border-color:var(--accent);background:#d4efdf;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
 </head>
 <body>
 
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
-            <div class="logo-container">
-                <div class="logo-arabic">إتقان</div><div class="logo-eng">Hifz Program</div><div class="logo-dv">ޙިފްޡް ޕްރޮގްރާމް</div>
-            </div>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="window.switchLogin('teacher')">މުދައްރިސް</button>
-                <button class="tab-btn" onclick="window.switchLogin('student')">ދަރިވަރު</button>
-            </div>
+            <div class="logo-container"><div class="logo-arabic">إتقان</div><div class="logo-eng">Hifz Program</div><div class="logo-dv">ޙިފްޡް ޕްރޮގްރާމް</div></div>
+            <div class="tabs"><button class="tab-btn active" onclick="window.switchLogin('teacher')">މުދައްރިސް</button><button class="tab-btn" onclick="window.switchLogin('student')">ދަރިވަރު</button></div>
             <div id="teacher-login-form">
-                <input type="text" id="teacherUsername" class="form-input" placeholder="ޔޫސަރ ނޭމް">
-                <input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
-                <button class="btn-primary" onclick="window.loginTeacher()">ލޮގިން</button>
+                <input type="text" id="teacherUsername" class="form-input" placeholder="ޔޫސަރ ނޭމް"><input type="password" id="teacherPassInput" class="form-input" placeholder="ޕާސްވޯޑް"><button class="btn-primary" onclick="window.loginTeacher()">ލޮގިން</button>
             </div>
             <div id="student-login-form" class="hidden">
-                <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު">
-                <div id="stuPassField" class="hidden" style="margin-top:10px;">
-                    <input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް">
-                </div>
-                <button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
+                <input type="text" id="stuIdInput" class="form-input" placeholder="އައިޑީ ނަންބަރު"><div id="stuPassField" class="hidden" style="margin-top:10px;"><input type="password" id="stuPassInput" class="form-input" placeholder="ޕާސްވޯޑް"></div><button class="btn-primary" style="background:var(--st-primary);" onclick="window.handleStudentLoginStep()">ލޮގިން</button>
             </div>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
+        
+        <!-- TEACHER DASHBOARD -->
         <div id="teacher-dashboard" class="container hidden">
-            <div class="app-header">
-                <div class="header-title">މުދައްރިސް ޕެނަލް</div>
-                <button class="icon-btn logout-btn" onclick="window.logout()">⏻</button>
-            </div>
+            <div class="app-header"><div class="header-title">މުދައްރިސް ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div class="dashboard-center">
                 <div class="card-btn" onclick="window.openPage('management-page')"><span class="card-icon">⚙️</span><h3 class="card-title">ކްލާސް މެނޭޖްމަންޓް</h3><span class="card-sub">ކްލާސް ހެދުން / ދަރިވަރުން</span></div>
                 <div class="card-btn" onclick="window.openGradingClassList()"><span class="card-icon">📚</span><h3 class="card-title">ފިލާވަޅު ނެގުން</h3><span class="card-sub">ރެކޯޑް ކުރުން / ބެލުން</span></div>
@@ -347,7 +178,6 @@
             <div class="app-header"><div class="header-title">ފިލާވަޅު ނެގުން</div><button class="icon-btn" onclick="window.openPage('teacher-dashboard')">⬅</button></div>
             <div id="gradingClassList" class="grid-container"></div>
         </div>
-        
         <div id="grading-student-page" class="container hidden">
             <div class="app-header"><div class="header-title">Students</div><button class="icon-btn" onclick="window.openPage('grading-class-page')">⬅</button></div>
             <div id="gradingStudentList" class="grid-container"></div>
@@ -384,7 +214,7 @@
             <div id="categoryHistoryList"></div>
         </div>
 
-        <!-- UNIVERSAL RECORDER -->
+        <!-- UNIVERSAL RECORDER (MUSHAF VIEW) -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
             <div class="app-header">
                 <div style="display:flex; align-items:center; gap:10px;"><button class="icon-btn" onclick="window.closeRecorder()">⬅</button><span class="header-title" id="recorderTitle">ރެކޯޑް</span></div>
@@ -436,7 +266,10 @@
                     <div class="exam-section">
                         <div class="stopwatch-box" style="display:flex; flex-direction:column; align-items:center;">
                             <input type="text" id="stopwatchDisplay" value="00:00:00" style="width:160px; border:none; background:transparent; text-align:center; font-family:monospace; font-size:32px; color:#e67e22; font-weight:bold; outline:none; margin-bottom:5px;">
-                            <div style="font-size:20px; display:flex; gap:15px;"><button onclick="window.startTimer()" style="border:none; color:#27ae60; background:none; cursor:pointer;" title="Start">▶</button> <button onclick="window.stopTimer()" style="border:none; color:#c0392b; background:none; cursor:pointer;" title="Stop">⏹</button></div>
+                            <div style="font-size:20px; display:flex; gap:15px;">
+                                <button onclick="window.startTimer()" style="border:none; color:#27ae60; background:none; cursor:pointer;" title="Start">▶</button> 
+                                <button onclick="window.stopTimer()" style="border:none; color:#c0392b; background:none; cursor:pointer;" title="Stop">⏹</button>
+                            </div>
                         </div>
                     </div>
                     <div class="exam-section">
@@ -635,7 +468,7 @@
 
         window.openBackupModal = () => document.getElementById('backupModal').style.display = 'flex';
         window.backupData = () => { const data = { classes: classesData, users: hifzUsers, semesters: semesters }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); };
-        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users ||[]; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
+        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users || []; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
 
         window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
         window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
@@ -649,24 +482,15 @@
         window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); } } };
         window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
 
-        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page'); 
-        window.createTeacher = () => { const name = document.getElementById('newTeachName').value, user = document.getElementById('newTeachUser').value, pass = document.getElementById('newTeachPass').value; if(name&&user&&pass) { hifzUsers.push({name,username:user,password:pass,role:'teacher'}); updateFirebase(); window.renderTeacherList(); document.getElementById('newTeachName').value=''; document.getElementById('newTeachUser').value=''; document.getElementById('newTeachPass').value=''; } }; 
-        window.renderTeacherList = () => { const div = document.getElementById('teacherList'); div.innerHTML=''; hifzUsers.forEach((u, i) => { if(u.role !== 'admin') div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><div style="display:flex; gap:5px; margin-top:5px;"><button class="btn-action-sm" onclick="window.resetTeacherPass(${i})" style="position:static; background:#fff3cd; color:#856404;">🔑</button><button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button></div></div>`; }); }; 
-        window.resetTeacherPass = (i) => { if(confirm("Reset password?")) { hifzUsers[i].password = ""; updateFirebase(); alert("Password reset."); } }; 
+        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page'); window.createTeacher = () => { const name = document.getElementById('newTeachName').value, user = document.getElementById('newTeachUser').value, pass = document.getElementById('newTeachPass').value; if(name&&user&&pass) { hifzUsers.push({name,username:user,password:pass,role:'teacher'}); updateFirebase(); window.renderTeacherList(); document.getElementById('newTeachName').value=''; document.getElementById('newTeachUser').value=''; document.getElementById('newTeachPass').value=''; } }; window.renderTeacherList = () => { const div = document.getElementById('teacherList'); div.innerHTML=''; hifzUsers.forEach((u, i) => { if(u.role !== 'admin') div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><div style="display:flex; gap:5px; margin-top:5px;"><button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button></div></div>`; }); }; 
         window.deleteTeacher = (i) => { if(confirm("Delete?")) { hifzUsers.splice(i, 1); updateFirebase(); window.renderTeacherList(); } };
-        window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; 
-        window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="cls-act-btn btn-edit-cls" onclick="event.stopPropagation(); window.editClass(${i})">✏️</button><button class="cls-act-btn btn-del-cls" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
-        window.editClass = (i) => { let name = prompt("New Name:", classesData[i].name), teach = prompt("New Teacher:", classesData[i].teacher); if(name) { classesData[i].name = name; classesData[i].teacher = teach; updateFirebase(); window.renderManageClassList(); } }; 
+        window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="btn-delete-hist btn-action-sm abs-pos" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
         window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
 
-        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Module:</span> <b>${s.module || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div><div class="st-info-item"><span class="st-info-label">Direction:</span> <b>${s.direction==='bottom_up'?'ތިރިން މަތިއަށް':'މަތިން ތިރިއަށް'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm" style="background:#fff3cd; color:#856404;" onclick="event.stopPropagation(); window.resetPass(${idx})">🔑</button><button class="btn-action-sm btn-edit-hist" onclick="event.stopPropagation(); window.openEditStudentModal(${idx})">✏️</button><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
-        window.resetPass = (idx) => { if(confirm("Reset password?")) { classesData[currentClassIdx].students[idx].password = ""; updateFirebase(); window.renderStudentList(); } }
-        window.openAddStudentModal = () => { editingStudentIndex = -1;['m_module','m_id','m_name','m_remarks'].forEach(id => document.getElementById(id).value = ''); document.getElementById('btnSaveStudent').innerText = "ސޭވް"; document.getElementById('addStudentModal').style.display='flex'; }
-        window.openEditStudentModal = (idx) => { editingStudentIndex = idx; const s = classesData[currentClassIdx].students[idx]; document.getElementById('m_module').value=s.module||''; document.getElementById('m_id').value=s.id; document.getElementById('m_name').value=s.name; document.getElementById('m_level').value=s.level||'1'; document.getElementById('m_direction').value=s.direction||'top_down'; document.getElementById('m_remarks').value=s.remarks||''; document.getElementById('btnSaveStudent').innerText="އަޕްޑޭޓް"; document.getElementById('addStudentModal').style.display='flex'; }
-        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Name & ID Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students =[]; if(editingStudentIndex > -1) { let s=classesData[currentClassIdx].students[editingStudentIndex]; s.name=name; s.id=id; s.module=document.getElementById('m_module').value; s.level=document.getElementById('m_level').value; s.direction=document.getElementById('m_direction').value; s.remarks=document.getElementById('m_remarks').value; } else { classesData[currentClassIdx].students.push({name, id, module:document.getElementById('m_module').value, level:document.getElementById('m_level').value, direction:document.getElementById('m_direction').value, remarks:document.getElementById('m_remarks').value, history:[], juzExams:{}, pendingData:[], password:"" }); } updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
+        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
+        window.openAddStudentModal = () => { document.getElementById('addStudentModal').style.display='flex'; }
+        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; classesData[currentClassIdx].students.push({name, id, level:document.getElementById('m_level').value, history:[], pendingData:[], password:"" }); updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
         window.deleteStudent = (idx) => { if(confirm("Delete Student?")) { classesData[currentClassIdx].students.splice(idx, 1); updateFirebase(); window.renderStudentList(); } }
-        window.downloadTemplate = () => { const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet([["Name", "ID", "Module", "Level", "Direction", "Juz Count", "Remarks"]]); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, "Student_Template.xlsx"); };
-        window.handleExcelUpload = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { const data = new Uint8Array(e.target.result), workbook = XLSX.read(data, {type: 'array'}), jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students =[]; jsonData.forEach(row => { const name = row['Name'] || row['Student Name'], id = row['ID'] || row['Student ID']; if(name && id) classesData[currentClassIdx].students.push({name, id, module:row['Module']||'', level:row['Level']||'1', direction:row['Direction']||'top_down', remarks:row['Remarks']||'', history:[], juzExams:{}, pendingData:[]}); }); updateFirebase(); window.renderStudentList(); alert("Uploaded!"); input.value = ""; }; reader.readAsArrayBuffer(file); };
 
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
@@ -679,7 +503,7 @@
             const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
             if(semesters.length > 0) activeHistorySemesterIdx = semesters.length - 1; else activeHistorySemesterIdx = -1;
             window.renderSemesterTabs(); window.renderHistory(s, 'categoryHistoryList', type); 
-            if(type === 'juz_exam' && currentUserType === 'student') { document.getElementById('peerExamBtn').style.display = 'inline-block'; document.getElementById('pastJuzBtn').style.display = 'none'; } 
+            if(type === 'juz_exam' && currentUserType === 'student') { document.getElementById('peerExamBtn').style.display = 'inline-block'; } 
             else if(type === 'juz_exam' && currentUserType === 'teacher') { document.getElementById('pastJuzBtn').style.display = 'inline-block'; document.getElementById('peerExamBtn').style.display = 'none'; } 
             else { document.getElementById('pastJuzBtn').style.display = 'none'; document.getElementById('peerExamBtn').style.display = 'none'; }
             document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
@@ -712,10 +536,9 @@
             alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!"); document.getElementById('pastJuzModal').style.display = 'none'; window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', 'juz_exam');
         }
 
-        // PROGRESS
         window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
         window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
-        window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn" onclick="window.viewSemesterReport(${i})"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
+        window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
         window.populateProgClassSelect = () => { const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>'; classesData.forEach((c, i) => sel.add(new Option(c.name, i))); }
 
         window.showClassProgressTable = (cIdx) => {
@@ -744,17 +567,19 @@
             if(student.manualPassedJuz && Array.isArray(student.manualPassedJuz)) { student.manualPassedJuz.forEach(j => allTimePassedJuz.add(j)); }
 
             if (student.history) {
-                let lessonRecs = student.history.filter(h => { const d = new Date(h.date); return h.type === 'new_lesson' && d >= startDate && d <= endDate; });
+                let lessonRecs = student.history.filter(h => { const d = new Date(h.date); return h.type === 'new_lesson' && d >= startDate && d <= endDate; }).sort((a,b) => new Date(a.date) - new Date(b.date));
                 if (lessonRecs.length > 0) {
-                    let minPageRec = lessonRecs[0]; let maxPageRec = lessonRecs[0]; let minPage = parseInt(minPageRec.page); let maxPage = parseInt(maxPageRec.endPage || maxPageRec.page);
-                    lessonRecs.forEach(r => { let sp = parseInt(r.page); let ep = parseInt(r.endPage || r.page); if(sp < minPage) { minPage = sp; minPageRec = r; } if(ep > maxPage) { maxPage = ep; maxPageRec = r; } });
-                    startPoint = `ޞ ${minPageRec.page} (${minPageRec.startDetails?.surah}:${minPageRec.startDetails?.ayah})`;
-                    endPoint = `ޞ ${maxPageRec.endPage || maxPageRec.page} (${maxPageRec.endDetails?.surah}:${maxPageRec.endDetails?.ayah})`;
-                    balancePages = (maxPage - minPage) + 1;
+                    const first = lessonRecs[0]; startPoint = `ޞ ${first.page} (${first.startDetails?.surah}:${first.startDetails?.ayah})`;
+                    const last = lessonRecs[lessonRecs.length - 1]; endPoint = `ޞ ${last.endPage || last.page} (${last.endDetails?.surah}:${last.endDetails?.ayah})`;
+                    let startPageNum = parseInt(first.page); let endPageNum = parseInt(last.endPage || last.page);
+                    if(endPageNum >= startPageNum) { balancePages = (endPageNum - startPageNum) + 1; }
                 }
                 student.history.forEach(h => {
                      const recDate = new Date(h.date); const score = parseFloat(h.score || 0);
-                     if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') { allTimePassedJuz.add(h.juz); if (recDate >= startDate && recDate <= endDate) passedJuzSet.add(h.juz); }
+                     if (h.type === 'juz_exam' && score >= 60 && h.status !== 'partial') {
+                         allTimePassedJuz.add(h.juz);
+                         if (recDate >= startDate && recDate <= endDate) passedJuzSet.add(h.juz);
+                     }
                 });
             }
             semJuzCount = passedJuzSet.size; semJuzDetails = Array.from(passedJuzSet).sort((a,b)=>a-b).join(', ');
@@ -769,9 +594,14 @@
             const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate); const end = new Date(latestSem.endDate); 
             const stats = window.calculateSemesterStats(student, start, end);
             document.getElementById('studentSemPages').innerText = stats.balancePages; document.getElementById('studentSemJuz').innerText = stats.semJuzCount; document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
-            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount; let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
+
+            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount;
+            let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
+
             document.getElementById('targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`; document.getElementById('targetPercent').innerText = `${Math.round(percent)}%`; document.getElementById('targetProgress').style.width = `${percent}%`;
-            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!"; document.getElementById('targetMsg').innerText = msg;
+            
+            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!";
+            document.getElementById('targetMsg').innerText = msg;
         }
 
         window.populateSurahSelects = () => {
@@ -850,9 +680,7 @@
             }
             if(!records.length) { list.innerHTML = `<div style="text-align:center; padding:40px; color:#999;"><div style="font-size:40px; margin-bottom:10px;">📭</div>މި ސެމިސްޓަރގައި ރެކޯޑެއް ނެތް</div>`; return; }
 
-            let sortedRecords = records.slice().sort((a,b) => { const dA = new Date(a.date).getTime(); const dB = new Date(b.date).getTime(); if(dB !== dA) return dB - dA; return parseInt(b.page||0) - parseInt(a.page||0); });
-
-            sortedRecords.forEach(rec => {
+            records.slice().reverse().forEach(rec => {
                 const realIndex = student.history.indexOf(rec); let html = '';
                 let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
                 let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
@@ -890,15 +718,8 @@
             } 
         }
 
-        window.downloadExamSlip = (encName, encRec) => {
-            const name = decodeURIComponent(encName); const rec = JSON.parse(decodeURIComponent(encRec)); const slip = document.createElement('div');
-            slip.style.cssText = "width:600px; padding:30px; background:white; font-family:'MV Waheed', sans-serif; direction:rtl; text-align:right; color:#333;";
-            slip.innerHTML = `<div style="text-align:center; border-bottom:3px solid #2c3e50; padding-bottom:15px; margin-bottom:20px;"><h1 style="margin:0; color:#2c3e50; font-size:32px;">إتقان - ޙިފްޡް ޕްރޮގްރާމް</h1><h2 style="margin:5px 0 0 0; color:#27ae60; font-size:24px;">ޖުޒުއު އިމްތިޙާން ރިޕޯޓް</h2></div><div style="font-size:20px; margin-bottom:10px;"><strong>ދަރިވަރު:</strong> ${name}</div><div style="font-size:20px; margin-bottom:20px;"><strong>ޖުޒުއު:</strong> ${rec.juz} (${rec.status === 'partial' ? 'ފަހުބައި ނުނިމޭ' : 'ފުރިހަމަ'})</div><table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:18px;"><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9; width:60%;">ތާރީޚް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.date}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ހޭދަވި ވަގުތު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.duration}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުދައްރިސް ކުށް (-2)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.teacherMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">އަމިއްލަ ކުށް (-1)</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.selfMistakes||0}</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ތަޖުވީދު</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.tajweed||0} / 10</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">ފަރިތަކަން</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.fluency||0} / 5</td></tr><tr><td style="padding:10px; border:1px solid #ddd; background:#f9f9f9;">މުތަޝާބިހް</td><td style="padding:10px; border:1px solid #ddd; text-align:center;">${rec.details?.mutashabihMarks||0} / 5</td></tr></table><div style="background:#eafaf1; border:2px solid #27ae60; border-radius:10px; padding:15px; text-align:center;"><span style="font-size:24px; font-weight:bold; color:#2c3e50;">ޖުމްލަ ނަތީޖާ:</span><span style="font-size:32px; font-weight:bold; color:#27ae60; margin-right:15px;">${rec.score}%</span></div>`;
-            document.body.appendChild(slip); html2pdf().set({ margin: 10, filename: `Juz_${rec.juz}_Slip_${name}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(slip).save().then(() => { document.body.removeChild(slip); });
-        };
-
         // RECORDER LOGIC
-        window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; window.populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { let maxPage = 1; recs.forEach(r => { let ep = parseInt(r.endPage || r.page); if(ep > maxPage) maxPage = ep; }); const nextP = maxPage + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
+        window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; window.populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
         window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null); else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType); };
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
         window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
@@ -912,7 +733,7 @@
             } 
         };
         
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; document.getElementById('recPageDisplay').innerText = `Page ${p}`; window.loadSmartPage(false, true); } }
+        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
         
         window.renderMushafText = (ayahs, target, highlights, isExam) => { 
             const container = document.getElementById(target); container.innerHTML = ''; if(ayahs.length === 0) return;
@@ -962,7 +783,7 @@
             document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); 
         };
         window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
-        window.loadExamPage = async (page) => { document.getElementById('currentPageDisplay').innerText = `Page ${page}`; const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); const first = data.data.ayahs[0]; document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`; window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true); };
+        window.loadExamPage = async (page) => { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); const first = data.data.ayahs[0]; document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`; window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true); };
         window.changeExamPage = (dir) => { let newPage = examState.currentPage + dir; if(newPage < 1 || newPage > 604) return; examState.currentPage = newPage; window.loadExamPage(newPage); };
         window.clickExamWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id); if(!examState.isMutashabih) window.updateScore('teacher', -1); } else { el.classList.add('mistake'); examState.mistakesList.push(id); if(!examState.isMutashabih) window.updateScore('teacher', 1); } };
         window.updateScore = (type, delta) => { if(type==='teacher') examState.mistakesTeacher = Math.max(0, examState.mistakesTeacher+delta); else examState.mistakesSelf = Math.max(0, examState.mistakesSelf+delta); document.getElementById('countTeacher').value = examState.mistakesTeacher; document.getElementById('countSelf').value = examState.mistakesSelf; window.calcScore(); };
