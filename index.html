@@ -808,6 +808,51 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
         window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
         window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
+        window.downloadFullStudentExcel = () => {
+    // މިހާރު ހުރި ދަރިވަރުގެ އޮބްޖެކްޓް ނެގުން
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    
+    if (!student || !student.history || student.history.length === 0) {
+        return alert("މި ދަރިވަރުގެ އެއްވެސް ރެކޯޑެއް ނެތް!");
+    }
+
+    // ހުރިހާ ރެކޯޑެއް ތާރީޚުގެ ތަރުތީބުން އަތުރާލުން (އެންމެ އާ ރެކޯޑް މައްޗަށް)
+    const sortedHistory = [...student.history].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // އެކްސެލްގައި ހިމަނާނެ ބައިތައް ތަރުތީބުކުރުން
+    const excelData = sortedHistory.map(r => {
+        // ބާވަތް ދިވެހިބަހުން ލިޔުން
+        let typeLabel = "";
+        if(r.type === 'new_lesson') typeLabel = "އާ ފިލާވަޅު";
+        else if(r.type === 'short_rev') typeLabel = "ކުރު މުރާޖަޢާ";
+        else if(r.type === 'long_rev') typeLabel = "ދިގު މުރާޖަޢާ";
+        else if(r.type === 'juz_exam') typeLabel = "ޖުޒުއު އިމްތިޙާން";
+        else if(r.type === 'final_exam') typeLabel = "ފަހު އިމްތިޙާން";
+        else typeLabel = r.type;
+
+        return {
+            "ތާރީޚް": r.date,
+            "ބާވަތް": typeLabel,
+            "ފެށޭ ޞަފްޙާ": r.page || "-",
+            "ނިމޭ ޞަފްޙާ": r.endPage || r.page || "-",
+            "ކުށުގެ ޢަދަދު": r.mistakesCount !== undefined ? r.mistakesCount : (r.details?.teacherMistakes || 0),
+            "ނަތީޖާ %": r.score ? r.score + "%" : "-",
+            "ފެށޭ ތަން": r.startDetails ? `ސޫރަތް: ${r.startDetails.surah}، އާޔަތް: ${r.startDetails.ayah}` : "-",
+            "ނިމޭ ތަން": r.endDetails ? `ސޫރަތް: ${r.endDetails.surah}، އާޔަތް: ${r.endDetails.ayah}` : "-"
+        };
+    });
+
+    // އެކްސެލް ފައިލް ތައްޔާރުކުރުން
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Student Full History");
+
+    // ފައިލްގެ ނަން (ދަރިވަރުގެ ނަން ހިމަނައިގެން)
+    const fileName = `${student.name.replace(/\s+/g, '_')}_Full_Report.xlsx`;
+
+    // ޑައުންލޯޑް ކުރުން
+    XLSX.writeFile(wb, fileName);
+};
 
     </script>
 </body>
