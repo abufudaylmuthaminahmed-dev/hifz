@@ -183,10 +183,16 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             <div id="gradingStudentList" class="grid-container"></div>
         </div>
         
+        <!-- GRADING MENU PAGE -->
         <div id="grading-menu-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="gradingStudentName">Student</div>
-                <div class="header-actions"><button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button><button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button></div>
+                <div class="header-actions">
+                    <button class="icon-btn teacher-only" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
+                    <button class="icon-btn teacher-only" onclick="window.openProgressPage()" title="Progress">📈</button>
+                    <button class="icon-btn nav-stud-btn teacher-only" onclick="window.goToStudentList()">👥</button>
+                    <button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button>
+                </div>
             </div>
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
@@ -197,37 +203,29 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             </div>
         </div>
 
+        <!-- CATEGORY PAGE -->
         <div id="category-page" class="container hidden">
-    <div class="app-header">
-        <div class="header-title" id="catPageTitle">Title</div>
-        <div class="header-actions">
-            <!-- ހޯމް އާއި ޕްރޮގްރެސް އަށް ދާނީ ހަމައެކަނި މުދައްރިސުންނަށް ކަމުން 'teacher-only' އިތުރުކުރީ -->
-            <button class="icon-btn teacher-only" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
-            <button class="icon-btn teacher-only" onclick="window.openProgressPage()" title="Progress">📈</button>
-            
-            <!-- ދަރިވަރުންނަށް ފެންނަންޖެހޭ ބަޓަންތައް -->
-            <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
-            <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+            <div class="app-header">
+                <div class="header-title" id="catPageTitle">Title</div>
+                <div class="header-actions">
+                    <button class="icon-btn teacher-only" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
+                    <button class="icon-btn teacher-only" onclick="window.openProgressPage()" title="Progress">📈</button>
+                    <button class="icon-btn nav-stud-btn teacher-only" onclick="window.goToStudentList()">👥</button>
+                    <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+                </div>
+            </div>
+            <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
+            <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <button id="pastJuzBtn" class="big-btn btn-orange teacher-only" style="display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openPastJuzModal()">ކުރީގެ ޖުޒުއުތައް</button>
+                    <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
+                    <button id="addRecordBtn" class="add-record-btn big-btn btn-green teacher-only" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
+                    <button id="btnDownloadCategorizedExcel" class="big-btn teacher-only" style="background:#28a745; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadCategorizedStudentExcel()">📥 އެކްސެލް</button>
+                </div>
+            </div>
+            <div id="categoryHistoryList"></div>
         </div>
-    </div>
-
-    <!-- ސެމިސްޓަރ ޓެބްތައް -->
-    <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
-
-    <!-- ޓޫލްބާ (އެކްސެލް އަދި ރެކޯޑް ބަޓަން) -->
-    <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <button id="pastJuzBtn" class="big-btn btn-orange teacher-only" style="display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openPastJuzModal()">ކުރީގެ ޖުޒުއުތައް</button>
-            <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
-            <button id="addRecordBtn" class="add-record-btn big-btn btn-green teacher-only" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
-            <button id="btnDownloadCategorizedExcel" class="big-btn teacher-only" style="background:#28a745; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadCategorizedStudentExcel()">📥 އެކްސެލް</button>
-        </div>
-    </div>
-
-    <!-- ހިސްޓްރީ ލިސްޓް ފެންނަ ދިމާލެވެ. މިއީ ކުރިން ގެއްލުނު ބަޔަކީ -->
-    <div id="categoryHistoryList"></div>
-</div>
 
         <!-- UNIVERSAL RECORDER (MUSHAF VIEW) -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
