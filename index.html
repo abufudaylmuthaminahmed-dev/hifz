@@ -178,7 +178,6 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             <div class="app-header">
                 <div class="header-title" id="gradingStudentName">Student</div>
                 <div class="header-actions">
-                    <!-- ދަރިވަރުންނަށް ނުފެންނަ ގޮތަށް 'teacher-only' ޖަހާފައި -->
                     <button class="icon-btn teacher-only" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
                     <button class="icon-btn teacher-only" onclick="window.openProgressPage()" title="Progress">📈</button>
                     <button class="icon-btn nav-stud-btn teacher-only" onclick="window.goToStudentList()">👥</button>
@@ -186,10 +185,11 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                 </div>
             </div>
             <div class="menu-grid">
-                <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')">📖 އާ ފިލާވަޅު</div>
-                <div class="menu-btn" onclick="window.openCategoryPage('short_rev')">🔄 ކުރު މުރާޖަޢާ</div>
-                <div class="menu-btn" onclick="window.openCategoryPage('long_rev')">📅 ދިގު މުރާޖަޢާ</div>
-                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')">📝 ޖުޒުއު އިމްތިޙާން</div>
+                <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('long_rev')"><span class="menu-icon" style="color:#8e44ad;">📅</span><h4 class="card-title">ދިގު މުރާޖަޢާ</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('juz_exam')"><span class="menu-icon" style="color:#2980b9;">📝</span><h4 class="card-title">ޖުޒުއު އިމްތިޙާން</h4></div>
+                <div class="menu-btn" onclick="window.openCategoryPage('final_exam')"><span class="menu-icon" style="color:#c0392b;">🎓</span><h4 class="card-title">ފަހު އިމްތިޙާން</h4></div>
             </div>
         </div>
 
@@ -200,19 +200,9 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                 <div class="header-actions">
                     <button class="icon-btn teacher-only" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
                     <button class="icon-btn teacher-only" onclick="window.openProgressPage()" title="Progress">📈</button>
+                    <button class="icon-btn nav-stud-btn teacher-only" onclick="window.goToStudentList()">👥</button>
                     <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
                 </div>
-            </div>
-            <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
-            <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:16px; font-weight:bold;">ރެކޯޑްތައް</span>
-                <div style="display:flex; gap:10px;">
-                    <button id="addRecordBtn" class="add-record-btn big-btn btn-green teacher-only" style="border-radius:50%; width:45px; height:45px;" onclick="window.handleAddButtonClick()">➕</button>
-                    <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none;" onclick="window.openJuzExamSetup('peer')">ކިޔައިދިނުން</button>
-                </div>
-            </div>
-            <div id="categoryHistoryList"></div>
-        </div>
             </div>
             <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
             <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
