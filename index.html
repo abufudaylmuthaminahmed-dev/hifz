@@ -201,35 +201,24 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
     <div class="app-header">
         <div class="header-title" id="catPageTitle">Title</div>
         <div class="header-actions">
-            <!-- ހޯމް ބަޓަން -->
             <button class="icon-btn" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
-            
-            <!-- ޕްރޮގްރެސް ބަޓަން -->
             <button class="icon-btn" onclick="window.openProgressPage()" title="Progress">📈</button>
-            
-            <!-- ދަރިވަރުންގެ ލިސްޓަށް ދާ ބަޓަން (ކުރިންވެސް އިން ބަޓަން) -->
             <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
-            
-            <!-- ފަހަތަށް ދާ ބަޓަން (ކުރިންވެސް އިން ބަޓަން) -->
             <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
         </div>
     </div>
-    ...
-            </div>
-            <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
-            <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
-                <div style="display:flex; gap:10px;">
-                    <button id="pastJuzBtn" class="big-btn btn-orange" style="display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openPastJuzModal()">ކުރީގެ ޖުޒުއުތައް</button>
-                    <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
-                    <button id="addRecordBtn" class="add-record-btn big-btn btn-green" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
-                    <button id="btnDownloadFullExcel" class="big-btn" style="background:#2980b9; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadFullStudentExcel()">📥 މުޅި ރިޕޯޓް އެކްސެލްކޮށް</button>
-                    <!-- މި ބަޓަން އިތުރުކުރާނީ category-page ގެ page-toolbar ތެރެއަށެވެ -->
-<button id="btnDownloadCategorizedExcel" class="big-btn" style="background:#28a745; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadCategorizedStudentExcel()">📥 މުޅި ރިޕޯޓް (ވަކިވަކި ބައިތަކާއެކު)</button>
-                </div>
-            </div>
-            <div id="categoryHistoryList"></div>
+    <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
+    <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:16px; font-weight:bold; color:var(--primary);">ރެކޯޑްތައް</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="pastJuzBtn" class="big-btn btn-orange" style="display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openPastJuzModal()">ކުރީގެ ޖުޒުއުތައް</button>
+            <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
+            <button id="addRecordBtn" class="add-record-btn big-btn btn-green" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
+            <button id="btnDownloadCategorizedExcel" class="big-btn" style="background:#28a745; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadCategorizedStudentExcel()">📥 އެކްސެލް</button>
         </div>
+    </div>
+    <div id="categoryHistoryList"></div>
+</div>
 
         <!-- UNIVERSAL RECORDER (MUSHAF VIEW) -->
         <div id="recorder-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:5000;">
