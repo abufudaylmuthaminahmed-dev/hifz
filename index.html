@@ -699,253 +699,96 @@ tableHtml += `<tr>
 
         window.rejectEntry = (cIdx, sIdx, pIdx) => { classesData[cIdx].students[sIdx].pendingData.splice(pIdx, 1); updateFirebase(); window.renderPendingApprovals(); }
 
+        // ހިސްޓްރީ ދައްކައިދޭ ފަންކްޝަން
         window.renderHistory = (student, listId, filterType) => {
-            const list = document.getElementById(listId); list.innerHTML = ''; if(!student.history) student.history =[];
-            let records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
-            if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
-                const currentSem = semesters[activeHistorySemesterIdx]; const startDate = new Date(currentSem.startDate); const endDate = new Date(currentSem.endDate); endDate.setHours(23, 59, 59, 999);
-                records = records.filter(rec => { const rDate = new Date(rec.date); return rDate >= startDate && rDate <= endDate; });
-            }
-            if(!records.length) { list.innerHTML = `<div style="text-align:center; padding:40px; color:#999;"><div style="font-size:40px; margin-bottom:10px;">📭</div>މި ސެމިސްޓަރގައި ރެކޯޑެއް ނެތް</div>`; return; }
+            const list = document.getElementById(listId); 
+            if(!list) return;
+            list.innerHTML = ''; 
+            if(!student || !student.history) return;
 
-            records.slice().reverse().forEach(rec => {
-                const realIndex = student.history.indexOf(rec); let html = '';
+            // 1. ކެޓަގަރީއަށް ފިލްޓަރ ކުރުން
+            let records = filterType ? student.history.filter(r => r.type === filterType) : student.history;
+            
+            // 2. ސެމިސްޓަރ ފިލްޓަރ ކުރުން
+            if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
+                const sem = semesters[activeHistorySemesterIdx];
+                const start = new Date(sem.startDate).setHours(0,0,0,0);
+                const end = new Date(sem.endDate).setHours(23,59,59,999);
+                records = records.filter(r => {
+                    const d = new Date(r.date).getTime();
+                    return d >= start && d <= end;
+                });
+            }
+
+            // 3. ރެކޯޑެއް ނެތްނަމަ މެސެޖެއް ދެއްކުން
+            if(records.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:50px; color:#999;"><div style="font-size:50px; margin-bottom:15px;">📭</div>މި ސެމިސްޓަރގައި އެއްވެސް ރެކޯޑެއް ނެތް.</div>`;
+                return;
+            }
+
+            // 4. ތާރީޚުގެ ތަރުތީބުން އަތުރާލުން (އެންމެ އާ ރެކޯޑް މައްޗަށް)
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // 5. ރެކޯޑް ކާޑުތައް ހެދުން
+            records.forEach(rec => {
+                const realIndex = student.history.indexOf(rec);
+                let html = '';
                 let deleteBtn = currentUserType === 'teacher' ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIndex})">🗑</button>` : ''; 
-                let editBtn = currentUserType === 'teacher' ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
-                let headerContent = `<div class="hist-header"><div class="hist-title-group"><span class="hist-title">${rec.type === 'juz_exam' ? 'Juz ' + rec.juz : 'Page ' + rec.page}</span><span class="hist-date">${rec.date}</span></div><div class="hist-actions">${editBtn} ${deleteBtn}</div></div>`;
+                let editBtn = (currentUserType === 'teacher' && rec.type !== 'juz_exam') ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIndex}, '${rec.type}')">✏️</button>` : '';
+                
+                let headerContent = `<div class="hist-header"><div class="hist-title-group"><span class="hist-title">${rec.type === 'juz_exam' ? 'Juz ' + rec.juz : 'ޞަފްޙާ ' + rec.page}</span><span class="hist-date">${rec.date}</span></div><div class="hist-actions">${editBtn} ${deleteBtn}</div></div>`;
 
                 if(rec.type === 'juz_exam') { 
-                    let status = rec.status === 'partial' ? '<span class="hist-badge bg-pending" style="background:#f1c40f;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފަހުބައި ނުނިމޭ</span>' : '<span class="hist-badge bg-complete" style="background:#2ecc71;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފުރިހަމަ</span>'; 
-                    let dlBtn = `<button style="background:none; border:none; cursor:pointer; font-size:20px;" title="Download Slip" onclick="event.stopPropagation(); window.downloadExamSlip('${encodeURIComponent(student.name)}', '${encodeURIComponent(JSON.stringify(rec))}')">📥</button>`;
-                    let peerBadge = rec.recitedTo ? `<div style="text-align:center; margin-bottom:10px; font-size:12px; color:#8e44ad; font-weight:bold;">👤 Peer Exam: ${rec.recitedTo}</div>` : '';
-                    html = `<div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>${headerContent}<div class="hist-body">${peerBadge}<div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;"><div><span style="font-size:12px;color:#777;display:block;">Status</span>${status}</div><div style="text-align:left;"><span style="font-size:12px;color:#777;display:block;">ވަގުތު</span><b>${rec.duration}</b></div></div><div class="hist-grid" style="grid-template-columns: 1fr 1fr;"><div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0}</span></div><div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val" style="color:#e67e22">${rec.details?.selfMistakes||0}</span></div></div></div><div class="hist-footer exam-score"><span>ނަތީޖާ: ${rec.score}%</span> ${dlBtn}</div></div>`; 
-                } else if(rec.type === 'final_exam') { html = `<div class="hist-card type-final_exam">${headerContent}<div class="hist-body"><div style="text-align:center; padding:10px;"><span style="font-size:14px; color:#777;">ކުށް: ${rec.mistakesCount}</span></div></div><div class="hist-footer exam-score" style="justify-content:center;">${rec.score}%</div></div>`; } 
-                else { 
-                    const sInfo = rec.startDetails ? `سورة ${rec.startDetails.surah}، آية ${rec.startDetails.ayah}` : '-'; const eInfo = rec.endDetails ? `سورة ${rec.endDetails.surah}، آية ${rec.endDetails.ayah}` : '-'; const extBadge = rec.recitedTo ? `<div class="hist-badge-external">👤 ކިޔައިދިނީ: ${rec.recitedTo}</div>` : ''; 
+                    let status = rec.status === 'partial' ? '<span style="background:#f1c40f;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ބައިކުޅަބައި</span>' : '<span style="background:#2ecc71;color:#fff;padding:3px 8px;border-radius:10px;font-size:12px;">ފުރިހަމަ</span>'; 
+                    html = `<div class="hist-card type-juz_exam" onclick='window.viewJuzRecord(${JSON.stringify(rec)})'>${headerContent}<div class="hist-body"><div style="display:flex; justify-content:space-between; margin-bottom:10px;"><div><span style="font-size:11px;color:#777;display:block;">ސްޓޭޓަސް</span>${status}</div><div style="text-align:left;"><span style="font-size:11px;color:#777;display:block;">ވަގުތު</span><b>${rec.duration || '-'}</b></div></div><div class="hist-grid"><div class="hist-item"><span class="hist-label">މުދައްރިސް ކުށް</span><span class="hist-val" style="color:red">${rec.details?.teacherMistakes||0}</span></div><div class="hist-item"><span class="hist-label">އަމިއްލަ ކުށް</span><span class="hist-val" style="color:#e67e22">${rec.details?.selfMistakes||0}</span></div></div></div><div class="hist-footer exam-score">ނަތީޖާ: ${rec.score}%</div></div>`; 
+                } else { 
+                    const sInfo = rec.startDetails ? `ސޫރަތް: ${rec.startDetails.surah}، އާޔަތް: ${rec.startDetails.ayah}` : '-'; 
+                    const eInfo = rec.endDetails ? `ސޫރަތް: ${rec.endDetails.surah}، އާޔަތް: ${rec.endDetails.ayah}` : '-'; 
+                    const extBadge = rec.recitedTo ? `<div class="hist-badge-external">👤 ކިޔައިދިނީ: ${rec.recitedTo}</div>` : ''; 
                     html = `<div class="hist-card type-${rec.type}" onclick='window.viewLessonRecord(${JSON.stringify(rec)})'>${headerContent}<div class="hist-body">${extBadge}<div class="hist-detail-row"><span class="hist-detail-lbl">ފެށުނީ</span><span class="hist-detail-val">${sInfo}</span><span class="hist-detail-pg">ޞ ${rec.page}</span></div><div class="hist-detail-row"><span class="hist-detail-lbl">ނިމުނީ</span><span class="hist-detail-val">${eInfo}</span><span class="hist-detail-pg">ޞ ${rec.endPage || rec.page}</span></div></div><div class="hist-footer" style="color:var(--mistake);">ކުށް: ${rec.mistakesCount||0}</div></div>`; 
                 }
                 list.innerHTML += html;
             });
         };
 
-        window.deleteHistoryRecord = (index) => { if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) { const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(index, 1); updateFirebase(); window.renderHistory(s, currentUserType==='student'?'studentDashHistory':'categoryHistoryList', currentSessionType); } }
-        
-        window.editRecord = (index, type) => { 
-            const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-            const rec = student.history[index]; isViewMode = false; editingRecordIndex = index; 
-            if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') { 
-                currentMistakes = rec.mistakeDetails ||[]; currentSessionType = rec.type; 
-                document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; 
-                currentRecViewPage = parseInt(rec.page); 
-                window.loadSmartPage(true).then(() => { 
-                    document.getElementById('endPage').value = rec.endPage; window.populateSurahSelects();
-                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
-                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
-                }); 
-                document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); 
-            } 
-        }
-
-        // RECORDER LOGIC
-        window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; window.populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
-        window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); if(currentUserType === 'student') window.renderHistory(currentStudentObj, 'studentDashHistory', null); else if(currentStudentIdx !== -1) window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', currentSessionType); };
-        window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
-        window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
-        
-        window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => { 
-            const page = currentRecViewPage; if(!page) return; 
-            const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); 
-            if(!isViewMode && data.data.ayahs.length > 0) { 
-                if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; window.populateSurahSelects(); document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1); document.getElementById('startAyah').value = first.numberInSurah; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
-                else if(isNavigating) { document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
+        // ރެކޯޑް ފުހޭ ފަންކްޝަން
+        window.deleteHistoryRecord = (index) => { 
+            if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) { 
+                const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; 
+                s.history.splice(index, 1); 
+                updateFirebase(); 
+                window.renderHistory(s, 'categoryHistoryList', currentSessionType); 
             } 
         };
-        
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
-        
-        window.renderMushafText = (ayahs, target, highlights, isExam) => { 
-            const container = document.getElementById(target); container.innerHTML = ''; if(ayahs.length === 0) return;
-            const first = ayahs[0]; const currentPageNum = first.page; const juzTarget = isExam ? 'mushafJuzInfo' : 'recMushafJuz'; const surahTarget = isExam ? 'mushafSurahInfo' : 'recMushafSurah';
-            if(document.getElementById(juzTarget)) document.getElementById(juzTarget).innerText = `Juz ${first.juz}`; if(document.getElementById(surahTarget)) document.getElementById(surahTarget).innerText = `سورة ${first.surah.name}`;
 
-            let currentSurah = null; let html = ''; const BISMILLAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
+        // ކެޓަގަރީ ޕޭޖު ހުޅުވާ ފަންކްޝަން
+        window.openCategoryPage = (type) => { 
+            currentSessionType = type; 
+            let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
+            document.getElementById('catPageTitle').innerText = title; 
+            const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
+            if(semesters.length > 0 && activeHistorySemesterIdx === -1) activeHistorySemesterIdx = semesters.length - 1;
+            window.renderSemesterTabs(); 
+            window.renderHistory(s, 'categoryHistoryList', type); 
 
-            ayahs.forEach(a => {
-                if (a.numberInSurah === 1) {
-                    if (currentSurah !== null) html += '</div>'; currentSurah = a.surah.number;
-                    html += `<div class="surah-header-box"><div class="surah-title">سورة ${a.surah.name}</div></div>`;
-                    if (a.surah.number !== 9) { html += `<div class="bismillah-box">${BISMILLAH}</div>`; }
-                    html += '<div class="quran-block" dir="rtl">';
-                } else if (currentSurah === null) { currentSurah = a.surah.number; html += '<div class="quran-block" dir="rtl">'; }
+            // ދަރިވަރުންނަށް ބައެއް ބަޓަންތައް ފޮރުވުން
+            const addBtn = document.getElementById('addRecordBtn');
+            if(addBtn) addBtn.style.display = (currentUserType==='student')?'none':'flex'; 
+            
+            const excelBtn = document.getElementById('btnDownloadCategorizedExcel');
+            if(excelBtn) excelBtn.style.display = (currentUserType==='student')?'none':'inline-flex';
 
-                let ayahText = a.text; if(a.numberInSurah === 1 && a.surah.number !== 9) { ayahText = ayahText.replace(BISMILLAH, '').trim(); }
-                const words = ayahText.split(' ');
-                words.forEach((w, i) => { const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`; let cls = highlights.includes(id) ? 'word mistake' : 'word'; let fn = isExam ? `window.clickExamWord('${id}')` : `window.clickRecWord('${id}')`; html += `<span id="${id}" class="${cls}" onclick="${fn}">${w}</span> `; });
-                html += `<span class="ayah-marker">(${a.numberInSurah})</span> `;
-            });
-            html += '</div>'; 
-            if(!isExam) { document.getElementById('recPageDisplay').innerText = `Page ${currentPageNum}`; } else { document.getElementById('currentPageDisplay').innerText = `Page ${currentPageNum}`; }
-            container.innerHTML = html;
+            window.openPage('category-page'); 
         };
 
-        window.clickRecWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x => x !== id); } else { el.classList.add('mistake'); currentMistakes.push(id); } document.getElementById('mistakeCountDisplay').innerText = currentMistakes.length; };
-        
-        window.saveRecord = () => { 
-            const startP = document.getElementById('startPage').value; const endP = document.getElementById('endPage').value; if(parseInt(endP) < parseInt(startP)) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); return; } 
-            const s = classesData[currentClassIdx].students[currentStudentIdx]; if(!s.history) s.history =[]; 
-            const ssIdx = document.getElementById('startSurah').selectedIndex; const esIdx = document.getElementById('endSurah').selectedIndex; const startSurahName = SURAH_NAMES_AR[ssIdx] || "-"; const endSurahName = SURAH_NAMES_AR[esIdx] || "-";
-            const record = { type: currentSessionType, date: document.getElementById('recDate').value, page: startP, endPage: endP, startDetails: { surah: startSurahName, ayah: document.getElementById('startAyah').value }, endDetails: { surah: endSurahName, ayah: document.getElementById('endAyah').value }, mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes }; 
-            if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); alert("ސޭވް ކުރެވިއްޖެ"); window.closeRecorder(); 
+        // ޕްރޮގްރެސް އިން ދަރިވަރުގެ ޞަފްޙާއަށް ދިއުން
+        window.navToStudentFromProg = (cIdx, sIdx) => {
+            currentClassIdx = parseInt(cIdx);
+            currentStudentIdx = parseInt(sIdx);
+            const student = classesData[currentClassIdx].students[currentStudentIdx];
+            document.getElementById('gradingStudentName').innerText = student.name;
+            window.openPage('grading-menu-page');
         };
-
-        window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails ||[]; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
-        
-        // JUZ EXAM LOGIC
-        window.manualUpdateScore = (type, val) => { let num = parseInt(val) || 0; if(num < 0) num = 0; if(type === 'teacher') examState.mistakesTeacher = num; else examState.mistakesSelf = num; document.getElementById(type === 'teacher' ? 'countTeacher' : 'countSelf').value = num; window.calcScore(); };
-        window.openJuzExamSetup = (role) => { isPeerExam = (role === 'peer'); const juzSel = document.getElementById('examJuzSelect'); juzSel.innerHTML = ''; for(let i=1; i<=30; i++) juzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('juzSetupModal').style.display='flex'; };
-        window.startJuzExam = () => { 
-            const juz = parseInt(document.getElementById('examJuzSelect').value); const mode = document.querySelector('input[name="examPart"]:checked').value; let startPage = ((juz-1)*20)+2; if(mode === 'part2') startPage += 10; 
-            examState = { juz: juz, mode: mode, mistakesTeacher: 0, mistakesSelf: 0, currentPage: startPage, mistakesList:[], isMutashabih: false, timer: null, seconds: 0 }; 
-            document.getElementById('juzSetupModal').style.display='none'; document.getElementById('juzExamTitle').innerText = `ޖުޒުއު ${juz}`; document.getElementById('partBadge').innerText = mode==='full'?'Full':(mode==='part1'?'Part 1':'Part 2'); document.getElementById('liveScore').innerText = "100%"; document.getElementById('countTeacher').value = "0"; document.getElementById('countSelf').value = "0"; 
-            if(isPeerExam) { document.getElementById('examinerNameField').style.display = 'block'; document.getElementById('mutashabihSection').style.display = 'none'; } else { document.getElementById('examinerNameField').style.display = 'none'; document.getElementById('mutashabihSection').style.display = (mode==='part1')?'none':'block'; }
-            document.getElementById('saveExamBtn').style.display = 'block'; isViewMode = false; window.loadExamPage(startPage); document.getElementById('juz-exam-page').classList.remove('hidden'); 
-        };
-        window.closeJuzExam = () => { window.stopTimer(); document.getElementById('juz-exam-page').classList.add('hidden'); };
-        window.loadExamPage = async (page) => { const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); const first = data.data.ayahs[0]; document.getElementById('mushafJuzInfo').innerText = `Juz ${first.juz}`; document.getElementById('mushafSurahInfo').innerText = `سورة ${first.surah.name}`; window.renderMushafText(data.data.ayahs, 'examMushafContent', examState.mistakesList, true); };
-        window.changeExamPage = (dir) => { let newPage = examState.currentPage + dir; if(newPage < 1 || newPage > 604) return; examState.currentPage = newPage; window.loadExamPage(newPage); };
-        window.clickExamWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); examState.mistakesList = examState.mistakesList.filter(x=>x!==id); if(!examState.isMutashabih) window.updateScore('teacher', -1); } else { el.classList.add('mistake'); examState.mistakesList.push(id); if(!examState.isMutashabih) window.updateScore('teacher', 1); } };
-        window.updateScore = (type, delta) => { if(type==='teacher') examState.mistakesTeacher = Math.max(0, examState.mistakesTeacher+delta); else examState.mistakesSelf = Math.max(0, examState.mistakesSelf+delta); document.getElementById('countTeacher').value = examState.mistakesTeacher; document.getElementById('countSelf').value = examState.mistakesSelf; window.calcScore(); };
-        window.calcScore = () => { let deduct = (examState.mistakesTeacher*2) + (examState.mistakesSelf*1) + (10 - document.getElementById('scoreTajweed').value) + (5 - document.getElementById('scoreFluency').value); if(!isPeerExam && examState.mode !== 'part1') deduct += (2.5 - parseFloat(document.getElementById('q1_score').value||0)) + (2.5 - parseFloat(document.getElementById('q2_score').value||0)); let final = Math.max(0, 100 - deduct); document.getElementById('liveScore').innerText = final + "%"; return final; };
-        window.startTimer = () => { if(examState.timer) return; let pts = document.getElementById('stopwatchDisplay').value.split(':'); if(pts.length===3) examState.seconds = (+pts[0])*3600+(+pts[1])*60+(+pts[2]); else examState.seconds = 0; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').value = d.toISOString().substr(11,8); }, 1000); };
-        window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
-        window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
-        window.saveJuzExamPart = () => { 
-            const score = window.calcScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let duration = document.getElementById('stopwatchDisplay').value; 
-            let details = { teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: parseFloat(document.getElementById('scoreTajweed').value || 10), fluency: parseFloat(document.getElementById('scoreFluency').value || 5), mutashabihMarks: (isPeerExam || examState.mode==='part1') ? 0 : (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) }; 
-            const todayISO = window.getFormattedDate();
-            if(isPeerExam) { const examiner = document.getElementById('examinerName').value || "Unknown"; const entry = { type: 'juz_exam', mode: examState.mode, juz: examState.juz, score: score, duration: duration, details: details, mistakeDetails: examState.mistakesList, recitedTo: examiner, date: todayISO, status: 'pending', isExternal: true }; if(!s.pendingData) s.pendingData =[]; s.pendingData.push(entry); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); window.closeJuzExam(); } 
-            else { if(!s.history) s.history =[]; if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; if(examState.mode === 'part1') { s.juzExams[examState.juz].part1 = score; s.history.push({ type:'juz_exam', status:'partial', date:todayISO, juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } else { let p1 = s.juzExams[examState.juz].part1 || 0; let final = (examState.mode === 'full') ? score : (p1 + score) / 2; s.history.push({ type:'juz_exam', status:'completed', date:todayISO, juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } updateFirebase(); alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); window.closeJuzExam(); window.openCategoryPage('juz_exam'); }
-        };
-        window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00"; document.getElementById('countTeacher').value = rec.details?.teacherMistakes||0; document.getElementById('countSelf').value = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; document.getElementById('examinerNameField').style.display = 'none'; isViewMode = true; examState.mistakesList = rec.mistakeDetails ||[]; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
-
-        window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
-        window.closeFinalExam = () => { document.getElementById('final-exam-page').classList.add('hidden'); };
-        window.loadFinalQuestion = async () => { const juz = document.getElementById('finalJuzSelect').value; const startP = ((juz-1)*20)+2; const randomP = startP + Math.floor(Math.random()*18); const res = await fetch(`https://api.alquran.cloud/v1/page/${randomP}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'finalMushafContent',[], true); };
-        window.updateFinalScore = (type, delta) => { if(type==='teacher') finalExamState.totalMistakesT = Math.max(0, finalExamState.totalMistakesT+delta); else finalExamState.totalMistakesS = Math.max(0, finalExamState.totalMistakesS+delta); document.getElementById('finalTeacherCount').innerText = finalExamState.totalMistakesT; document.getElementById('finalSelfCount').innerText = finalExamState.totalMistakesS; window.calcFinalScore(); };
-        window.calcFinalScore = () => { let deduct = (finalExamState.totalMistakesT*5) + (finalExamState.totalMistakesS*2); let score = Math.max(0, 100 - deduct); document.getElementById('finalExamScore').innerText = score + "%"; return score; };
-        window.nextFinalQuestion = () => { if(finalExamState.currentQ < finalExamState.maxQ) { finalExamState.currentQ++; document.getElementById('questionIndicator').innerText = `ސުވާލު ${finalExamState.currentQ} / ${finalExamState.maxQ}`; if(finalExamState.currentQ === finalExamState.maxQ) { document.getElementById('nextQBtn').classList.add('hidden'); document.getElementById('finishExamBtn').classList.remove('hidden'); } } };
-        window.saveFinalExam = () => { const score = window.calcFinalScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; s.history.push({type:'final_exam', date:window.getFormattedDate(), score:score, mistakesCount:(finalExamState.totalMistakesT+finalExamState.totalMistakesS)}); updateFirebase(); window.closeFinalExam(); window.openStudentMenu(currentStudentIdx); };
-        window.downloadFullStudentExcel = () => {
-    // މިހާރު ހުރި ދަރިވަރުގެ އޮބްޖެކްޓް ނެގުން
-    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-    
-    if (!student || !student.history || student.history.length === 0) {
-        return alert("މި ދަރިވަރުގެ އެއްވެސް ރެކޯޑެއް ނެތް!");
-    }
-
-    // ހުރިހާ ރެކޯޑެއް ތާރީޚުގެ ތަރުތީބުން އަތުރާލުން (އެންމެ އާ ރެކޯޑް މައްޗަށް)
-    const sortedHistory = [...student.history].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // އެކްސެލްގައި ހިމަނާނެ ބައިތައް ތަރުތީބުކުރުން
-    const excelData = sortedHistory.map(r => {
-        // ބާވަތް ދިވެހިބަހުން ލިޔުން
-        let typeLabel = "";
-        if(r.type === 'new_lesson') typeLabel = "އާ ފިލާވަޅު";
-        else if(r.type === 'short_rev') typeLabel = "ކުރު މުރާޖަޢާ";
-        else if(r.type === 'long_rev') typeLabel = "ދިގު މުރާޖަޢާ";
-        else if(r.type === 'juz_exam') typeLabel = "ޖުޒުއު އިމްތިޙާން";
-        else if(r.type === 'final_exam') typeLabel = "ފަހު އިމްތިޙާން";
-        else typeLabel = r.type;
-
-        return {
-            "ތާރީޚް": r.date,
-            "ބާވަތް": typeLabel,
-            "ފެށޭ ޞަފްޙާ": r.page || "-",
-            "ނިމޭ ޞަފްޙާ": r.endPage || r.page || "-",
-            "ކުށުގެ ޢަދަދު": r.mistakesCount !== undefined ? r.mistakesCount : (r.details?.teacherMistakes || 0),
-            "ނަތީޖާ %": r.score ? r.score + "%" : "-",
-            "ފެށޭ ތަން": r.startDetails ? `ސޫރަތް: ${r.startDetails.surah}، އާޔަތް: ${r.startDetails.ayah}` : "-",
-            "ނިމޭ ތަން": r.endDetails ? `ސޫރަތް: ${r.endDetails.surah}، އާޔަތް: ${r.endDetails.ayah}` : "-"
-        };
-    });
-
-    // އެކްސެލް ފައިލް ތައްޔާރުކުރުން
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Student Full History");
-
-    // ފައިލްގެ ނަން (ދަރިވަރުގެ ނަން ހިމަނައިގެން)
-    const fileName = `${student.name.replace(/\s+/g, '_')}_Full_Report.xlsx`;
-
-    // ޑައުންލޯޑް ކުރުން
-    XLSX.writeFile(wb, fileName);
-};
-window.downloadCategorizedStudentExcel = () => {
-    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-    
-    if (!student || !student.history || student.history.length === 0) {
-        return alert("މި ދަރިވަރުގެ އެއްވެސް ރެކޯޑެއް ނެތް!");
-    }
-
-    // އެކްސެލް ފައިލް (Workbook) ހެދުން
-    const wb = XLSX.utils.book_new();
-
-    // ކެޓަގަރީތައް ތަރުތީބުކުރުން
-    const categories = [
-        { id: 'new_lesson', name: 'އާ ފިލާވަޅު' },
-        { id: 'short_rev', name: 'ކުރު މުރާޖަޢާ' },
-        { id: 'long_rev', name: 'ދިގު މުރާޖަޢާ' },
-        { id: 'juz_exam', name: 'ޖުޒުއު އިމްތިޙާން' }
-    ];
-
-    categories.forEach(cat => {
-        // އެ ކެޓަގަރީއަކަށްވާ ރެކޯޑްތައް އެކަނި ނެގުން
-        const filteredData = student.history
-            .filter(r => r.type === cat.id)
-            .sort((a, b) => new Date(b.date) - new Date(a.date)) // ތާރީޚުން ތަރުތީބުކުރުން
-            .map(r => ({
-                "ތާރީޚް": r.date,
-                "ފެށޭ ޞަފްޙާ": r.page || "-",
-                "ނިމޭ ޞަފްޙާ": r.endPage || r.page || "-",
-                "ކުށުގެ ޢަދަދު": r.mistakesCount !== undefined ? r.mistakesCount : (r.details?.teacherMistakes || 0),
-                "ފެށޭ ތަން": r.startDetails ? `ސޫރަތް: ${r.startDetails.surah}، އާޔަތް: ${r.startDetails.ayah}` : "-",
-                "ނިމޭ ތަން": r.endDetails ? `ސޫރަތް: ${r.endDetails.surah}، އާޔަތް: ${r.endDetails.ayah}` : "-",
-                "ނަތީޖާ %": r.score ? r.score + "%" : "-",
-                "އިތުރު މަޢުލޫމާތު": r.recitedTo ? `ކިޔައިދިނީ: ${r.recitedTo}` : ""
-            }));
-
-        // އެ ބަޔަކަށް ރެކޯޑެއް ހުރިނަމަ އެކަނި ޝީޓެއް ހެދުން
-        if (filteredData.length > 0) {
-            const ws = XLSX.utils.json_to_sheet(filteredData);
-            // ގޮޅިތަކުގެ ފުޅާމިން ރަނގަޅުކުރުން
-            ws['!cols'] = [{wch:12}, {wch:10}, {wch:10}, {wch:10}, {wch:25}, {wch:25}, {wch:10}, {wch:20}];
-            XLSX.utils.book_append_sheet(wb, ws, cat.name);
-        }
-    });
-
-    // ފައިލްގެ ނަން ތައްޔާރުކުރުން
-    const fileName = `${student.name.replace(/\s+/g, '_')}_Progress_Report.xlsx`;
-
-    // ފައިލް ޑައުންލޯޑް ކުރުން
-    XLSX.writeFile(wb, fileName);
-};
-        // ޕްރޮގްރެސް ޕޭޖުން ސީދާ ދަރިވަރުގެ މެނޫއަށް ގެންގޮސްދޭ ފަންކްޝަން
-window.navToStudentFromProg = (cIdx, sIdx) => {
-    // މިހާރު ހުރި ކްލާހާއި ދަރިވަރުގެ އިންޑެކްސް ސެޓްކުރުން
-    currentClassIdx = parseInt(cIdx);
-    currentStudentIdx = parseInt(sIdx);
-    
-    // ދަރިވަރުގެ ނަން މަތީގައި ލިޔުން
-    const student = classesData[currentClassIdx].students[currentStudentIdx];
-    document.getElementById('gradingStudentName').innerText = student.name;
-    
-    // ދަރިވަރުގެ މެނޫ ޕޭޖު ހުޅުވުން (އާ ފިލާވަޅު، މުރާޖަޢާ، އިމްތިޙާން ބަޓަންތައް ހުންނަ ޞަފްޙާ)
-    window.openPage('grading-menu-page');
-};
-        /* ދަރިވަރުން ލޮގިންވެފައި ތިބޭއިރު މުދައްރިސުންގެ ބަޓަންތައް ފޮރުވުން */
-body.student-mode .teacher-only {
-    display: none !important;
-}
     </script>
 </body>
 </html>
