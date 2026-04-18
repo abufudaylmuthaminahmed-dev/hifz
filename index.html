@@ -210,6 +210,8 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <button id="peerExamBtn" class="big-btn" style="background:#8e44ad; display:none; padding:8px 15px; font-size:14px; width:auto;" onclick="window.openJuzExamSetup('peer')">އެހެން މީހަކަށް ކިޔައިދިނުން</button>
                     <button id="addRecordBtn" class="add-record-btn big-btn btn-green" style="border-radius:50%; width:45px; height:45px; padding:0;" onclick="window.handleAddButtonClick()">➕</button>
                     <button id="btnDownloadFullExcel" class="big-btn" style="background:#2980b9; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadFullStudentExcel()">📥 މުޅި ރިޕޯޓް އެކްސެލްކޮށް</button>
+                    <!-- މި ބަޓަން އިތުރުކުރާނީ category-page ގެ page-toolbar ތެރެއަށެވެ -->
+<button id="btnDownloadCategorizedExcel" class="big-btn" style="background:#28a745; padding:8px 15px; font-size:14px; width:auto;" onclick="window.downloadCategorizedStudentExcel()">📥 މުޅި ރިޕޯޓް (ވަކިވަކި ބައިތަކާއެކު)</button>
                 </div>
             </div>
             <div id="categoryHistoryList"></div>
@@ -853,7 +855,55 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
     // ޑައުންލޯޑް ކުރުން
     XLSX.writeFile(wb, fileName);
 };
+window.downloadCategorizedStudentExcel = () => {
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    
+    if (!student || !student.history || student.history.length === 0) {
+        return alert("މި ދަރިވަރުގެ އެއްވެސް ރެކޯޑެއް ނެތް!");
+    }
 
+    // އެކްސެލް ފައިލް (Workbook) ހެދުން
+    const wb = XLSX.utils.book_new();
+
+    // ކެޓަގަރީތައް ތަރުތީބުކުރުން
+    const categories = [
+        { id: 'new_lesson', name: 'އާ ފިލާވަޅު' },
+        { id: 'short_rev', name: 'ކުރު މުރާޖަޢާ' },
+        { id: 'long_rev', name: 'ދިގު މުރާޖަޢާ' },
+        { id: 'juz_exam', name: 'ޖުޒުއު އިމްތިޙާން' }
+    ];
+
+    categories.forEach(cat => {
+        // އެ ކެޓަގަރީއަކަށްވާ ރެކޯޑްތައް އެކަނި ނެގުން
+        const filteredData = student.history
+            .filter(r => r.type === cat.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date)) // ތާރީޚުން ތަރުތީބުކުރުން
+            .map(r => ({
+                "ތާރީޚް": r.date,
+                "ފެށޭ ޞަފްޙާ": r.page || "-",
+                "ނިމޭ ޞަފްޙާ": r.endPage || r.page || "-",
+                "ކުށުގެ ޢަދަދު": r.mistakesCount !== undefined ? r.mistakesCount : (r.details?.teacherMistakes || 0),
+                "ފެށޭ ތަން": r.startDetails ? `ސޫރަތް: ${r.startDetails.surah}، އާޔަތް: ${r.startDetails.ayah}` : "-",
+                "ނިމޭ ތަން": r.endDetails ? `ސޫރަތް: ${r.endDetails.surah}، އާޔަތް: ${r.endDetails.ayah}` : "-",
+                "ނަތީޖާ %": r.score ? r.score + "%" : "-",
+                "އިތުރު މަޢުލޫމާތު": r.recitedTo ? `ކިޔައިދިނީ: ${r.recitedTo}` : ""
+            }));
+
+        // އެ ބަޔަކަށް ރެކޯޑެއް ހުރިނަމަ އެކަނި ޝީޓެއް ހެދުން
+        if (filteredData.length > 0) {
+            const ws = XLSX.utils.json_to_sheet(filteredData);
+            // ގޮޅިތަކުގެ ފުޅާމިން ރަނގަޅުކުރުން
+            ws['!cols'] = [{wch:12}, {wch:10}, {wch:10}, {wch:10}, {wch:25}, {wch:25}, {wch:10}, {wch:20}];
+            XLSX.utils.book_append_sheet(wb, ws, cat.name);
+        }
+    });
+
+    // ފައިލްގެ ނަން ތައްޔާރުކުރުން
+    const fileName = `${student.name.replace(/\s+/g, '_')}_Progress_Report.xlsx`;
+
+    // ފައިލް ޑައުންލޯޑް ކުރުން
+    XLSX.writeFile(wb, fileName);
+};
     </script>
 </body>
 </html>
