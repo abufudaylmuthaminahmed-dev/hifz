@@ -720,6 +720,10 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.deleteHistoryRecord = (idx) => { if(confirm("Delete?")) { const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(idx, 1); updateFirebase(); window.renderHistory(s, 'categoryHistoryList', currentSessionType); } };
         window.navToStudentFromProg = (c, s) => { currentClassIdx = c; currentStudentIdx = s; document.getElementById('gradingStudentName').innerText = classesData[c].students[s].name; window.openPage('grading-menu-page'); };
         window.downloadCategorizedStudentExcel = () => { alert("Downloading..."); }; // Excel logic can be added here
+        /* ދަރިވަރުންގެ ލޮގިންގައި މުދައްރިސުންގެ ބަޓަންތައް ފޮރުވުން */
+body.student-mode .teacher-only {
+    display: none !important;
+}
     </script>
 </body>
 </html>
