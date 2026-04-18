@@ -909,6 +909,19 @@ window.downloadCategorizedStudentExcel = () => {
     // ފައިލް ޑައުންލޯޑް ކުރުން
     XLSX.writeFile(wb, fileName);
 };
+        // ޕްރޮގްރެސް ޕޭޖުން ސީދާ ދަރިވަރުގެ މެނޫއަށް ގެންގޮސްދޭ ފަންކްޝަން
+window.navToStudentFromProg = (cIdx, sIdx) => {
+    // މިހާރު ހުރި ކްލާހާއި ދަރިވަރުގެ އިންޑެކްސް ސެޓްކުރުން
+    currentClassIdx = parseInt(cIdx);
+    currentStudentIdx = parseInt(sIdx);
+    
+    // ދަރިވަރުގެ ނަން މަތީގައި ލިޔުން
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
+    document.getElementById('gradingStudentName').innerText = student.name;
+    
+    // ދަރިވަރުގެ މެނޫ ޕޭޖު ހުޅުވުން (އާ ފިލާވަޅު، މުރާޖަޢާ، އިމްތިޙާން ބަޓަންތައް ހުންނަ ޞަފްޙާ)
+    window.openPage('grading-menu-page');
+};
     </script>
 </body>
 </html>
