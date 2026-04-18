@@ -698,7 +698,27 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             document.getElementById(isExam ? 'currentPageDisplay' : 'recPageDisplay').innerText = `Page ${ayahs[0].page}`;
         };
 
-        window.clickRecWord = (id) => { if(isViewMode) return; const el = document.getElementById(id); if(el.classList.contains('mistake')) { el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x => x !== id); } else { el.classList.add('mistake'); currentMistakes.push(id); } document.getElementById('mistakeCountDisplay').innerText = currentMistakes.length; };
+       // ބަހަކަށް ފިތާލުމުން ކުށް ފާހަގަކުރާ ފަންކްޝަން
+        window.clickRecWord = (id) => {
+            if(isViewMode) return; // ބަލާލަން ހުޅުވާފައި ހުންނައިރު އެއްވެސް ބަދަލެއް ނުގެނެވޭނެ
+            
+            const el = document.getElementById(id);
+            if(!el) return;
+
+            if(el.classList.contains('mistake')) {
+                // ކުރިން ކުށެއްގެ ގޮތުގައި އިނީނަމަ އުނިކުރުން
+                el.classList.remove('mistake');
+                currentMistakes = currentMistakes.filter(x => x !== id);
+            } else {
+                // ކުށެއްގެ ގޮތުގައި ފާހަގަކުރުން
+                el.classList.add('mistake');
+                currentMistakes.push(id);
+            }
+            
+            // ކުށުގެ ޢަދަދު ސްކްރީނުން އަޕްޑޭޓްކުރުން
+            const countDisplay = document.getElementById('mistakeCountDisplay');
+            if(countDisplay) countDisplay.innerText = currentMistakes.length;
+        };
 
         window.saveRecord = () => {
             const s = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
