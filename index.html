@@ -198,9 +198,23 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         </div>
 
         <div id="category-page" class="container hidden">
-            <div class="app-header">
-                <div class="header-title" id="catPageTitle">Title</div>
-                <div class="header-actions"><button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button><button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button></div>
+    <div class="app-header">
+        <div class="header-title" id="catPageTitle">Title</div>
+        <div class="header-actions">
+            <!-- ހޯމް ބަޓަން -->
+            <button class="icon-btn" onclick="window.openPage('teacher-dashboard')" title="Home">🏠</button>
+            
+            <!-- ޕްރޮގްރެސް ބަޓަން -->
+            <button class="icon-btn" onclick="window.openProgressPage()" title="Progress">📈</button>
+            
+            <!-- ދަރިވަރުންގެ ލިސްޓަށް ދާ ބަޓަން (ކުރިންވެސް އިން ބަޓަން) -->
+            <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+            
+            <!-- ފަހަތަށް ދާ ބަޓަން (ކުރިންވެސް އިން ބަޓަން) -->
+            <button class="icon-btn" onclick="window.goBackFromCategory()">⬅</button>
+        </div>
+    </div>
+    ...
             </div>
             <div id="historySemesterTabs" style="overflow-x:auto; white-space:nowrap; margin-bottom:15px; padding:10px; text-align:right; border-bottom:1px solid #eee;"></div>
             <div class="page-toolbar" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
