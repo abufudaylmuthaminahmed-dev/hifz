@@ -705,21 +705,52 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
 
         // HISTORY & NAVIGATION
         window.renderHistory = (student, listId, filterType) => {
-            const list = document.getElementById(listId); if(!list || !student) return; list.innerHTML = '';
-            let records = (student.history || []).filter(r => r.type === filterType);
-            if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
-                const sem = semesters[activeHistorySemesterIdx];
-                const start = new Date(sem.startDate).getTime(); const end = new Date(sem.endDate).setHours(23,59,59);
-                records = records.filter(r => { const d = new Date(r.date).getTime(); return d >= start && d <= end; });
-            }
-            if(!records.length) { list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">ރެކޯޑެއް ނެތް</p>'; return; }
-            records.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(rec => {
-                const realIdx = student.history.indexOf(rec);
-                const editBtn = (currentUserType==='teacher' && rec.type!=='juz_exam') ? `<button class="btn-edit-hist" onclick="window.editRecord(${realIdx},'${rec.type}')">✏️</button>` : '';
-                const delBtn = (currentUserType==='teacher') ? `<button class="btn-delete-hist" onclick="window.deleteHistoryRecord(${realIdx})">🗑</button>` : '';
-                list.innerHTML += `<div class="hist-card"><div class="hist-header"><b>ޞަފްޙާ ${rec.page}</b><span>${rec.date}</span><div class="hist-actions">${editBtn}${delBtn}</div></div><div class="hist-body">ކުށް: ${rec.mistakesCount}</div></div>`;
-            });
-        };
+    const list = document.getElementById(listId); 
+    if(!list || !student) return; 
+    list.innerHTML = '';
+    
+    let records = (student.history || []).filter(r => r.type === filterType);
+    
+    // ސެމިސްޓަރ ފިލްޓަރ
+    if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
+        const sem = semesters[activeHistorySemesterIdx];
+        const start = new Date(sem.startDate).getTime(); 
+        const end = new Date(sem.endDate).setHours(23,59,59);
+        records = records.filter(r => { 
+            const d = new Date(r.date).getTime(); 
+            return d >= start && d <= end; 
+        });
+    }
+
+    if(!records.length) { 
+        list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">ރެކޯޑެއް ނެތް</p>'; 
+        return; 
+    }
+
+    records.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(rec => {
+        const realIdx = student.history.indexOf(rec);
+        const editBtn = (currentUserType==='teacher' && rec.type!=='juz_exam') ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIdx},'${rec.type}')">✏️</button>` : '';
+        const delBtn = (currentUserType==='teacher') ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIdx})">🗑</button>` : '';
+        
+        // މިތަނުގައި ނިމޭ ޞަފްޙާ (endPage) ހިމެނިފައިވާނެ
+        const pageRange = rec.endPage && rec.endPage !== rec.page ? `ޞަފްޙާ: ${rec.page} - ${rec.endPage}` : `ޞަފްޙާ: ${rec.page}`;
+        
+        list.innerHTML += `
+            <div class="hist-card" onclick='window.viewRecord(${JSON.stringify(rec)})'>
+                <div class="hist-header">
+                    <b>${pageRange}</b>
+                    <span style="font-size:12px; background:#eee; padding:2px 5px; border-radius:5px;">${rec.date}</span>
+                    <div class="hist-actions">${editBtn}${delBtn}</div>
+                </div>
+                <div class="hist-body">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>ކުށުގެ ޢަދަދު: <b style="color:red;">${rec.mistakesCount || 0}</b></span>
+                        <span style="color:#27ae60; font-size:12px;">ބަލާލުމަށް ފިތާލާ 📖</span>
+                    </div>
+                </div>
+            </div>`;
+    });
+};
 
         window.deleteHistoryRecord = (idx) => { if(confirm("Delete?")) { const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(idx, 1); updateFirebase(); window.renderHistory(s, 'categoryHistoryList', currentSessionType); } };
         window.navToStudentFromProg = (c, s) => { currentClassIdx = c; currentStudentIdx = s; document.getElementById('gradingStudentName').innerText = classesData[c].students[s].name; window.openPage('grading-menu-page'); };
