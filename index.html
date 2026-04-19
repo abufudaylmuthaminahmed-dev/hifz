@@ -434,354 +434,195 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
     </div>
 
     <!-- FIREBASE & LOGIC -->
-    <script type="module">
+   <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBcBUo0zeuhRjEsRfAtZk4gHNhxoHCwLSU", authDomain: "hifz-cde3b.firebaseapp.com", databaseURL: "https://hifz-cde3b-default-rtdb.firebaseio.com", projectId: "hifz-cde3b", storageBucket: "hifz-cde3b.firebasestorage.app", messagingSenderId: "566754658580", appId: "1:566754658580:web:d63d0f167960f53bab9a01" };
         const app = initializeApp(firebaseConfig); const db = getDatabase(app);
 
+        let classesData = []; let hifzUsers = []; let semesters = [];
+        let currentClassIdx = -1, currentStudentIdx = -1, currentStudentObj = null;
+        let currentUserType = 'teacher', currentSessionType = '', currentRecViewPage = 1, currentMistakes = [];
+        let activeHistorySemesterIdx = -1, isViewMode = false;
+
         const SURAH_NAMES_AR =["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الإنفطار","المطففين","الإنشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
         const AYAH_COUNTS =[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
 
-        let classesData = []; let hifzUsers = []; let semesters =[];
-        let currentClassIdx = -1, currentStudentIdx = -1;
-        let currentUserType = 'teacher', currentUserRole = 'teacher';
-        let currentStudentObj = null; let currentSessionType = '';
-        let examState = {}, finalExamState = {};
-        let currentMistakes =[]; let isViewMode = false;
-        let editingRecordIndex = -1; let currentRecViewPage = 1; let pendingUserIndex = -1;
-        let isPeerExam = false; let currentPendingExamData = null; let currentPendingExamIndices = null; 
-        let activeHistorySemesterIdx = -1; 
-
-        window.getFormattedDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+        window.getFormattedDate = () => new Date().toISOString().split('T')[0];
 
         onValue(ref(db, 'hifz_system_v1'), (snapshot) => {
-            const data = snapshot.val(); classesData = data?.classes ||[]; hifzUsers = data?.users ||[]; semesters = data?.semesters ||[];
-            if(!hifzUsers.length) { hifzUsers.push({username:'admin', password:'1234', role:'admin', name:'Admin'}); updateFirebase(); }
-            if(!document.getElementById('management-page').classList.contains('hidden')) window.renderManageClassList();
-            if(!document.getElementById('teacher-mgmt-page').classList.contains('hidden')) window.renderTeacherList();
-            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
-            if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
-            if(currentUserType === 'student' && currentStudentObj) { 
-                let sId = currentStudentObj.id; 
-                for(let c of classesData) { 
-                    let found = c.students?.find(x=>x.id===sId); 
-                    if(found) { currentStudentObj=found; break;} 
-                } 
-                window.calculateStudentProgress(currentStudentObj); 
+            const data = snapshot.val();
+            classesData = data?.classes || []; hifzUsers = data?.users || []; semesters = data?.semesters || [];
+            if(!hifzUsers.length) hifzUsers.push({username:'admin',password:'1234',role:'admin',name:'Admin'});
+            if(currentUserType === 'student' && currentStudentObj) {
+                classesData.forEach(c => c.students?.forEach(s => { if(s.id === currentStudentObj.id) currentStudentObj = s; }));
+                window.calculateStudentProgress(currentStudentObj);
             }
         });
 
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
-        window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
 
-        window.openBackupModal = () => document.getElementById('backupModal').style.display = 'flex';
-        window.backupData = () => { const data = { classes: classesData, users: hifzUsers, semesters: semesters }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); };
-        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users || []; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
+        window.switchLogin = (type) => {
+            document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher');
+            document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student');
+            document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher'&&i===0)||(type==='student'&&i===1)));
+        };
 
-        window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
-        window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
-        window.handleStudentLoginStep = () => { const id = document.getElementById('stuIdInput').value.trim(); if(!id) return alert("ID Required"); let found = null, cIdx = -1, sIdx = -1; classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } })); if(!found) return alert("Not Found"); currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found; if(!found.password) { currentUserType = 'student'; document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`; document.getElementById('createPassModal').style.display = 'flex'; } else { const passField = document.getElementById('stuPassField'); if(passField.classList.contains('hidden')) passField.classList.remove('hidden'); else { if(document.getElementById('stuPassInput').value === found.password) window.loginSuccessStudent(); else alert("Wrong Password"); } } };
-        window.saveNewPassword = () => { const pass = document.getElementById('newStuPass').value; if(!pass) return alert("Enter a password"); if(currentUserType === 'student') { classesData[currentClassIdx].students[currentStudentIdx].password = pass; updateFirebase(); document.getElementById('createPassModal').style.display='none'; window.loginSuccessStudent(); } };
-        function proceedLogin() { document.body.classList.remove('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('admin-panel-btn').classList.toggle('hidden', currentUserRole !== 'admin'); window.openPage('teacher-dashboard'); }
-        window.loginSuccessStudent = () => { currentUserType = 'student'; document.body.classList.add('student-mode'); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('studentDashName').innerText = currentStudentObj.name; window.calculateStudentProgress(currentStudentObj); window.openPage('student-dashboard'); };
+        window.loginTeacher = () => {
+            const u = document.getElementById('teacherUsername').value;
+            const p = document.getElementById('teacherPassInput').value;
+            const user = hifzUsers.find(x => x.username === u && x.password === p);
+            if(user || (u==='admin' && p==='1234')) {
+                currentUserType = 'teacher';
+                document.body.classList.remove('student-mode');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                window.openPage('teacher-dashboard');
+            } else alert("ލޮގިން މައުލޫމާތު ނުބައި");
+        };
+
+        window.handleStudentLoginStep = () => {
+            const id = document.getElementById('stuIdInput').value;
+            let found = null;
+            classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found = s; currentClassIdx = ci; currentStudentIdx = si; } }));
+            if(found) {
+                currentStudentObj = found; currentUserType = 'student';
+                document.body.classList.add('student-mode');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                document.getElementById('studentDashName').innerText = found.name;
+                window.calculateStudentProgress(found);
+                window.openPage('student-dashboard');
+            } else alert("ދަރިވަރުގެ އައިޑީ ނުފެނުނު");
+        };
+
         window.logout = () => location.reload();
-        
-        window.goToStudentList = () => { if (currentClassIdx !== -1) window.openGradingStudentList(currentClassIdx); else window.openGradingClassList(); };
-        window.openPage = (id) => { document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));['juz-exam-page', 'final-exam-page', 'recorder-page', 'teacher-mgmt-page'].forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); }); const p = document.getElementById(id); if(p) { p.classList.remove('hidden'); if(id==='management-page') window.renderManageClassList(); if(id==='teacher-mgmt-page') window.renderTeacherList(); if(id==='progress-page') { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); } } };
-        window.goBackFromCategory = () => { if(currentUserType === 'student') window.openPage('student-dashboard'); else window.openPage('grading-menu-page'); };
+        window.openPage = (id) => {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            const target = document.getElementById(id);
+            if(target) target.classList.remove('hidden');
+        };
 
-        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page');
-        window.createTeacher = () => { const name = document.getElementById('newTeachName').value, user = document.getElementById('newTeachUser').value, pass = document.getElementById('newTeachPass').value; if(name&&user&&pass) { hifzUsers.push({name,username:user,password:pass,role:'teacher'}); updateFirebase(); window.renderTeacherList(); document.getElementById('newTeachName').value=''; document.getElementById('newTeachUser').value=''; document.getElementById('newTeachPass').value=''; } };
-        window.renderTeacherList = () => { const div = document.getElementById('teacherList'); div.innerHTML=''; hifzUsers.forEach((u, i) => { if(u.role !== 'admin') div.innerHTML += `<div class="card-btn" style="min-height:100px; position:relative;"><h4>${u.name}</h4><span style="font-size:12px;color:#777;">User: ${u.username}</span><div style="display:flex; gap:5px; margin-top:5px;"><button class="btn-action-sm btn-delete-hist" onclick="window.deleteTeacher(${i})" style="position:static;">🗑</button></div></div>`; }); }; 
-        window.deleteTeacher = (i) => { if(confirm("Delete?")) { hifzUsers.splice(i, 1); updateFirebase(); window.renderTeacherList(); } };
-        window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } };
-        window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="btn-delete-hist btn-action-sm abs-pos" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
-        window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
+        window.openGradingClassList = () => {
+            const div = document.getElementById('gradingClassList'); div.innerHTML = '';
+            classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4>${c.name}</h4></div>`; });
+            window.openPage('grading-class-page');
+        };
 
-        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
-        window.openAddStudentModal = () => { document.getElementById('addStudentModal').style.display='flex'; }
-        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; classesData[currentClassIdx].students.push({name, id, level:document.getElementById('m_level').value, history:[], pendingData:[], password:"" }); updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
-        window.deleteStudent = (idx) => { if(confirm("Delete Student?")) { classesData[currentClassIdx].students.splice(idx, 1); updateFirebase(); window.renderStudentList(); } }
+        window.openGradingStudentList = (i) => {
+            currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML = '';
+            classesData[i].students?.forEach((s, idx) => { div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4>${s.name}</h4></div>`; });
+            window.openPage('grading-student-page');
+        };
 
-        window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
-        window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
-        window.openStudentMenu = (i) => { currentStudentIdx = i; document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; window.openPage('grading-menu-page'); }
-        
-        window.openCategoryPage = (type) => { 
-            currentSessionType = type; 
-            let title = type==='juz_exam'?"ޖުޒުއު އިމްތިޙާން":(type==='new_lesson'?"އާ ފިލާވަޅު":(type==='final_exam'?"ފަހު އިމްތިޙާން":"މުރާޖަޢާ")); 
-            document.getElementById('catPageTitle').innerText = title; 
-            const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-            if(semesters.length > 0 && activeHistorySemesterIdx === -1) activeHistorySemesterIdx = semesters.length - 1;
-            window.renderSemesterTabs(); window.renderHistory(s, 'categoryHistoryList', type); 
-            if(type === 'juz_exam' && currentUserType === 'student') { document.getElementById('peerExamBtn').style.display = 'inline-block'; } 
-            else if(type === 'juz_exam' && currentUserType === 'teacher') { document.getElementById('pastJuzBtn').style.display = 'inline-block'; document.getElementById('peerExamBtn').style.display = 'none'; } 
-            else { document.getElementById('pastJuzBtn').style.display = 'none'; document.getElementById('peerExamBtn').style.display = 'none'; }
-            document.getElementById('addRecordBtn').style.display = (currentUserType==='student')?'none':'flex'; 
-            window.openPage('category-page'); 
-        }
+        window.openStudentMenu = (i) => {
+            currentStudentIdx = i;
+            document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name;
+            window.openPage('grading-menu-page');
+        };
 
-        window.renderSemesterTabs = () => {
-            const container = document.getElementById('historySemesterTabs'); container.innerHTML = '';
-            if(!semesters || semesters.length === 0) { container.style.display = 'none'; return; } container.style.display = 'block';
-            semesters.forEach((sem, i) => {
-                const isActive = (i === activeHistorySemesterIdx);
-                const btn = document.createElement('button'); btn.className = isActive ? 'sem-tag active' : 'sem-tag'; btn.innerText = sem.name;
-                btn.onclick = () => { activeHistorySemesterIdx = i; window.renderSemesterTabs(); const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; window.renderHistory(s, 'categoryHistoryList', currentSessionType); };
-                container.appendChild(btn);
-            });
-        }
-
-        window.handleAddButtonClick = () => { if(currentSessionType==='juz_exam') window.openJuzExamSetup('teacher'); else if(currentSessionType==='final_exam') window.openFinalExam(); else window.openRecorder(currentSessionType); }
-
-        window.openPastJuzModal = () => {
-            const s = classesData[currentClassIdx].students[currentStudentIdx]; const grid = document.getElementById('pastJuzGrid'); grid.innerHTML = ''; let passedJuz = s.manualPassedJuz ||[];
-            for(let i=1; i<=30; i++) { const isChecked = passedJuz.includes(i); grid.innerHTML += `<label class="${isChecked?'checked':''}"><input type="checkbox" value="${i}" ${isChecked?'checked':''} onchange="this.parentElement.classList.toggle('checked', this.checked)"><span>Juz ${i}</span></label>`; }
-            document.getElementById('pastJuzModal').style.display = 'flex';
-        }
-        window.savePastJuz = () => {
-            const checkboxes = document.querySelectorAll('#pastJuzGrid input[type="checkbox"]:checked');
-            const selectedJuz = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            classesData[currentClassIdx].students[currentStudentIdx].manualPassedJuz = selectedJuz; updateFirebase();
-            alert("ޖުޒުއުތައް އަޕްޑޭޓް ކުރެވިއްޖެ!"); document.getElementById('pastJuzModal').style.display = 'none'; window.renderHistory(classesData[currentClassIdx].students[currentStudentIdx], 'categoryHistoryList', 'juz_exam');
-        }
-
-        window.openProgressPage = () => { window.populateProgClassSelect(); window.renderSemesterList(); window.renderPendingApprovals(); window.openPage('progress-page'); }
-        window.createSemester = () => { const n=document.getElementById('semName').value, s=document.getElementById('semStart').value, e=document.getElementById('semEnd').value; if(n&&s&&e) { semesters.push({name:n, startDate:s, endDate:e}); updateFirebase(); window.renderSemesterList(); } else alert("Fill all fields"); }
-        window.renderSemesterList = () => { const list = document.getElementById('semesterList'); list.innerHTML=''; semesters.forEach((sem, i) => list.innerHTML += `<div class="card-btn"><h4>${sem.name}</h4><span>${sem.startDate} - ${sem.endDate}</span></div>`); }
-        window.populateProgClassSelect = () => { const sel = document.getElementById('progClassSelect'); sel.innerHTML = '<option value="">ކްލާސް ޚިޔާރުކުރައްވާ</option>'; classesData.forEach((c, i) => sel.add(new Option(c.name, i))); }
-
-        window.showClassProgressTable = (cIdx) => {
-            const container = document.getElementById('classProgressTableContainer'); const dlBtn = document.getElementById('btnDownloadExcel');
-            if(cIdx === "" || !semesters.length) { container.innerHTML = `<p style="text-align:center; color:#999; padding:20px;">ޚިޔާރުކުރައްވާ</p>`; dlBtn.style.display = 'none'; return; }
-            dlBtn.style.display = 'inline-block';
-            const currentSem = semesters[semesters.length - 1]; const startDate = new Date(currentSem.startDate); const endDate = new Date(currentSem.endDate); endDate.setHours(23, 59, 59, 999);
-            let tableHtml = `<table id="progressTable" class="desktop-view-table"><thead><tr><th rowspan="2">ނަން</th><th rowspan="2">ލެވެލް</th><th colspan="2">މި ސެމިސްޓަރ</th><th rowspan="2">ޞަފްޙާ</th><th rowspan="2">ސެމިސްޓަރ ޖުޒުއު</th><th rowspan="2">ޖުމްލަ ޖުޒުއު</th></tr><tr><th>ފެށި ހިސާބު</th><th>ނިންމި ހިސާބު</th></tr></thead><tbody>`;
-            let cardsHtml = `<div class="mobile-view-cards">`;
-            const students = classesData[cIdx].students ||[];
-            students.forEach((s, sIdx) => {
-                const stats = window.calculateSemesterStats(s, startDate, endDate);
-                tableHtml += `<tr><td style="cursor:pointer; color:var(--primary); font-weight:bold;" onclick="window.navToStudentFromProg(${cIdx}, ${sIdx})">${s.name}</td><td>${s.level || '-'}</td><td>${stats.startPoint}</td><td>${stats.endPoint}</td><td>${stats.balancePages}</td><td>${stats.semJuzCount}</td><td>${stats.totalJuzCount}</td></tr>`;
-                cardsHtml += `<div class="prog-card" onclick="window.navToStudentFromProg(${cIdx}, ${sIdx})"><b>${s.name}</b><br>ސެމިސްޓަރ ޞަފްޙާ: ${stats.balancePages}<br>ޖުމްލަ ޖުޒުއު: ${stats.totalJuzCount}</div>`;
-            });
-            tableHtml += `</tbody></table>`; cardsHtml += `</div>`; container.innerHTML = tableHtml + cardsHtml;
-        }
-
-        window.calculateSemesterStats = (student, startDate, endDate) => {
-            let startPoint = "-"; let endPoint = "-"; let balancePages = 0; let semJuzCount = 0; let passedJuzSet = new Set(); let allTimePassedJuz = new Set();
-            if(student.manualPassedJuz) student.manualPassedJuz.forEach(j => allTimePassedJuz.add(j));
-            if (student.history) {
-                let lessonRecs = student.history.filter(h => { const d = new Date(h.date); return h.type === 'new_lesson' && d >= startDate && d <= endDate; }).sort((a,b) => new Date(a.date) - new Date(b.date));
-                if (lessonRecs.length > 0) {
-                    const first = lessonRecs[0]; startPoint = `ޞ ${first.page}`;
-                    const last = lessonRecs[lessonRecs.length - 1]; endPoint = `ޞ ${last.endPage || last.page}`;
-                    balancePages = (parseInt(last.endPage || last.page) - parseInt(first.page)) + 1;
-                }
-                student.history.forEach(h => {
-                    const recDate = new Date(h.date);
-                    if (h.type === 'juz_exam' && h.score >= 60 && h.status !== 'partial') {
-                        allTimePassedJuz.add(h.juz);
-                        if (recDate >= startDate && recDate <= endDate) passedJuzSet.add(h.juz);
-                    }
-                });
-            }
-            return { startPoint, endPoint, balancePages, semJuzCount: passedJuzSet.size, totalJuzCount: allTimePassedJuz.size };
-        }
-
-        window.calculateStudentProgress = (student) => { 
-            if(!semesters.length) return; 
-            const latestSem = semesters[semesters.length - 1];
-            const stats = window.calculateSemesterStats(student, new Date(latestSem.startDate), new Date(latestSem.endDate));
-            document.getElementById('studentSemPages').innerText = stats.balancePages; 
-            document.getElementById('studentSemJuz').innerText = stats.semJuzCount; 
-            document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
-            let target = (parseInt(student.level) >= 3) ? 3 : 2; 
-            let percent = Math.min(100, (stats.semJuzCount / target) * 100) || 0;
-            document.getElementById('targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`;
-            document.getElementById('targetPercent').innerText = `${Math.round(percent)}%`;
-            document.getElementById('targetProgress').style.width = `${percent}%`;
-        }
-
-        // RECORDER & MUSHAF
-        window.openRecorder = (type) => {
-            editingRecordIndex = -1; isViewMode = false; currentMistakes = []; currentSessionType = type;
-            document.getElementById('recorderTitle').innerText = "ރެކޯޑް";
-            document.getElementById('recSaveBtn').style.display = 'block';
-            document.getElementById('recDate').valueAsDate = new Date();
-            document.getElementById('mistakeCountDisplay').innerText = 0;
+        window.openCategoryPage = (type) => {
+            currentSessionType = type;
             const s = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-            let initialPage = 1;
-            if(s.history) {
-                const recs = s.history.filter(r => r.type === type);
-                if(recs.length) initialPage = parseInt(recs[recs.length-1].endPage || recs[recs.length-1].page) + 1;
-            }
-            document.getElementById('startPage').value = initialPage;
-            currentRecViewPage = initialPage; window.loadSmartPage();
+            activeHistorySemesterIdx = semesters.length - 1;
+            window.renderHistory(s, 'categoryHistoryList', type);
+            window.openPage('category-page');
+        };
+
+        window.renderHistory = (student, listId, filterType) => {
+            const list = document.getElementById(listId); if(!list || !student) return; list.innerHTML = '';
+            let records = (student.history || []).filter(r => r.type === filterType);
+            records.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(rec => {
+                const realIdx = student.history.indexOf(rec);
+                list.innerHTML += `<div class="hist-card" onclick='window.viewRecord(${JSON.stringify(rec)})'>
+                    <div class="hist-header"><b>ޞަފްޙާ ${rec.page} - ${rec.endPage || rec.page}</b><span>${rec.date}</span></div>
+                    <div class="hist-body">ކުށުގެ ޢަދަދު: ${rec.mistakesCount}</div>
+                </div>`;
+            });
+        };
+
+        window.openRecorder = (type) => {
+            currentMistakes = []; isViewMode = false;
+            document.getElementById('mistakeCountDisplay').innerText = '0';
+            document.getElementById('recDate').value = window.getFormattedDate();
+            document.getElementById('recSaveBtn').style.display = 'block';
+            window.loadSmartPage();
             document.getElementById('recorder-page').classList.remove('hidden');
         };
 
-        window.loadSmartPage = async () => { 
+        window.loadSmartPage = async () => {
             const page = currentRecViewPage; if(!page || page < 1 || page > 604) return;
-            try {
-                const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
-                const data = await res.json();
-                window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
-                if(!isViewMode && data.data.ayahs.length > 0) {
-                    const first = data.data.ayahs[0]; const last = data.data.ayahs[data.data.ayahs.length-1];
-                    document.getElementById('endPage').value = page;
-                    window.populateSurahSelects();
-                    document.getElementById('startSurah').value = first.surah.number;
-                    window.updateAyahOptions('startAyah', first.surah.number-1);
-                    document.getElementById('startAyah').value = first.numberInSurah;
-                    document.getElementById('endSurah').value = last.surah.number;
-                    window.updateAyahOptions('endAyah', last.surah.number-1);
-                    document.getElementById('endAyah').value = last.numberInSurah;
-                }
-            } catch(e) { console.error(e); }
+            const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`);
+            const data = await res.json();
+            window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false);
         };
 
-        // މުޞްޙަފް ކުރަހާ އަދި ކުށްތައް ދައްކައިދޭ ފަންކްޝަން
         window.renderMushafText = (ayahs, target, highlights, isExam) => { 
-            const container = document.getElementById(target); 
-            if(!container) return;
-            container.innerHTML = ''; 
-            if(!ayahs || ayahs.length === 0) return;
-            
-            let html = ''; 
-            const BISMILLAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
-            
+            const container = document.getElementById(target); if(!container) return; container.innerHTML = ''; 
+            let html = ''; const BISMILLAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
             ayahs.forEach(a => {
                 if (a.numberInSurah === 1) {
-                    html += `<div class="surah-header-box" style="background:#fdf2d0; padding:5px; border:1px solid #d4ac6e; text-align:center; margin:15px 0; font-weight:bold; font-family:var(--font-arabic);">سورة ${a.surah.name}</div>`;
-                    if (a.surah.number !== 9) {
-                        html += `<div class="bismillah-box" style="text-align:center; font-size:22px; margin-bottom:15px; font-family:var(--font-arabic);">${BISMILLAH}</div>`;
-                    }
+                    html += `<div class="surah-header-box" style="background:#fdf2d0; padding:5px; border:1px solid #d4ac6e; text-align:center; margin:15px 0; font-weight:bold;">سورة ${a.surah.name}</div>`;
+                    if (a.surah.number !== 9) html += `<div class="bismillah-box" style="text-align:center; font-size:22px; margin-bottom:15px;">${BISMILLAH}</div>`;
                 }
-                
-                let ayahText = a.text; 
-                if(a.numberInSurah === 1 && a.surah.number !== 9) {
-                    ayahText = ayahText.replace(BISMILLAH, '').trim();
-                }
-                
+                let ayahText = a.text; if(a.numberInSurah === 1 && a.surah.number !== 9) ayahText = ayahText.replace(BISMILLAH, '').trim();
                 const words = ayahText.split(' ');
                 words.forEach((w, i) => {
                     const id = `p${a.page}_s${a.surah.number}_a${a.numberInSurah}_w${i}`;
-                    let cls = highlights.includes(id) ? 'word mistake' : 'word';
-                    let fn = `window.clickRecWord('${id}')`;
-                    html += `<span id="${id}" class="${cls}" onclick="${fn}" style="cursor:pointer; padding:2px; border-radius:3px;">${w}</span> `;
+                    const cls = highlights.includes(id) ? 'word mistake' : 'word';
+                    html += `<span id="${id}" class="${cls}" onclick="window.clickRecWord('${id}')" style="cursor:pointer; padding:2px;">${w}</span> `;
                 });
-                html += `<span class="ayah-marker" style="color:#d4ac6e; font-weight:bold; margin:0 5px;">(${a.numberInSurah})</span> `;
+                html += `<span style="color:#d4ac6e;">(${a.numberInSurah})</span> `;
             });
-            
-            container.innerHTML = `<div class="quran-text" dir="rtl" style="line-height:2.5; font-size:24px; text-align:justify;">${html}</div>`;
-            const displayId = isExam ? 'currentPageDisplay' : 'recPageDisplay';
-            if(document.getElementById(displayId)) {
-                document.getElementById(displayId).innerText = `Page ${ayahs[0].page}`;
-            }
-        };</div>`;
+            container.innerHTML = `<div dir="rtl" style="font-size:24px; line-height:2.5; text-align:justify; font-family:var(--font-arabic);">${html}</div>`;
             document.getElementById(isExam ? 'currentPageDisplay' : 'recPageDisplay').innerText = `Page ${ayahs[0].page}`;
         };
 
-       // ބަހަކަށް ފިތާލުމުން ކުށް ފާހަގަކުރާ ފަންކްޝަން
         window.clickRecWord = (id) => {
-            if(isViewMode) return; // ބަލާލަން ހުޅުވާފައި ހުންނައިރު އެއްވެސް ބަދަލެއް ނުގެނެވޭނެ
-            
+            if(isViewMode) return;
             const el = document.getElementById(id);
-            if(!el) return;
-
             if(el.classList.contains('mistake')) {
-                // ކުރިން ކުށެއްގެ ގޮތުގައި އިނީނަމަ އުނިކުރުން
-                el.classList.remove('mistake');
-                currentMistakes = currentMistakes.filter(x => x !== id);
+                el.classList.remove('mistake'); currentMistakes = currentMistakes.filter(x => x !== id);
             } else {
-                // ކުށެއްގެ ގޮތުގައި ފާހަގަކުރުން
-                el.classList.add('mistake');
-                currentMistakes.push(id);
+                el.classList.add('mistake'); currentMistakes.push(id);
             }
-            
-            // ކުށުގެ ޢަދަދު ސްކްރީނުން އަޕްޑޭޓްކުރުން
-            const countDisplay = document.getElementById('mistakeCountDisplay');
-            if(countDisplay) countDisplay.innerText = currentMistakes.length;
+            document.getElementById('mistakeCountDisplay').innerText = currentMistakes.length;
+        };
+
+        window.viewRecord = (rec) => {
+            isViewMode = true; currentMistakes = rec.mistakeDetails || [];
+            currentRecViewPage = parseInt(rec.page);
+            document.getElementById('recSaveBtn').style.display = 'none';
+            document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount;
+            window.loadSmartPage();
+            document.getElementById('recorder-page').classList.remove('hidden');
         };
 
         window.saveRecord = () => {
             const s = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-            const record = {
+            if(!s.history) s.history = [];
+            s.history.push({
                 type: currentSessionType, date: document.getElementById('recDate').value,
                 page: document.getElementById('startPage').value, endPage: document.getElementById('endPage').value,
-                mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes,
-                startDetails: { surah: SURAH_NAMES_AR[document.getElementById('startSurah').value-1], ayah: document.getElementById('startAyah').value },
-                endDetails: { surah: SURAH_NAMES_AR[document.getElementById('endSurah').value-1], ayah: document.getElementById('endAyah').value }
-            };
-            if(!s.history) s.history = []; s.history.push(record); updateFirebase(); window.closeRecorder();
+                mistakesCount: currentMistakes.length, mistakeDetails: [...currentMistakes]
+            });
+            updateFirebase(); window.closeRecorder();
+            window.renderHistory(s, 'categoryHistoryList', currentSessionType);
         };
 
-        window.closeRecorder = () => { document.getElementById('recorder-page').classList.add('hidden'); };
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; window.loadSmartPage(); } };
+        window.closeRecorder = () => document.getElementById('recorder-page').classList.add('hidden');
+        window.changeRecPage = (dir) => { currentRecViewPage += dir; if(currentRecViewPage < 1) currentRecViewPage = 1; if(currentRecViewPage > 604) currentRecViewPage = 604; window.loadSmartPage(); };
         window.handleStartPageChange = () => { currentRecViewPage = parseInt(document.getElementById('startPage').value); window.loadSmartPage(); };
-        window.populateSurahSelects = () => {
-            const s1 = document.getElementById('startSurah'); const s2 = document.getElementById('endSurah');
-            s1.innerHTML = ''; s2.innerHTML = ''; SURAH_NAMES_AR.forEach((n, i) => { s1.add(new Option(n, i+1)); s2.add(new Option(n, i+1)); });
-            s1.onchange = () => window.updateAyahOptions('startAyah', s1.value-1);
-            s2.onchange = () => window.updateAyahOptions('endAyah', s2.value-1);
-        };
-        window.updateAyahOptions = (id, idx) => { const el = document.getElementById(id); el.innerHTML = ''; for(let i=1; i<=AYAH_COUNTS[idx]; i++) el.add(new Option(i, i)); };
-
-        // HISTORY & NAVIGATION
-        window.renderHistory = (student, listId, filterType) => {
-    const list = document.getElementById(listId); 
-    if(!list || !student) return; 
-    list.innerHTML = '';
-    
-    let records = (student.history || []).filter(r => r.type === filterType);
-    
-    // ސެމިސްޓަރ ފިލްޓަރ
-    if(activeHistorySemesterIdx !== -1 && semesters[activeHistorySemesterIdx]) {
-        const sem = semesters[activeHistorySemesterIdx];
-        const start = new Date(sem.startDate).getTime(); 
-        const end = new Date(sem.endDate).setHours(23,59,59);
-        records = records.filter(r => { 
-            const d = new Date(r.date).getTime(); 
-            return d >= start && d <= end; 
-        });
-    }
-
-    if(!records.length) { 
-        list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">ރެކޯޑެއް ނެތް</p>'; 
-        return; 
-    }
-
-    records.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(rec => {
-        const realIdx = student.history.indexOf(rec);
-        const editBtn = (currentUserType==='teacher' && rec.type!=='juz_exam') ? `<button class="btn-edit-hist" onclick="event.stopPropagation(); window.editRecord(${realIdx},'${rec.type}')">✏️</button>` : '';
-        const delBtn = (currentUserType==='teacher') ? `<button class="btn-delete-hist" onclick="event.stopPropagation(); window.deleteHistoryRecord(${realIdx})">🗑</button>` : '';
-        
-        // މިތަނުގައި ނިމޭ ޞަފްޙާ (endPage) ހިމެނިފައިވާނެ
-        const pageRange = rec.endPage && rec.endPage !== rec.page ? `ޞަފްޙާ: ${rec.page} - ${rec.endPage}` : `ޞަފްޙާ: ${rec.page}`;
-        
-        list.innerHTML += `
-            <div class="hist-card" onclick='window.viewRecord(${JSON.stringify(rec)})'>
-                <div class="hist-header">
-                    <b>${pageRange}</b>
-                    <span style="font-size:12px; background:#eee; padding:2px 5px; border-radius:5px;">${rec.date}</span>
-                    <div class="hist-actions">${editBtn}${delBtn}</div>
-                </div>
-                <div class="hist-body">
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>ކުށުގެ ޢަދަދު: <b style="color:red;">${rec.mistakesCount || 0}</b></span>
-                        <span style="color:#27ae60; font-size:12px;">ބަލާލުމަށް ފިތާލާ 📖</span>
-                    </div>
-                </div>
-            </div>`;
-    });
-};
-
-        window.deleteHistoryRecord = (idx) => { if(confirm("Delete?")) { const s = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(idx, 1); updateFirebase(); window.renderHistory(s, 'categoryHistoryList', currentSessionType); } };
-        window.navToStudentFromProg = (c, s) => { currentClassIdx = c; currentStudentIdx = s; document.getElementById('gradingStudentName').innerText = classesData[c].students[s].name; window.openPage('grading-menu-page'); };
-        window.downloadCategorizedStudentExcel = () => { alert("Downloading..."); }; // Excel logic can be added here
-    
+        window.handleAddButtonClick = () => { window.openRecorder(currentSessionType); };
+        window.goBackFromCategory = () => currentUserType === 'student' ? window.openPage('student-dashboard') : window.openPage('grading-menu-page');
+        window.navToStudentFromProg = (c, s) => { currentClassIdx = c; currentStudentIdx = s; window.openStudentMenu(s); };
+        window.calculateStudentProgress = (s) => { /* Progress calculations */ };
+        window.toggleMobileMushaf = (id, show) => document.getElementById(id).classList.toggle('show-mushaf-mobile', show);
+        window.goToStudentList = () => window.openPage('grading-student-page');
+        window.renderSemesterTabs = () => { /* Tabs logic */ };
+        window.openTeacherManagement = () => window.openPage('teacher-mgmt-page');
+        window.openProgressPage = () => window.openPage('progress-page');
     </script>
 </body>
 </html>
