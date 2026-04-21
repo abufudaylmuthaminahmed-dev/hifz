@@ -453,6 +453,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         let editingRecordIndex = -1; let currentRecViewPage = 1; let pendingUserIndex = -1;
         let isPeerExam = false; let currentPendingExamData = null; let currentPendingExamIndices = null; 
         let activeHistorySemesterIdx = -1; 
+        let currentEditStudentIdx = -1; // އެޑިޓްކުރާ ދަރިވަރުގެ އިންޑެކްސް ބަލަހައްޓަން
 
         window.getFormattedDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
@@ -490,10 +491,133 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         window.createClass = () => { let name = document.getElementById('newClassName').value, teach = document.getElementById('newTeacherName').value; if(name) { classesData.push({name:name, teacher:teach, students:[]}); updateFirebase(); window.renderManageClassList(); } }; window.renderManageClassList = () => { const div = document.getElementById('manageClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => { div.innerHTML += `<div class="card-btn" onclick="window.openClass(${i})" style="position:relative;"><span class="card-icon">🏫</span><h4 class="card-title">${c.name}</h4><span class="card-sub">${c.teacher||''}</span><div class="class-actions"><button class="btn-delete-hist btn-action-sm abs-pos" onclick="event.stopPropagation(); window.deleteClass(${i})">🗑</button></div></div>`; }); }; 
         window.deleteClass = (i) => { if(confirm("Delete?")) { classesData.splice(i, 1); updateFirebase(); window.renderManageClassList(); } }; window.openClass = (i) => { currentClassIdx = i; window.renderStudentList(); window.openPage('class-details-page'); };
 
-        window.renderStudentList = () => { const div = document.getElementById('studentManageList'); div.innerHTML=''; const students = classesData[currentClassIdx].students ||[]; if(!students.length) div.innerHTML = "<p style='text-align:center; color:#999'>No students yet.</p>"; students.forEach((s, idx) => { let pass = (s.password) ? `<span style="color:green">Pass Set</span>` : `<span style="color:red; font-weight:bold;">No Pass</span>`; div.innerHTML += `<div class="student-detail-card"><div class="st-card-header"><div class="st-name">${s.name}</div><div class="st-id">${s.id}</div></div><div class="st-info-grid"><div class="st-info-item"><span class="st-info-label">Level:</span> <b>${s.level || '-'}</b></div></div><div class="st-remarks-box">${s.remarks || 'No remarks'}</div><div class="st-footer-actions"><div style="font-size:12px;">${pass}</div><div class="student-actions" style="position:static;"><button class="btn-action-sm btn-delete-hist" onclick="event.stopPropagation(); window.deleteStudent(${idx})">🗑</button></div></div></div>`; }); }; 
-        window.openAddStudentModal = () => { document.getElementById('addStudentModal').style.display='flex'; }
-        window.confirmAddStudent = () => { const name = document.getElementById('m_name').value, id = document.getElementById('m_id').value; if(!name||!id) return alert("Required"); if(!classesData[currentClassIdx].students) classesData[currentClassIdx].students = []; classesData[currentClassIdx].students.push({name, id, level:document.getElementById('m_level').value, history:[], pendingData:[], password:"" }); updateFirebase(); document.getElementById('addStudentModal').style.display='none'; window.renderStudentList(); }
-        window.deleteStudent = (idx) => { if(confirm("Delete Student?")) { classesData[currentClassIdx].students.splice(idx, 1); updateFirebase(); window.renderStudentList(); } }
+        window.renderStudentList = () => {
+    const div = document.getElementById('studentManageList');
+    div.innerHTML = '';
+    const students = classesData[currentClassIdx].students || [];
+    
+    if (!students.length) {
+        div.innerHTML = "<p style='text-align:center; color:#999'>މި ކްލާހުގައި އަދި އެއްވެސް ދަރިވަރަކު ނެތް.</p>";
+        return;
+    }
+    
+    students.forEach((s, idx) => {
+        let passStatus = (s.password) ? 
+            `<span style="color:green; font-size:11px;">ޕާސްވޯޑް ހަދާފައި</span>` : 
+            `<span style="color:red; font-size:11px; font-weight:bold;">ޕާސްވޯޑެއް ނެތް</span>`;
+            
+        div.innerHTML += `
+            <div class="student-detail-card">
+                <div class="st-card-header">
+                    <div class="st-name">${s.name}</div>
+                    <div class="st-id">${s.id}</div>
+                </div>
+                <div class="st-info-grid">
+                    <div class="st-info-item"><span class="st-info-label">ލެވެލް:</span> <b>${s.level || '-'}</b></div>
+                    <div class="st-info-item"><span class="st-info-label">ކިޔަވާ ގޮތް:</span> <b>${s.direction === 'bottom_up' ? 'ތިރިން މައްޗަށް' : 'މަތިން ތިރިއަށް'}</b></div>
+                </div>
+                <div class="st-remarks-box">${s.remarks || 'ނޯޓެއް ނެތް'}</div>
+                <div class="st-footer-actions">
+                    <div style="line-height:1.2;">${passStatus}</div>
+                    <div class="student-actions" style="display:flex; gap:5px;">
+                        <button class="btn-action-sm btn-edit-hist" title="Edit" onclick="window.openEditStudentModal(${idx})">✏️</button>
+                        <button class="btn-action-sm" title="Reset Password" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;" onclick="window.resetStudentPassword(${idx})">🔑</button>
+                        <button class="btn-action-sm btn-delete-hist" title="Delete" onclick="window.deleteStudent(${idx})">🗑</button>
+                    </div>
+                </div>
+            </div>`;
+    });
+}; 
+        // އާ ދަރިވަރަކު އިތުރުކުރަން މޮޑަލް ހުޅުވުން
+window.openAddStudentModal = () => {
+    currentEditStudentIdx = -1; 
+    document.getElementById('addStudentModal').querySelector('h3').innerText = "ދަރިވަރަކު އިތުރުކުރުން";
+    document.getElementById('btnSaveStudent').innerText = "ސޭވް";
+    
+    // ފީލްޑްތައް ހުސްކުރުން
+    document.getElementById('m_name').value = '';
+    document.getElementById('m_id').value = '';
+    document.getElementById('m_module').value = '';
+    document.getElementById('m_level').value = '1';
+    document.getElementById('m_direction').value = 'top_down';
+    document.getElementById('m_remarks').value = '';
+    
+    document.getElementById('addStudentModal').style.display = 'flex';
+};
+
+// އެޑިޓްކުރަން މޮޑަލް ހުޅުވުން
+window.openEditStudentModal = (idx) => {
+    currentEditStudentIdx = idx; 
+    const s = classesData[currentClassIdx].students[idx];
+    
+    document.getElementById('addStudentModal').querySelector('h3').innerText = "މަޢުލޫމާތު ބަދަލުކުރުން";
+    document.getElementById('btnSaveStudent').innerText = "އަޕްޑޭޓް";
+    
+    // ހުރި މަޢުލޫމާތު ފޯމަށް ލުން
+    document.getElementById('m_name').value = s.name || '';
+    document.getElementById('m_id').value = s.id || '';
+    document.getElementById('m_module').value = s.module || '';
+    document.getElementById('m_level').value = s.level || '1';
+    document.getElementById('m_direction').value = s.direction || 'top_down';
+    document.getElementById('m_remarks').value = s.remarks || '';
+    
+    document.getElementById('addStudentModal').style.display = 'flex';
+};
+
+// ސޭވް ނުވަތަ އަޕްޑޭޓް ކުރުން ކަށަވަރުކުރުން
+window.confirmAddStudent = () => {
+    const name = document.getElementById('m_name').value;
+    const id = document.getElementById('m_id').value;
+    const module = document.getElementById('m_module').value;
+    const level = document.getElementById('m_level').value;
+    const direction = document.getElementById('m_direction').value;
+    const remarks = document.getElementById('m_remarks').value;
+
+    if (!name || !id) return alert("ނަމާއި އައިޑީ ފުރިހަމަކުރައްވާ!");
+
+    if (!classesData[currentClassIdx].students) classesData[currentClassIdx].students = [];
+
+    if (currentEditStudentIdx === -1) {
+        // އާ ދަރިވަރަކު އިތުރުކުރުން
+        classesData[currentClassIdx].students.push({
+            name, id, module, level, direction, remarks,
+            history: [], pendingData: [], password: ""
+        });
+    } else {
+        // ހުރި ދަރިވަރެއްގެ މަޢުލޫމާތު ބަދަލުކުރުން
+        let s = classesData[currentClassIdx].students[currentEditStudentIdx];
+        s.name = name;
+        s.id = id;
+        s.module = module;
+        s.level = level;
+        s.direction = direction;
+        s.remarks = remarks;
+    }
+
+    updateFirebase();
+    document.getElementById('addStudentModal').style.display = 'none';
+    window.renderStudentList();
+};
+
+// ދަރިވަރަކު ފުހެލުން
+window.deleteStudent = (idx) => {
+    if(confirm("މި ދަރިވަރު ފުހެލަން ބޭނުންތަ؟")) {
+        classesData[currentClassIdx].students.splice(idx, 1);
+        updateFirebase();
+        window.renderStudentList();
+    }
+};
+
+// ޕާސްވޯޑް ރިސެޓްކުރުން
+window.resetStudentPassword = (idx) => {
+    const s = classesData[currentClassIdx].students[idx];
+    if (confirm(`${s.name} ގެ ޕާސްވޯޑް ރިސެޓް ކުރަން ބޭނުންތަ؟`)) {
+        s.password = ""; 
+        updateFirebase();
+        window.renderStudentList();
+        alert("ޕާސްވޯޑް ރިސެޓް ކުރެވިއްޖެ. ދެން ދަރިވަރު ލޮގިންވާއިރު އާ ޕާސްވޯޑެއް ހެދޭނެ.");
+    }
+};
 
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
