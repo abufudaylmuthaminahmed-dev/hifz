@@ -1002,7 +1002,12 @@ window.resetStudentPassword = (idx) => {
             const s = classesData[currentClassIdx].students[currentStudentIdx]; if(!s.history) s.history =[]; 
             const ssIdx = document.getElementById('startSurah').selectedIndex; const esIdx = document.getElementById('endSurah').selectedIndex; const startSurahName = SURAH_NAMES_AR[ssIdx] || "-"; const endSurahName = SURAH_NAMES_AR[esIdx] || "-";
             const record = { type: currentSessionType, date: document.getElementById('recDate').value, page: startP, endPage: endP, startDetails: { surah: startSurahName, ayah: document.getElementById('startAyah').value }, endDetails: { surah: endSurahName, ayah: document.getElementById('endAyah').value }, mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes }; 
-            if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); alert("ސޭވް ކުރެވިއްޖެ"); window.closeRecorder(); 
+            if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); 
+            alert("ސޭވް ކުރެވިއްޖެ"); 
+            
+            // ރެކޯޑަރ ޕޭޖް ފޮރުވާފައި ސީދާ އެ ބައެއްގެ ހިސްޓްރީއަށް ދިއުން
+            document.getElementById('recorder-page').classList.add('hidden');
+            window.openCategoryPage(currentSessionType);
         };
 
         window.viewLessonRecord = (rec) => { isViewMode = true; currentMistakes = rec.mistakeDetails ||[]; document.getElementById('recorderTitle').innerText = "View Record"; document.getElementById('recSaveBtn').style.display = 'none'; document.getElementById('viewModeBadge').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; document.getElementById('endPage').value = rec.endPage; document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); currentRecViewPage = parseInt(rec.page); window.loadSmartPage(true); };
