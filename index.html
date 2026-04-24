@@ -1006,21 +1006,58 @@ window.resetStudentPassword = (idx) => {
 
         window.deleteHistoryRecord = (index) => { if(confirm("މި ރެކޯޑް ފޮހެލަން ބޭނުންވޭތަ؟")) { const s = currentUserType==='student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; s.history.splice(index, 1); updateFirebase(); window.renderHistory(s, currentUserType==='student'?'studentDashHistory':'categoryHistoryList', currentSessionType); } }
         
-        window.editRecord = (index, type) => { 
-            const student = currentUserType==='student'?currentStudentObj:classesData[currentClassIdx].students[currentStudentIdx]; 
-            const rec = student.history[index]; isViewMode = false; editingRecordIndex = index; 
+window.editRecord = (index, type) => { 
+            const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; 
+            const rec = student.history[index]; 
+            isViewMode = false; 
+            editingRecordIndex = index; 
+
+            // އާ ފިލާވަޅު ނުވަތަ މުރާޖަޢާ އެޑިޓްކުރުން
             if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') { 
-                currentMistakes = rec.mistakeDetails ||[]; currentSessionType = rec.type; 
-                document.getElementById('recorderTitle').innerText = "Edit Record"; document.getElementById('recSaveBtn').innerText = "Update"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('recDate').value = rec.date; document.getElementById('startPage').value = rec.page; 
+                currentMistakes = rec.mistakeDetails || []; 
+                currentSessionType = rec.type; 
+                document.getElementById('recorderTitle').innerText = "Edit Record"; 
+                document.getElementById('recSaveBtn').innerText = "Update"; 
+                document.getElementById('recSaveBtn').style.display = 'block'; 
+                document.getElementById('recDate').value = rec.date; 
+                document.getElementById('startPage').value = rec.page; 
                 currentRecViewPage = parseInt(rec.page); 
                 window.loadSmartPage(true).then(() => { 
-                    document.getElementById('endPage').value = rec.endPage; window.populateSurahSelects();
-                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
-                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
+                    document.getElementById('endPage').value = rec.endPage; 
+                    window.populateSurahSelects();
+                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); 
+                    if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
+                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); 
+                    if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
                 }); 
-                document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; document.getElementById('recorder-page').classList.remove('hidden'); 
+                document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; 
+                document.getElementById('recorder-page').classList.remove('hidden'); 
             } 
-        }
+            // ޖުޒުއު އިމްތިޙާން އެޑިޓްކުރުން
+            else if(type === 'juz_exam') {
+                document.getElementById('juzExamTitle').innerText = "Edit Juz Exam";
+                document.getElementById('juz-exam-page').classList.remove('hidden');
+                document.getElementById('liveScore').innerText = rec.score + "%";
+                document.getElementById('saveExamBtn').style.display = 'block';
+                document.getElementById('saveExamBtn').innerText = "Update 💾";
+                
+                document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00";
+                document.getElementById('countTeacher').value = rec.details?.teacherMistakes || 0;
+                document.getElementById('countSelf').value = rec.details?.selfMistakes || 0;
+                document.getElementById('scoreTajweed').value = rec.details?.tajweed || 10;
+                document.getElementById('scoreFluency').value = rec.details?.fluency || 5;
+                
+                examState = {
+                    juz: rec.juz,
+                    mode: rec.status === 'partial' ? 'part1' : 'full',
+                    mistakesTeacher: rec.details?.teacherMistakes || 0,
+                    mistakesSelf: rec.details?.selfMistakes || 0,
+                    mistakesList: rec.mistakeDetails || [],
+                    currentPage: ((rec.juz - 1) * 20) + 2
+                };
+                window.loadExamPage(examState.currentPage);
+            }
+        };
 
         // RECORDER LOGIC
         window.openRecorder = (type) => { editingRecordIndex = -1; isViewMode = false; currentMistakes =[]; currentSessionType = type; document.getElementById('recorderTitle').innerText = "ރެކޯޑް"; document.getElementById('recSaveBtn').innerText = "Save"; document.getElementById('recSaveBtn').style.display = 'block'; document.getElementById('viewModeBadge').style.display = 'none'; document.getElementById('recDate').valueAsDate = new Date(); document.getElementById('mistakeCountDisplay').innerText = 0; document.getElementById('mushafContent').innerHTML = '<p style="color:#999; margin-top:100px;">ޞަފްޙާ ޖައްސަވާ</p>'; window.populateSurahSelects(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let initialPage = 1; if(s.history) { const recs = s.history.filter(r => r.type === type); if(recs.length > 0) { const last = recs[recs.length-1]; const nextP = parseInt(last.endPage || last.page) + 1; if(nextP <= 604) initialPage = nextP; } } document.getElementById('startPage').value = initialPage; currentRecViewPage = initialPage; window.loadSmartPage(); document.getElementById('recorder-page').classList.remove('hidden'); };
@@ -1100,12 +1137,57 @@ window.resetStudentPassword = (idx) => {
         window.startTimer = () => { if(examState.timer) return; let pts = document.getElementById('stopwatchDisplay').value.split(':'); if(pts.length===3) examState.seconds = (+pts[0])*3600+(+pts[1])*60+(+pts[2]); else examState.seconds = 0; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').value = d.toISOString().substr(11,8); }, 1000); };
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
-        window.saveJuzExamPart = () => { 
-            const score = window.calcScore(); const s = classesData[currentClassIdx].students[currentStudentIdx]; let duration = document.getElementById('stopwatchDisplay').value; 
-            let details = { teacherMistakes: examState.mistakesTeacher, selfMistakes: examState.mistakesSelf, tajweed: parseFloat(document.getElementById('scoreTajweed').value || 10), fluency: parseFloat(document.getElementById('scoreFluency').value || 5), mutashabihMarks: (isPeerExam || examState.mode==='part1') ? 0 : (parseFloat(document.getElementById('q1_score').value || 0) + parseFloat(document.getElementById('q2_score').value || 0)) }; 
+window.saveJuzExamPart = () => { 
+            const score = window.calcScore(); 
+            const s = classesData[currentClassIdx].students[currentStudentIdx]; 
+            let duration = document.getElementById('stopwatchDisplay').value; 
+            let details = { 
+                teacherMistakes: examState.mistakesTeacher, 
+                selfMistakes: examState.mistakesSelf, 
+                tajweed: parseFloat(document.getElementById('scoreTajweed').value || 10), 
+                fluency: parseFloat(document.getElementById('scoreFluency').value || 5), 
+                mutashabihMarks: (isPeerExam || examState.mode==='part1') ? 0 : (parseFloat(document.getElementById('q1_score').value||0) + parseFloat(document.getElementById('q2_score').value||0)) 
+            }; 
             const todayISO = window.getFormattedDate();
-            if(isPeerExam) { const examiner = document.getElementById('examinerName').value || "Unknown"; const entry = { type: 'juz_exam', mode: examState.mode, juz: examState.juz, score: score, duration: duration, details: details, mistakeDetails: examState.mistakesList, recitedTo: examiner, date: todayISO, status: 'pending', isExternal: true }; if(!s.pendingData) s.pendingData =[]; s.pendingData.push(entry); updateFirebase(); alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); window.closeJuzExam(); } 
-            else { if(!s.history) s.history =[]; if(!s.juzExams) s.juzExams={}; if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; if(examState.mode === 'part1') { s.juzExams[examState.juz].part1 = score; s.history.push({ type:'juz_exam', status:'partial', date:todayISO, juz:examState.juz, score:score, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } else { let p1 = s.juzExams[examState.juz].part1 || 0; let final = (examState.mode === 'full') ? score : (p1 + score) / 2; s.history.push({ type:'juz_exam', status:'completed', date:todayISO, juz:examState.juz, score:final, duration:duration, details: details, mistakeDetails: examState.mistakesList }); } updateFirebase(); alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); window.closeJuzExam(); window.openCategoryPage('juz_exam'); }
+
+            if(isPeerExam) { 
+                const examiner = document.getElementById('examinerName').value || "Unknown"; 
+                const entry = { type: 'juz_exam', mode: examState.mode, juz: examState.juz, score: score, duration: duration, details: details, mistakeDetails: examState.mistakesList, recitedTo: examiner, date: todayISO, status: 'pending', isExternal: true }; 
+                if(!s.pendingData) s.pendingData =[]; s.pendingData.push(entry); 
+                updateFirebase(); 
+                alert("އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); 
+                window.closeJuzExam(); 
+            } 
+            else { 
+                if(!s.history) s.history =[]; 
+                const examRecord = { 
+                    type: 'juz_exam', 
+                    status: examState.mode === 'part1' ? 'partial' : 'completed', 
+                    date: todayISO, juz: examState.juz, score: score, duration: duration, details: details, mistakeDetails: examState.mistakesList 
+                };
+
+                // އެޑިޓްކުރާނަމަ ކުރީގެ ރެކޯޑް އަޕްޑޭޓްކުރުން
+                if (typeof editingRecordIndex !== 'undefined' && editingRecordIndex > -1) {
+                    s.history[editingRecordIndex] = examRecord;
+                    editingRecordIndex = -1; 
+                } else {
+                    if(!s.juzExams) s.juzExams={}; 
+                    if(!s.juzExams[examState.juz]) s.juzExams[examState.juz]={}; 
+                    if(examState.mode === 'part1') { 
+                        s.juzExams[examState.juz].part1 = score; 
+                    } else { 
+                        let p1 = s.juzExams[examState.juz].part1 || 0; 
+                        if(examState.mode === 'part2') examRecord.score = (p1 + score) / 2;
+                    }
+                    s.history.push(examRecord); 
+                }
+
+                updateFirebase(); 
+                alert("ސޭވް ކުރެވިއްޖެ!"); 
+                window.closeJuzExam(); 
+                window.openCategoryPage('juz_exam'); 
+            }
+        };
         };
         window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00"; document.getElementById('countTeacher').value = rec.details?.teacherMistakes||0; document.getElementById('countSelf').value = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; document.getElementById('examinerNameField').style.display = 'none'; isViewMode = true; examState.mistakesList = rec.mistakeDetails ||[]; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
