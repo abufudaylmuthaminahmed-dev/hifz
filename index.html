@@ -1012,23 +1012,32 @@ window.editRecord = (index, type) => {
             isViewMode = false; 
             editingRecordIndex = index; 
 
-            // އާ ފިލާވަޅު ނުވަތަ މުރާޖަޢާ އެޑިޓްކުރުން
+            // އާ ފިލާވަޅު، ކުރު ނުވަތަ ދިގު މުރާޖަޢާ އެޑިޓްކުރުން
             if(type === 'new_lesson' || type === 'short_rev' || type === 'long_rev') { 
                 currentMistakes = rec.mistakeDetails || []; 
                 currentSessionType = rec.type; 
                 document.getElementById('recorderTitle').innerText = "Edit Record"; 
                 document.getElementById('recSaveBtn').innerText = "Update"; 
                 document.getElementById('recSaveBtn').style.display = 'block'; 
+                document.getElementById('viewModeBadge').style.display = 'none';
                 document.getElementById('recDate').value = rec.date; 
                 document.getElementById('startPage').value = rec.page; 
                 currentRecViewPage = parseInt(rec.page); 
                 window.loadSmartPage(true).then(() => { 
                     document.getElementById('endPage').value = rec.endPage; 
                     window.populateSurahSelects();
-                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails.surah); 
-                    if(sIndex > -1) { document.getElementById('startSurah').value = sIndex + 1; window.updateAyahOptions('startAyah', sIndex); document.getElementById('startAyah').value = rec.startDetails.ayah; }
-                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails.surah); 
-                    if(eIndex > -1) { document.getElementById('endSurah').value = eIndex + 1; window.updateAyahOptions('endAyah', eIndex); document.getElementById('endAyah').value = rec.endDetails.ayah; }
+                    let sIndex = SURAH_NAMES_AR.indexOf(rec.startDetails?.surah); 
+                    if(sIndex > -1) { 
+                        document.getElementById('startSurah').value = sIndex + 1; 
+                        window.updateAyahOptions('startAyah', sIndex); 
+                        document.getElementById('startAyah').value = rec.startDetails.ayah; 
+                    }
+                    let eIndex = SURAH_NAMES_AR.indexOf(rec.endDetails?.surah); 
+                    if(eIndex > -1) { 
+                        document.getElementById('endSurah').value = eIndex + 1; 
+                        window.updateAyahOptions('endAyah', eIndex); 
+                        document.getElementById('endAyah').value = rec.endDetails.ayah; 
+                    }
                 }); 
                 document.getElementById('mistakeCountDisplay').innerText = rec.mistakesCount; 
                 document.getElementById('recorder-page').classList.remove('hidden'); 
@@ -1040,6 +1049,7 @@ window.editRecord = (index, type) => {
                 document.getElementById('liveScore').innerText = rec.score + "%";
                 document.getElementById('saveExamBtn').style.display = 'block';
                 document.getElementById('saveExamBtn').innerText = "Update 💾";
+                document.getElementById('examinerNameField').style.display = 'none';
                 
                 document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00";
                 document.getElementById('countTeacher').value = rec.details?.teacherMistakes || 0;
@@ -1108,10 +1118,9 @@ window.editRecord = (index, type) => {
             const s = classesData[currentClassIdx].students[currentStudentIdx]; if(!s.history) s.history =[]; 
             const ssIdx = document.getElementById('startSurah').selectedIndex; const esIdx = document.getElementById('endSurah').selectedIndex; const startSurahName = SURAH_NAMES_AR[ssIdx] || "-"; const endSurahName = SURAH_NAMES_AR[esIdx] || "-";
             const record = { type: currentSessionType, date: document.getElementById('recDate').value, page: startP, endPage: endP, startDetails: { surah: startSurahName, ayah: document.getElementById('startAyah').value }, endDetails: { surah: endSurahName, ayah: document.getElementById('endAyah').value }, mistakesCount: currentMistakes.length, mistakeDetails: currentMistakes }; 
-            if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } updateFirebase(); 
+            if(editingRecordIndex > -1) { s.history[editingRecordIndex] = record; } else { s.history.push(record); } 
+            updateFirebase(); 
             alert("ސޭވް ކުރެވިއްޖެ"); 
-            
-            // ރެކޯޑަރ ޕޭޖް ފޮރުވާފައި ސީދާ އެ ބައެއްގެ ހިސްޓްރީއަށް ދިއުން
             document.getElementById('recorder-page').classList.add('hidden');
             window.openCategoryPage(currentSessionType);
         };
@@ -1137,7 +1146,8 @@ window.editRecord = (index, type) => {
         window.startTimer = () => { if(examState.timer) return; let pts = document.getElementById('stopwatchDisplay').value.split(':'); if(pts.length===3) examState.seconds = (+pts[0])*3600+(+pts[1])*60+(+pts[2]); else examState.seconds = 0; examState.timer = setInterval(() => { examState.seconds++; let d = new Date(0); d.setSeconds(examState.seconds); document.getElementById('stopwatchDisplay').value = d.toISOString().substr(11,8); }, 1000); };
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
-window.saveJuzExamPart = () => { 
+
+        window.saveJuzExamPart = () => { 
             const score = window.calcScore(); 
             const s = classesData[currentClassIdx].students[currentStudentIdx]; 
             let duration = document.getElementById('stopwatchDisplay').value; 
@@ -1188,7 +1198,7 @@ window.saveJuzExamPart = () => {
                 window.openCategoryPage('juz_exam'); 
             }
         };
-        };
+
         window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00"; document.getElementById('countTeacher').value = rec.details?.teacherMistakes||0; document.getElementById('countSelf').value = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; document.getElementById('examinerNameField').style.display = 'none'; isViewMode = true; examState.mistakesList = rec.mistakeDetails ||[]; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
         window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
