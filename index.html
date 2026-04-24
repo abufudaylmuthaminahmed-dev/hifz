@@ -5,6 +5,7 @@
 <title>إتقان - Hifz Program (Master Build)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
@@ -345,6 +346,21 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <div class="st-stat-item"><div class="st-stat-val st-color-3" id="studentTotalJuz">0</div><div class="st-stat-lbl">ޖުމްލަ ޙިފްޡް<br>(ޖުޒުއު)</div></div>
                 </div>
             </div>
+            <!-- ޗާޓްތައް ހިމެނޭ ބައި -->
+            <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 0; margin-bottom: 20px;">
+                <div class="student-stat-container" style="margin-bottom: 0; padding: 15px; background: white;">
+                    <h4 style="text-align: center; margin-top: 0; color: var(--primary); font-family: var(--font-heading);">ޖުމްލަ ޙިފްޡް (30 ޖުޒުއު)</h4>
+                    <div style="max-height: 250px; position: relative; display: flex; justify-content: center;">
+                        <canvas id="overallProgressChart"></canvas>
+                    </div>
+                </div>
+                <div class="student-stat-container" style="margin-bottom: 0; padding: 15px; background: white;">
+                    <h4 style="text-align: center; margin-top: 0; color: var(--primary); font-family: var(--font-heading);">ފާއިތުވި 7 ދުވަސް (ޞަފްޙާ)</h4>
+                    <div style="max-height: 250px; position: relative;">
+                        <canvas id="monthlyActivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
             <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px;">
                 <button class="big-btn" onclick="window.openBulkEntryModal()" style="background:var(--st-primary); font-size:14px;">📜 ކުރީގެ ޑޭޓާ އެންޓަރކުރުން</button>
                 <button class="big-btn btn-orange" onclick="window.openExternalRecModal()" style="font-size:14px;">🗣 އެހެން ފަރާތަކަށް ކިޔައިދިނުން</button>
@@ -537,6 +553,7 @@ onValue(ref(db, 'hifz_system_v1'), (snapshot) => {
                     if(f) { currentStudentObj=f; break; } 
                 } 
                 window.calculateStudentProgress(currentStudentObj); 
+                window.renderStudentCharts(student);
             }
         });
 
@@ -1312,6 +1329,73 @@ window.goToStudentFromProgress = (cIdx, sIdx) => {
     
     // ގްރޭޑިންގ މެނޫ ޕޭޖު ހުޅުވުން
     window.openPage('grading-menu-page');
+};
+        let overallChart = null;
+let activityChart = null;
+
+window.renderStudentCharts = (student) => {
+    // 1. Overall Progress Chart (Pie Chart)
+    const ctx1 = document.getElementById('overallProgressChart').getContext('2d');
+    const totalJuz = 30;
+    const completedJuz = parseFloat(document.getElementById('studentTotalJuz').innerText) || 0;
+    const remainingJuz = Math.max(0, totalJuz - completedJuz);
+
+    if (overallChart) overallChart.destroy();
+    overallChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['ނިމިފައި', 'ބާކީ'],
+            datasets: [{
+                data: [completedJuz, remainingJuz],
+                backgroundColor: ['#27ae60', '#ecf0f1'],
+                borderWidth: 0
+            }]
+        },
+        options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // 2. Monthly Activity Chart (Bar Chart)
+    const ctx2 = document.getElementById('monthlyActivityChart').getContext('2d');
+    const last7Days = [];
+    const pagesPerDay = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        last7Days.push(d.getDate() + "/" + (d.getMonth()+1));
+        
+        // އެ ދުވަހަކު ކިޔެވި ޞަފްޙާ ގުނުން
+        let dayPages = 0;
+        if (student.history) {
+            student.history.forEach(h => {
+                if (h.date === dateStr && h.type === 'new_lesson') {
+                    const startP = parseInt(h.page) || 0;
+                    const endP = parseInt(h.endPage) || startP;
+                    dayPages += (endP - startP) + 1;
+                }
+            });
+        }
+        pagesPerDay.push(dayPages);
+    }
+
+    if (activityChart) activityChart.destroy();
+    activityChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: last7Days,
+            datasets: [{
+                label: 'ޞަފްޙާ',
+                data: pagesPerDay,
+                backgroundColor: '#117a65',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+            plugins: { legend: { display: false } }
+        }
+    });
 };
     </script>
 </body>
