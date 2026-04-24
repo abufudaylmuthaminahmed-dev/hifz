@@ -1100,16 +1100,57 @@ window.editRecord = (index, type) => {
         window.handleStartPageChange = () => { let val = parseInt(document.getElementById('startPage').value); if(val) { currentRecViewPage = val; window.loadSmartPage(); window.validateRecorderPages(); } }
         window.validateRecorderPages = () => { const sp = parseInt(document.getElementById('startPage').value); const ep = parseInt(document.getElementById('endPage').value); if(sp && ep && ep < sp) { alert("ނިމޭ ޞަފްޙާ ފެށޭ ޞަފްޙާއަށްވުރެ ކުޑަ ނުކުރެވޭނެއެވެ."); document.getElementById('endPage').value = sp; } }
         
-        window.loadSmartPage = async (applyHighlights=false, isNavigating=false) => { 
-            const page = currentRecViewPage; if(!page) return; 
-            const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); const data = await res.json(); window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); 
-            if(!isViewMode && data.data.ayahs.length > 0) { 
-                if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { document.getElementById('endPage').value = page; const first = data.data.ayahs[0]; window.populateSurahSelects(); document.getElementById('startSurah').value = first.surah.number; window.updateAyahOptions('startAyah', first.surah.number-1); document.getElementById('startAyah').value = first.numberInSurah; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
-                else if(isNavigating) { document.getElementById('endPage').value = page; const last = data.data.ayahs[data.data.ayahs.length-1]; document.getElementById('endSurah').value = last.surah.number; window.updateAyahOptions('endAyah', last.surah.number-1); document.getElementById('endAyah').value = last.numberInSurah; } 
-            } 
-        };
+window.loadSmartPage = async (applyHighlights=false, isNavigating=false, navigationDir=0) => { 
+    const page = currentRecViewPage; 
+    if(!page) return; 
+    const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`); 
+    const data = await res.json(); 
+    window.renderMushafText(data.data.ayahs, 'mushafContent', currentMistakes, false); 
+    
+    if(!isViewMode && data.data.ayahs.length > 0) { 
+        const firstAyah = data.data.ayahs[0];
+        const lastAyah = data.data.ayahs[data.data.ayahs.length-1];
+
+        // ފުރަތަމަ ފަހަރަށް ޕޭޖް ހުޅުވާއިރު (Initial Load)
+        if(editingRecordIndex === -1 && !isNavigating && page == document.getElementById('startPage').value) { 
+            document.getElementById('endPage').value = page; 
+            window.populateSurahSelects();
+            // ފެށޭ ބައި
+            document.getElementById('startSurah').value = firstAyah.surah.number; 
+            window.updateAyahOptions('startAyah', firstAyah.surah.number-1); 
+            document.getElementById('startAyah').value = firstAyah.numberInSurah; 
+            // ނިމޭ ބައި
+            document.getElementById('endSurah').value = lastAyah.surah.number; 
+            window.updateAyahOptions('endAyah', lastAyah.surah.number-1); 
+            document.getElementById('endAyah').value = lastAyah.numberInSurah; 
+        } 
+        // މުޞްޙަފްގައި ޞަފްޙާ ޖައްސާއިރު (Navigation)
+        else if(isNavigating) { 
+            if (navigationDir > 0) { 
+                // ކުރިއަށް ދާނަމަ ނިމޭ ޞަފްޙާ ބަދަލުކުރުން
+                document.getElementById('endPage').value = page; 
+                document.getElementById('endSurah').value = lastAyah.surah.number; 
+                window.updateAyahOptions('endAyah', lastAyah.surah.number-1); 
+                document.getElementById('endAyah').value = lastAyah.numberInSurah; 
+            } else if (navigationDir < 0) { 
+                // ފަހަތަށް ދާނަމަ ފެށޭ ޞަފްޙާ ބަދަލުކުރުން
+                document.getElementById('startPage').value = page; 
+                document.getElementById('startSurah').value = firstAyah.surah.number; 
+                window.updateAyahOptions('startAyah', firstAyah.surah.number-1); 
+                document.getElementById('startAyah').value = firstAyah.numberInSurah; 
+            }
+        } 
+    } 
+};
         
-        window.changeRecPage = (dir) => { let p = currentRecViewPage + dir; if(p > 0 && p <= 604) { currentRecViewPage = p; window.loadSmartPage(false, true); } }
+        window.changeRecPage = (dir) => { 
+    let p = currentRecViewPage + dir; 
+    if(p > 0 && p <= 604) { 
+        currentRecViewPage = p; 
+        // ފަހަތަށް ދާނަމަ -1، ކުރިއަށް ދާނަމަ 1 ފޮނުވާނެ
+        window.loadSmartPage(false, true, dir); 
+    } 
+};
         
         window.renderMushafText = (ayahs, target, highlights, isExam) => { 
             const container = document.getElementById(target); container.innerHTML = ''; if(ayahs.length === 0) return;
