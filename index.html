@@ -553,9 +553,10 @@ onValue(ref(db, 'hifz_system_v1'), (snapshot) => {
                     if(f) { currentStudentObj=f; break; } 
                 } 
                 window.calculateStudentProgress(currentStudentObj); 
-                window.renderStudentCharts(student);
-            }
-        });
+                
+                // މި ލައިން މިގޮތަށް ބަދަލުކުރޭ (student އިން currentStudentObj އަށް)
+                window.renderStudentCharts(currentStudentObj);
+            }        });
 
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
         window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
