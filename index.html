@@ -196,7 +196,7 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         <div id="grading-menu-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="gradingStudentName">Student</div>
-                <div class="header-actions"><button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button><button class="icon-btn" onclick="window.openPage('grading-student-page')">⬅</button></div>
+                <div class="header-actions"><button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button><button class="icon-btn" onclick="window.handleGradingMenuBack()">⬅</button></div>
             </div>
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
@@ -485,7 +485,8 @@ if (localStorage.getItem('hifz_session')) {
         let isPeerExam = false; let currentPendingExamData = null; let currentPendingExamIndices = null; 
         let activeHistorySemesterIdx = -1; 
         let currentEditStudentIdx = -1; // އެޑިޓްކުރާ ދަރިވަރުގެ އިންޑެކްސް ބަލަހައްޓަން
-
+        let navigationSource = 'grading'; // އައީ ކޮން ޞަފްޙާއަކުންކަން ބަލަން ('grading' ނުވަތަ 'progress')
+        
         window.getFormattedDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
         // ފަޔަރބޭސް ޑޭޓާ ލޯޑުވުމުން އޮޓޯ ލޮގިން ހަދާ ބައި
@@ -747,7 +748,13 @@ window.resetStudentPassword = (idx) => {
 
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
-        window.openStudentMenu = (i) => { currentStudentIdx = i; document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; window.openPage('grading-menu-page'); }
+       window.openStudentMenu = (i) => { 
+    currentStudentIdx = i; 
+    document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; 
+    
+    navigationSource = 'grading'; // އައީ ގްރޭޑިންގ (ފިލާވަޅު ނަގާ) ބައިންކަން ބުނެދިނުން
+    window.openPage('grading-menu-page'); 
+};
         
         window.openCategoryPage = (type) => { 
             currentSessionType = type; 
@@ -1320,15 +1327,14 @@ window.downloadCategorizedStudentExcel = () => {
     // ފައިލް ޑައުންލޯޑް ކުރުން
     XLSX.writeFile(wb, fileName);
 };
-        // ޕްރޮގްރެސް ޕޭޖުން ދަރިވަރުގެ ގްރޭޑިންގ މެނޫއަށް ދިއުން
 window.goToStudentFromProgress = (cIdx, sIdx) => {
     currentClassIdx = parseInt(cIdx);
     currentStudentIdx = parseInt(sIdx);
     
-    // ދަރިވަރުގެ ނަން ސެޓްކުރުން
+    // ދަރިވަރުގެ ނަން ޖެހުން
     document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[currentStudentIdx].name;
     
-    // ގްރޭޑިންގ މެނޫ ޕޭޖު ހުޅުވުން
+    navigationSource = 'progress'; // އައީ ޕްރޮގްރެސް ޕޭޖުންކަން މި ލައިނުން ބުނެދޭނެ
     window.openPage('grading-menu-page');
 };
         let overallChart = null;
@@ -1397,6 +1403,14 @@ window.renderStudentCharts = (student) => {
             plugins: { legend: { display: false } }
         }
     });
+};
+        // ގްރޭޑިންގ މެނޫއިން ބެކްއަށް ދާއިރު އައި ތަނަކަށް ފޮނުވާލުން
+window.handleGradingMenuBack = () => {
+    if (navigationSource === 'progress') {
+        window.openPage('progress-page');
+    } else {
+        window.openPage('grading-student-page');
+    }
 };
     </script>
 </body>
