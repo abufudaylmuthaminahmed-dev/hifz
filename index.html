@@ -193,11 +193,51 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
             <div id="gradingStudentList" class="grid-container"></div>
         </div>
         
-        <div id="grading-menu-page" class="container hidden">
+<div id="grading-menu-page" class="container hidden">
             <div class="app-header">
                 <div class="header-title" id="gradingStudentName">Student</div>
-                <div class="header-actions"><button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button><button class="icon-btn" onclick="window.handleGradingMenuBack()">⬅</button></div>
+                <div class="header-actions">
+                    <button class="icon-btn nav-stud-btn" onclick="window.goToStudentList()">👥</button>
+                    <!-- ބެކް ބަޓަން: އައި ތަނަކަށް އެނބުރިދާ ގޮތަށް ބަދަލުކުރެވިފައި -->
+                    <button class="icon-btn" onclick="window.handleGradingMenuBack()">⬅</button>
+                </div>
             </div>
+
+            <!-- ދަރިވަރުގެ ސްޓެޓިސްޓިކްސް (މުދައްރިސަށް ފެންނަ ބައި) -->
+            <div id="teacher-student-view-stats" style="margin-top: 20px;">
+                <div class="student-stat-container">
+                    <div class="target-box">
+                        <div class="target-header">
+                            <span id="t_targetLabel">މި ޓާމްގެ ޓާރގެޓް: 0 ޖުޒުއު</span>
+                            <span id="t_targetPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-bg"><div id="t_targetProgress" class="progress-bar-fill"></div></div>
+                        <div id="t_targetMsg" class="target-msg">ހިއްވަރުކުރޭ!</div>
+                    </div><br>
+                    <div class="st-stats-grid">
+                        <div class="st-stat-item"><div class="st-stat-val" id="t_studentSemPages" style="color:var(--st-primary)">0</div><div class="st-stat-lbl">މި ސެމިސްޓަރ<br>(ޞަފްޙާ)</div></div>
+                        <div class="st-stat-item"><div class="st-stat-val" id="t_studentSemJuz" style="color:#e67e22">0</div><div class="st-stat-lbl">މި ސެމިސްޓަރ<br>(ޖުޒުއު)</div></div>
+                        <div class="st-stat-item"><div class="st-stat-val" id="t_studentTotalJuz" style="color:#27ae60">0</div><div class="st-stat-lbl">ޖުމްލަ ޙިފްޡް<br>(ޖުޒުއު)</div></div>
+                    </div>
+                </div>
+
+                <!-- ޗާޓްތައް ދައްކާ ބައި -->
+                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; margin-bottom: 20px;">
+                    <div class="student-stat-container" style="margin-bottom: 0; padding: 15px; background: white;">
+                        <h4 style="text-align: center; margin-top: 0; color: var(--primary);">ޖުމްލަ ޙިފްޡް (30 ޖުޒުއު)</h4>
+                        <div style="height: 200px; position: relative; display: flex; justify-content: center;">
+                            <canvas id="t_overallProgressChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="student-stat-container" style="margin-bottom: 0; padding: 15px; background: white;">
+                        <h4 style="text-align: center; margin-top: 0; color: var(--primary);">ފާއިތުވި 7 ދުވަސް (ޞަފްޙާ)</h4>
+                        <div style="height: 200px; position: relative;">
+                            <canvas id="t_monthlyActivityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
@@ -748,12 +788,17 @@ window.resetStudentPassword = (idx) => {
 
         window.openGradingClassList = () => { const div = document.getElementById('gradingClassList'); div.innerHTML=''; if(classesData) classesData.forEach((c, i) => div.innerHTML += `<div class="card-btn" onclick="window.openGradingStudentList(${i})"><h4 class="card-title">${c.name}</h4></div>`); window.openPage('grading-class-page'); }
         window.openGradingStudentList = (i) => { currentClassIdx = i; const div = document.getElementById('gradingStudentList'); div.innerHTML=''; const students = classesData[i].students ||[]; students.forEach((s, idx) => div.innerHTML += `<div class="card-btn" onclick="window.openStudentMenu(${idx})"><h4 class="card-title">${s.name}</h4></div>`); window.openPage('grading-student-page'); }
-       window.openStudentMenu = (i) => { 
+window.openStudentMenu = (i) => { 
     currentStudentIdx = i; 
-    document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[i].name; 
+    const student = classesData[currentClassIdx].students[i];
+    document.getElementById('gradingStudentName').innerText = student.name; 
     
-    navigationSource = 'grading'; // އައީ ގްރޭޑިންގ (ފިލާވަޅު ނަގާ) ބައިންކަން ބުނެދިނުން
+    navigationSource = 'grading'; 
     window.openPage('grading-menu-page'); 
+    
+    // ޗާޓާއި ޕްރޮގްރެސް ދެއްކުން (މުދައްރިސް ބަޔަށް)
+    window.calculateStudentProgress(student, true); 
+    window.renderStudentCharts(student, true);
 };
         
         window.openCategoryPage = (type) => { 
@@ -918,20 +963,34 @@ window.resetStudentPassword = (idx) => {
         
         window.downloadProgressExcel = () => { const table = document.getElementById("progressTable"); if(!table) return; const wb = XLSX.utils.table_to_book(table, {sheet: "Progress"}); XLSX.writeFile(wb, "Hifz_Progress_Report.xlsx"); }
 
-        window.calculateStudentProgress = (student) => { 
+window.calculateStudentProgress = (student, isTeacherView = false) => { 
             if(!semesters.length) return; 
-            const latestSem = semesters[semesters.length - 1]; const start = new Date(latestSem.startDate); const end = new Date(latestSem.endDate); 
+            const latestSem = semesters[semesters.length - 1]; 
+            const start = new Date(latestSem.startDate); 
+            const end = new Date(latestSem.endDate); 
             const stats = window.calculateSemesterStats(student, start, end);
-            document.getElementById('studentSemPages').innerText = stats.balancePages; document.getElementById('studentSemJuz').innerText = stats.semJuzCount; document.getElementById('studentTotalJuz').innerText = stats.totalJuzCount; 
-
-            let level = parseInt(student.level) || 1; let target = (level >= 3) ? 3 : 2; let achieved = stats.semJuzCount;
-            let percent = Math.min(100, (achieved / target) * 100); if (isNaN(percent)) percent = 0;
-
-            document.getElementById('targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`; document.getElementById('targetPercent').innerText = `${Math.round(percent)}%`; document.getElementById('targetProgress').style.width = `${percent}%`;
             
-            let msg = "ހިއްވަރުކުރޭ!"; if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!";
-            document.getElementById('targetMsg').innerText = msg;
-        }
+            const prefix = isTeacherView ? 't_' : ''; 
+
+            document.getElementById(prefix + 'studentSemPages').innerText = stats.balancePages; 
+            document.getElementById(prefix + 'studentSemJuz').innerText = stats.semJuzCount; 
+            document.getElementById(prefix + 'studentTotalJuz').innerText = stats.totalJuzCount; 
+
+            let level = parseInt(student.level) || 1; 
+            let target = (level >= 3) ? 3 : 2; 
+            let achieved = stats.semJuzCount;
+            let percent = Math.min(100, (achieved / target) * 100); 
+            if (isNaN(percent)) percent = 0;
+
+            document.getElementById(prefix + 'targetLabel').innerText = `މި ޓާމްގެ ޓާރގެޓް: ${target} ޖުޒުއު`; 
+            document.getElementById(prefix + 'targetPercent').innerText = `${Math.round(percent)}%`; 
+            document.getElementById(prefix + 'targetProgress').style.width = `${percent}%`;
+            
+            let msg = "ހިއްވަރުކުރޭ!"; 
+            if(percent >= 100) msg = "މާޝާﷲ! ޓާރގެޓް ހާސިލްވެއްޖެ!"; 
+            else if(percent >= 50) msg = "ވަރަށް ރަނގަޅު، ކުރިއަށް!";
+            document.getElementById(prefix + 'targetMsg').innerText = msg;
+        };
 
         window.populateSurahSelects = () => {
             const sSel = document.getElementById('startSurah'); const eSel = document.getElementById('endSurah');
@@ -1371,88 +1430,98 @@ window.downloadCategorizedStudentExcel = () => {
 window.goToStudentFromProgress = (cIdx, sIdx) => {
     currentClassIdx = parseInt(cIdx);
     currentStudentIdx = parseInt(sIdx);
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
+    document.getElementById('gradingStudentName').innerText = student.name;
     
-    // ދަރިވަރުގެ ނަން ޖެހުން
-    document.getElementById('gradingStudentName').innerText = classesData[currentClassIdx].students[currentStudentIdx].name;
-    
-    navigationSource = 'progress'; // އައީ ޕްރޮގްރެސް ޕޭޖުންކަން މި ލައިނުން ބުނެދޭނެ
+    navigationSource = 'progress'; 
     window.openPage('grading-menu-page');
-};
-        let overallChart = null;
-let activityChart = null;
-
-window.renderStudentCharts = (student) => {
-    // 1. Overall Progress Chart (Pie Chart)
-    const ctx1 = document.getElementById('overallProgressChart').getContext('2d');
-    const totalJuz = 30;
-    const completedJuz = parseFloat(document.getElementById('studentTotalJuz').innerText) || 0;
-    const remainingJuz = Math.max(0, totalJuz - completedJuz);
-
-    if (overallChart) overallChart.destroy();
-    overallChart = new Chart(ctx1, {
-        type: 'doughnut',
-        data: {
-            labels: ['ނިމިފައި', 'ބާކީ'],
-            datasets: [{
-                data: [completedJuz, remainingJuz],
-                backgroundColor: ['#27ae60', '#ecf0f1'],
-                borderWidth: 0
-            }]
-        },
-        options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
-    });
-
-    // 2. Monthly Activity Chart (Bar Chart)
-    const ctx2 = document.getElementById('monthlyActivityChart').getContext('2d');
-    const last7Days = [];
-    const pagesPerDay = [];
     
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        last7Days.push(d.getDate() + "/" + (d.getMonth()+1));
-        
-        // އެ ދުވަހަކު ކިޔެވި ޞަފްޙާ ގުނުން
-        let dayPages = 0;
-        if (student.history) {
-            student.history.forEach(h => {
-                if (h.date === dateStr && h.type === 'new_lesson') {
-                    const startP = parseInt(h.page) || 0;
-                    const endP = parseInt(h.endPage) || startP;
-                    dayPages += (endP - startP) + 1;
-                }
-            });
-        }
-        pagesPerDay.push(dayPages);
-    }
+    // ޗާޓާއި ޕްރޮގްރެސް ދެއްކުން (މުދައްރިސް ބަޔަށް)
+    window.calculateStudentProgress(student, true); 
+    window.renderStudentCharts(student, true);
+};
+// ޗާޓްތައް ކުރެހުމަށް ބޭނުންވާ ވޭރިއަބަލްތައް
+        let overallChart = null, activityChart = null;
+        let t_overallChart = null, t_activityChart = null;
 
-    if (activityChart) activityChart.destroy();
-    activityChart = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: last7Days,
-            datasets: [{
-                label: 'ޞަފްޙާ',
-                data: pagesPerDay,
-                backgroundColor: '#117a65',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-            plugins: { legend: { display: false } }
-        }
-    });
-};
+        window.renderStudentCharts = (student, isTeacherView = false) => {
+            const prefix = isTeacherView ? 't_' : '';
+            const canvas1 = document.getElementById(prefix + 'overallProgressChart');
+            const canvas2 = document.getElementById(prefix + 'monthlyActivityChart');
+            
+            if (!canvas1 || !canvas2) return;
+
+            const ctx1 = canvas1.getContext('2d');
+            const completedJuz = parseFloat(document.getElementById(prefix + 'studentTotalJuz').innerText) || 0;
+            const remainingJuz = Math.max(0, 30 - completedJuz);
+
+            // 1. މުޅި ޤުރުއާނުގެ ޗާޓު
+            if (isTeacherView) { if (t_overallChart) t_overallChart.destroy(); } 
+            else { if (overallChart) overallChart.destroy(); }
+
+            const chart1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ނިމިފައި', 'ބާކީ'],
+                    datasets: [{ data: [completedJuz, remainingJuz], backgroundColor: ['#27ae60', '#ecf0f1'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+            });
+            if (isTeacherView) t_overallChart = chart1; else overallChart = chart1;
+
+            // 2. ހަފްތާގެ ކުރިއެރުން
+            const ctx2 = canvas2.getContext('2d');
+            const last7Days = [];
+            const pagesPerDay = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                last7Days.push(d.getDate() + "/" + (d.getMonth() + 1));
+                let dayPages = 0;
+                if (student && student.history) {
+                    student.history.forEach(h => {
+                        if (h.date === dateStr && h.type === 'new_lesson') {
+                            dayPages += (parseInt(h.endPage || h.page) - parseInt(h.page)) + 1;
+                        }
+                    });
+                }
+                pagesPerDay.push(dayPages);
+            }
+
+            if (isTeacherView) { if (t_activityChart) t_activityChart.destroy(); } 
+            else { if (activityChart) activityChart.destroy(); }
+
+            const chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: last7Days, datasets: [{ label: 'ޞަފްޙާ', data: pagesPerDay, backgroundColor: '#117a65', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+            });
+            if (isTeacherView) t_activityChart = chart2; else activityChart = chart2;
+        };
+
+        // ޕްރޮގްރެސް ޕޭޖުން ދަރިވަރުގެ ބަޔަށް ދިއުން
+        window.goToStudentFromProgress = (cIdx, sIdx) => {
+            currentClassIdx = parseInt(cIdx);
+            currentStudentIdx = parseInt(sIdx);
+            const student = classesData[currentClassIdx].students[currentStudentIdx];
+            document.getElementById('gradingStudentName').innerText = student.name;
+            
+            navigationSource = 'progress'; 
+            window.openPage('grading-menu-page');
+            
+            // މުދައްރިސް ވިއުއަށް ޑޭޓާ އަދި ޗާޓު ލޯޑުކުރުން
+            window.calculateStudentProgress(student, true); 
+            window.renderStudentCharts(student, true);
+        };
+
         // ގްރޭޑިންގ މެނޫއިން ބެކްއަށް ދާއިރު އައި ތަނަކަށް ފޮނުވާލުން
-window.handleGradingMenuBack = () => {
-    if (navigationSource === 'progress') {
-        window.openPage('progress-page');
-    } else {
-        window.openPage('grading-student-page');
-    }
-};
+        window.handleGradingMenuBack = () => {
+            if (typeof navigationSource !== 'undefined' && navigationSource === 'progress') {
+                window.openPage('progress-page');
+            } else {
+                window.openPage('grading-student-page');
+            }
+        };
     </script>
 </body>
 </html>
