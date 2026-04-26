@@ -637,18 +637,24 @@ onValue(ref(db, 'hifz_system_v1'), (snapshot) => {
             if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
             
-            // ދަރިވަރުގެ ޕްރޮގްރެސް އަޕްޑޭޓްކުރުން
+            // ދަރިވަރުގެ ޕްރޮގްރެސް އަދި މަސައްކަތް އަޕްޑޭޓްކުރުން
             if(currentUserType === 'student' && currentStudentObj) { 
                 let sId = currentStudentObj.id; 
                 for(let c of classesData) { 
                     let f = c.students?.find(x=>x.id===sId); 
-                    if(f) { currentStudentObj=f; break; } 
+                    if(f) { 
+                        currentStudentObj = f; // އެންމެ ފަހުގެ ޑޭޓާ ނެގުން
+                        break; 
+                    } 
                 } 
                 window.calculateStudentProgress(currentStudentObj); 
-                
-                // މި ލައިން މިގޮތަށް ބަދަލުކުރޭ (student އިން currentStudentObj އަށް)
                 window.renderStudentCharts(currentStudentObj);
-            }        });
+                
+                // މިއީ ދަރިވަރުގެ ޑޭޝްބޯޑުން މަސައްކަތް ދައްކައިދޭ ލައިން
+                if (typeof window.displayLongRevTask === 'function') {
+                    window.displayLongRevTask(currentStudentObj, false);
+                }
+            }
 
         function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
         window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
