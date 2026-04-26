@@ -267,6 +267,22 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     <button class="big-btn btn-green" style="width: auto; padding: 10px 25px;" onclick="window.downloadStudentExcelFiltered()">📥 ރިޕޯޓް ޑައުންލޯޑް ކުރޭ</button>
                 </div>
             </div>
+    <!-- ދިގު މުރާޖަޢާ ހަވާލުކުރާ ބައި (މުދައްރިސަށް) -->
+            <div class="action-card" style="margin-top: 15px; border-top: 5px solid #8e44ad; text-align: right;">
+                <h4 style="margin-top: 0; color: #8e44ad;">📅 ދިގު މުރާޖަޢާ ހަވާލުކުރުން</h4>
+                <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                    <div style="width: 100px;">
+                        <label class="form-label" style="font-size: 11px;">ނިމޭ ޞަފްޙާ</label>
+                        <input type="number" id="assign_end_page" class="form-input" style="margin-bottom: 0; text-align: center;">
+                    </div>
+                    <div style="width: 100px;">
+                        <label class="form-label" style="font-size: 11px;">ފެށޭ ޞަފްޙާ</label>
+                        <input type="number" id="assign_start_page" class="form-input" style="margin-bottom: 0; text-align: center;">
+                    </div>
+                    <button class="big-btn" style="background: #8e44ad; height: 45px; margin-top: 22px; width: auto; padding: 0 20px;" onclick="window.saveLongRevAssignment()">ހަވާލުކުރޭ</button>
+                </div>
+                <div id="t_assignment_display" style="margin-top: 10px; font-size: 14px; color: #555;"></div>
+            </div>
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
@@ -407,6 +423,12 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         <div id="student-dashboard" class="container hidden">
             <div class="app-header"><div class="header-title">ދަރިވަރު ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div style="background:white; padding:30px; border-radius:15px; text-align:center; margin-bottom:20px;"><h2 style="color:var(--st-primary);">މަރުޙަބާ!</h2><h3 id="studentDashName"></h3></div>
+            <!-- ހަވާލުކޮށްފައިވާ މަސައްކަތް ފެންނަ ބައި (ދަރިވަރަށް) -->
+            <div id="student-task-card" class="action-card hidden" style="margin-bottom: 20px; background: #f4ecf7; border: 2px dashed #8e44ad; text-align: center;">
+                <h4 style="margin: 0; color: #8e44ad;">📝 މިއަދުގެ ދިގު މުރާޖަޢާ މަސައްކަތް</h4>
+                <div id="s_task_detail" style="font-size: 22px; font-weight: bold; margin: 10px 0; color: #2c3e50;"></div>
+                <button class="big-btn" style="background: #8e44ad; font-size: 14px;" onclick="window.openCategoryPage('long_rev')">މުރާޖަޢާ ފަށާ</button>
+            </div>
             <div class="student-stat-container">
                 <div class="target-box"><div class="target-header"><span id="targetLabel">މި ޓާމްގެ ޓާރގެޓް: 0 ޖުޒުއު</span><span id="targetPercent">0%</span></div><div class="progress-bar-bg"><div id="targetProgress" class="progress-bar-fill"></div></div><div id="targetMsg" class="target-msg">ހިއްވަރުކުރޭ!</div></div><br>
                 <div class="st-stats-grid">
@@ -1601,6 +1623,48 @@ window.goToStudentFromProgress = (cIdx, sIdx) => {
     
     const fileName = `${student.name.replace(/\s+/g, '_')}_Report.xlsx`;
     XLSX.writeFile(wb, fileName);
+};
+        // މަސައްކަތް ހަވާލުކުރުން ސޭވްކުރުން
+window.saveLongRevAssignment = () => {
+    const start = document.getElementById('assign_start_page').value;
+    const end = document.getElementById('assign_end_page').value;
+    
+    if (!start || !end) return alert("ފެށޭ އަދި ނިމޭ ޞަފްޙާ ޖައްސަވާ!");
+    
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
+    student.longRevAssignment = {
+        startPage: start,
+        endPage: end,
+        date: window.getFormattedDate()
+    };
+    
+    updateFirebase();
+    alert("މަސައްކަތް ހަވާލުކުރެވިއްޖެ");
+    window.displayLongRevTask(student, true);
+};
+
+// މަސައްކަތް ސްކްރީނުން ދެއްކުން
+window.displayLongRevTask = (student, isTeacherView = false) => {
+    const task = student.longRevAssignment;
+    if (isTeacherView) {
+        const div = document.getElementById('t_assignment_display');
+        if (task) {
+            div.innerHTML = `📌 މިހާރު ހަވާލުކުރެވިފައި: ޞަފްޙާ <b>${task.startPage}</b> އިން <b>${task.endPage}</b> އަށް (${task.date})`;
+            document.getElementById('assign_start_page').value = task.startPage;
+            document.getElementById('assign_end_page').value = task.endPage;
+        } else {
+            div.innerHTML = "އަދި އެއްވެސް މަސައްކަތެއް ހަވާލެއް ނުކުރެވޭ.";
+        }
+    } else {
+        const card = document.getElementById('student-task-card');
+        const detail = document.getElementById('s_task_detail');
+        if (task) {
+            card.classList.remove('hidden');
+            detail.innerText = `ޞަފްޙާ ${task.startPage} އިން ${task.endPage} އަށް`;
+        } else {
+            card.classList.add('hidden');
+        }
+    }
 };
     </script>
 </body>
