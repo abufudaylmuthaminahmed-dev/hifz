@@ -237,7 +237,23 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     </div>
                 </div>
             </div>
-
+<!-- އެކްސެލް ރިޕޯޓް ޑައުންލޯޑް ކުރާ ބައި -->
+            <div class="action-card" style="margin-top: 15px; border-top: 4px solid #2980b9; text-align: right;">
+                <h4 style="margin-top: 0; color: #2c3e50;">📊 ރިޕޯޓް ޑައުންލޯޑް ކުރައްވާ</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="form-label" style="font-size: 12px;">ނިމޭ ތާރީޚް</label>
+                        <input type="date" id="dl_end_date" class="form-input" style="margin-bottom: 0;">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="form-label" style="font-size: 12px;">ފެށޭ ތާރީޚް</label>
+                        <input type="date" id="dl_start_date" class="form-input" style="margin-bottom: 0;">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                    <button class="big-btn btn-green" style="width: auto; padding: 10px 20px;" onclick="window.downloadStudentExcelFiltered()">📥 ރިޕޯޓް (Excel)</button>
+                </div>
+            </div>
             <div class="menu-grid">
                 <div class="menu-btn" onclick="window.openCategoryPage('new_lesson')"><span class="menu-icon" style="color:var(--accent);">📖</span><h4 class="card-title">އާ ފިލާވަޅު</h4></div>
                 <div class="menu-btn" onclick="window.openCategoryPage('short_rev')"><span class="menu-icon" style="color:var(--accent-rev);">🔄</span><h4 class="card-title">ކުރު މުރާޖަޢާ</h4></div>
@@ -1522,6 +1538,57 @@ window.goToStudentFromProgress = (cIdx, sIdx) => {
                 window.openPage('grading-student-page');
             }
         };
+            window.downloadStudentExcelFiltered = () => {
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    const startDate = document.getElementById('dl_start_date').value;
+    const endDate = document.getElementById('dl_end_date').value;
+
+    if (!student.history || student.history.length === 0) {
+        return alert("މި ދަރިވަރުގެ އެއްވެސް ރެކޯޑެއް ނެތް!");
+    }
+
+    let records = [...student.history];
+
+    // ތާރީޚުން ފިލްޓަރ ކުރުން
+    if (startDate || endDate) {
+        records = records.filter(r => {
+            const rDate = r.date;
+            if (startDate && rDate < startDate) return false;
+            if (endDate && rDate > endDate) return false;
+            return true;
+        });
+    }
+
+    if (records.length === 0) {
+        return alert("ތިޔަ ހޮއްވެވި ތާރީޚްތަކުގެ ތެރޭގައި އެއްވެސް ރެކޯޑެއް ނެތް!");
+    }
+
+    // އެކްސެލްއަށް ޑޭޓާ ތަރުތީބުކުރުން
+    const excelData = records.sort((a, b) => new Date(b.date) - new Date(a.date)).map(r => {
+        let typeLabel = "";
+        if(r.type === 'new_lesson') typeLabel = "އާ ފިލާވަޅު";
+        else if(r.type === 'short_rev') typeLabel = "ކުރު މުރާޖަޢާ";
+        else if(r.type === 'long_rev') typeLabel = "ދިގު މުރާޖަޢާ";
+        else if(r.type === 'juz_exam') typeLabel = "ޖުޒުއު އިމްތިޙާން";
+        else if(r.type === 'final_exam') typeLabel = "ފަހު އިމްތިޙާން";
+
+        return {
+            "ތާރީޚް": r.date,
+            "ބާވަތް": typeLabel,
+            "ޞަފްޙާ": r.type === 'juz_exam' ? "ޖުޒުއު " + r.juz : (r.page + " އިން " + (r.endPage || r.page)),
+            "ކުށް": r.mistakesCount !== undefined ? r.mistakesCount : (r.details?.teacherMistakes || 0),
+            "މާކްސް": r.score ? r.score + "%" : "-",
+            "ތަފްޞީލް": r.startDetails ? `${r.startDetails.surah}:${r.startDetails.ayah} - ${r.endDetails?.surah}:${r.endDetails?.ayah}` : ""
+        };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Progress Report");
+    
+    const fileName = `${student.name.replace(/\s+/g, '_')}_Report.xlsx`;
+    XLSX.writeFile(wb, fileName);
+};
     </script>
 </body>
 </html>
