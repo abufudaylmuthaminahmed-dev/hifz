@@ -580,125 +580,117 @@ if (localStorage.getItem('hifz_session')) {
         
         window.getFormattedDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
-        // ފަޔަރބޭސް ޑޭޓާ ލޯޑުވުމުން އޮޓޯ ލޮގިން ހަދާ ބައި
-onValue(ref(db, 'hifz_system_v1'), (snapshot) => {
-            const data = snapshot.val(); 
-            classesData = data?.classes || []; 
-            hifzUsers = data?.users || []; 
-            semesters = data?.semesters || [];
+// --- ޗާޓްތައް ކުރެހުމަށް ބޭނުންވާ ވޭރިއަބަލްތައް ---
+        let overallChart = null, activityChart = null;
+        let t_overallChart = null, t_activityChart = null;
+
+        window.renderStudentCharts = (student, isTeacherView = false) => {
+            if (!student) return;
+            const prefix = isTeacherView ? 't_' : '';
+            const canvas1 = document.getElementById(prefix + 'overallProgressChart');
+            const canvas2 = document.getElementById(prefix + 'monthlyActivityChart');
             
-            if(!hifzUsers.length) { 
-                hifzUsers.push({username:'admin', password:'1234', role:'admin', name:'Admin'}); 
-                updateFirebase(); 
+            if (!canvas1 || !canvas2) return;
+
+            const ctx1 = canvas1.getContext('2d');
+            const completedJuz = parseFloat(document.getElementById(prefix + 'studentTotalJuz').innerText) || 0;
+            const remainingJuz = Math.max(0, 30 - completedJuz);
+
+            // މުޅި ޤުރުއާނުގެ ޗާޓު
+            if (isTeacherView) { if (t_overallChart) t_overallChart.destroy(); } 
+            else { if (overallChart) overallChart.destroy(); }
+
+            const chart1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ނިމިފައި', 'ބާކީ'],
+                    datasets: [{ data: [completedJuz, remainingJuz], backgroundColor: ['#27ae60', '#ecf0f1'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+            });
+            if (isTeacherView) t_overallChart = chart1; else overallChart = chart1;
+
+            // ހަފްތާގެ ކުރިއެރުން
+            const ctx2 = canvas2.getContext('2d');
+            const last7Days = [];
+            const pagesPerDay = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                last7Days.push(d.getDate() + "/" + (d.getMonth() + 1));
+                let dayPages = 0;
+                if (student.history) {
+                    student.history.forEach(h => {
+                        if (h.date === dateStr && h.type === 'new_lesson') {
+                            dayPages += (parseInt(h.endPage || h.page) - parseInt(h.page)) + 1;
+                        }
+                    });
+                }
+                pagesPerDay.push(dayPages);
             }
 
-            // --- އޮޓޯ ލޮގިން ބައި ފެށުނީ ---
-            const savedSession = localStorage.getItem('hifz_session');
-            if (savedSession) {
-                const session = JSON.parse(savedSession);
-                if (session.type === 'teacher') {
-                    currentUserType = 'teacher';
-                    currentUserRole = session.role;
-                    document.body.classList.remove('student-mode');
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('app-container').classList.remove('hidden');
-                    document.getElementById('admin-panel-btn').classList.toggle('hidden', currentUserRole !== 'admin');
-                    window.openPage('teacher-dashboard');
-                } 
-                else if (session.type === 'student') {
-                    let found = null;
-                    classesData.forEach((c, ci) => c.students?.forEach((s, si) => {
-                        if (s.id === session.id) { found = s; currentClassIdx = ci; currentStudentIdx = si; }
-                    }));
-                    if (found) {
-                        currentStudentObj = found;
-                        currentUserType = 'student';
-                        document.body.classList.add('student-mode');
-                        document.getElementById('login-screen').classList.add('hidden');
-                        document.getElementById('app-container').classList.remove('hidden');
-                        document.getElementById('studentDashName').innerText = found.name;
-                        window.calculateStudentProgress(found);
-                        window.openPage('student-dashboard');
-                    } else {
-                        localStorage.removeItem('hifz_session');
-                        location.reload();
-                    }
-                }
+            if (isTeacherView) { if (t_activityChart) t_activityChart.destroy(); } 
+            else { if (activityChart) activityChart.destroy(); }
+
+            const chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: last7Days, datasets: [{ label: 'ޞަފްޙާ', data: pagesPerDay, backgroundColor: '#117a65', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+            });
+            if (isTeacherView) t_activityChart = chart2; else activityChart = chart2;
+        };
+
+        // --- ދިގު މުރާޖަޢާ އެސައިންމަންޓް ލޮޖިކް ---
+        window.saveLongRevAssignment = () => {
+            const start = document.getElementById('assign_start_page').value;
+            const end = document.getElementById('assign_end_page').value;
+            if (!start || !end) return alert("ފެށޭ އަދި ނިމޭ ޞަފްޙާ ޖައްސަވާ!");
+            
+            const student = classesData[currentClassIdx].students[currentStudentIdx];
+            student.longRevAssignment = { startPage: start, endPage: end, date: window.getFormattedDate() };
+            
+            updateFirebase();
+            alert("މަސައްކަތް ހަވާލުކުރެވިއްޖެ");
+            window.displayLongRevTask(student, true);
+        };
+
+        window.displayLongRevTask = (student, isTeacherView = false) => {
+            if (!student) return;
+            const task = student.longRevAssignment;
+            if (isTeacherView) {
+                const div = document.getElementById('t_assignment_display');
+                if (div) div.innerHTML = task ? `📌 ހަވާލުކުރެވިފައި: ޞަފްޙާ <b>${task.startPage}</b> އިން <b>${task.endPage}</b> އަށް` : "އަދި އެއްވެސް މަސައްކަތެއް ހަވާލެއް ނުކުރެވޭ.";
             } else {
-                // ލޮގިންވެފައި ނެތްނަމަ ލޮގިން ސްކްރީން ދެއްކުން
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('login-screen').classList.remove('hidden');
-            }
-            // --- އޮޓޯ ލޮގިން ބައި ނިމުނީ ---
-
-            // ޕޭޖްތަކުގެ ޑޭޓާ ރެންޑަރ ކުރުން
-            if(!document.getElementById('management-page').classList.contains('hidden')) window.renderManageClassList();
-            if(!document.getElementById('teacher-mgmt-page').classList.contains('hidden')) window.renderTeacherList();
-            if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
-            if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
-            
-            // ދަރިވަރުގެ ޕްރޮގްރެސް އަދި މަސައްކަތް އަޕްޑޭޓްކުރުން
-            if(currentUserType === 'student' && currentStudentObj) { 
-                let sId = currentStudentObj.id; 
-                for(let c of classesData) { 
-                    let f = c.students?.find(x=>x.id===sId); 
-                    if(f) { 
-                        currentStudentObj = f; // އެންމެ ފަހުގެ ޑޭޓާ ނެގުން
-                        break; 
-                    } 
-                } 
-                window.calculateStudentProgress(currentStudentObj); 
-                window.renderStudentCharts(currentStudentObj);
-                
-                // މިއީ ދަރިވަރުގެ ޑޭޝްބޯޑުން މަސައްކަތް ދައްކައިދޭ ލައިން
-                if (typeof window.displayLongRevTask === 'function') {
-                    window.displayLongRevTask(currentStudentObj, false);
+                const card = document.getElementById('student-task-card');
+                const detail = document.getElementById('s_task_detail');
+                if (card && detail) {
+                    if (task) { card.classList.remove('hidden'); detail.innerText = `ޞަފްޙާ ${task.startPage} އިން ${task.endPage} އަށް`; }
+                    else { card.classList.add('hidden'); }
                 }
             }
+        };
 
-        function updateFirebase() { set(ref(db, 'hifz_system_v1'), { classes: classesData, users: hifzUsers, semesters: semesters }); }
-        window.toggleMobileMushaf = (layoutId, show) => { const layout = document.getElementById(layoutId); if(layout) layout.classList.toggle('show-mushaf-mobile', show); };
+        // --- ނެވިގޭޝަން ލޮޖިކް ---
+        window.goToStudentFromProgress = (cIdx, sIdx) => {
+            currentClassIdx = parseInt(cIdx);
+            currentStudentIdx = parseInt(sIdx);
+            const student = classesData[currentClassIdx].students[currentStudentIdx];
+            document.getElementById('gradingStudentName').innerText = student.name;
+            navigationSource = 'progress';
+            window.openPage('grading-menu-page');
+            
+            window.calculateStudentProgress(student, true);
+            window.renderStudentCharts(student, true);
+            window.displayLongRevTask(student, true);
+        };
 
-        window.openBackupModal = () => document.getElementById('backupModal').style.display = 'flex';
-        window.backupData = () => { const data = { classes: classesData, users: hifzUsers, semesters: semesters }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "hifz_backup_" + window.getFormattedDate() + ".json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); };
-        window.restoreData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if (confirm("މި ފައިލް ރިސްޓޯ ކޮށްފިނަމަ، މިހާރު ހުރި ޑޭޓާ ފުހެވޭނެ. ކުރިއަށް ގެންދަންވީތަ؟")) { classesData = data.classes || []; hifzUsers = data.users || []; semesters = data.semesters ||[]; updateFirebase(); alert("ޑޭޓާ ރިސްޓޯ ކުރެވިއްޖެ!"); location.reload(); } } catch (err) { alert("Invalid Backup File"); } }; reader.readAsText(file); };
-
-        window.switchLogin = (type) => { document.getElementById('teacher-login-form').classList.toggle('hidden', type !== 'teacher'); document.getElementById('student-login-form').classList.toggle('hidden', type !== 'student'); document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (type==='teacher' && i===0) || (type==='student' && i===1))); };
-        window.loginTeacher = () => { const u = document.getElementById('teacherUsername').value; const p = document.getElementById('teacherPassInput').value; if(p === '1234' && (!u || u === 'admin')) { currentUserType = 'teacher'; currentUserRole = 'admin'; proceedLogin(); return; } const uIdx = hifzUsers.findIndex(x => x.username === u); const user = hifzUsers[uIdx]; if(user) { if(user.password === p) { currentUserType = 'teacher'; currentUserRole = user.role; proceedLogin(); } else alert('ޕާސްވޯޑް ނުބައި'); } else alert('ނަމާއި ޕާސްވޯޑް ދިމައެއްނުވޭ'); };
-        window.handleStudentLoginStep = () => { const id = document.getElementById('stuIdInput').value.trim(); if(!id) return alert("ID Required"); let found = null, cIdx = -1, sIdx = -1; classesData.forEach((c, ci) => c.students?.forEach((s, si) => { if(s.id === id) { found=s; cIdx=ci; sIdx=si; } })); if(!found) return alert("Not Found"); currentClassIdx = cIdx; currentStudentIdx = sIdx; currentStudentObj = found; if(!found.password) { currentUserType = 'student'; document.getElementById('passModalUserText').innerText = `ދަރިވަރު: ${found.name}`; document.getElementById('createPassModal').style.display = 'flex'; } else { const passField = document.getElementById('stuPassField'); if(passField.classList.contains('hidden')) passField.classList.remove('hidden'); else { if(document.getElementById('stuPassInput').value === found.password) window.loginSuccessStudent(); else alert("Wrong Password"); } } };
-        window.saveNewPassword = () => { const pass = document.getElementById('newStuPass').value; if(!pass) return alert("Enter a password"); if(currentUserType === 'student') { classesData[currentClassIdx].students[currentStudentIdx].password = pass; updateFirebase(); document.getElementById('createPassModal').style.display='none'; window.loginSuccessStudent(); } };
-        // މުދައްރިސް ލޮގިން ކާމިޔާބުވުން
-function proceedLogin() {
-    // ސެޝަން ސޭވްކުރުން
-    localStorage.setItem('hifz_session', JSON.stringify({
-        type: 'teacher',
-        username: document.getElementById('teacherUsername').value,
-        role: currentUserRole
-    }));
-
-    document.body.classList.remove('student-mode');
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-container').classList.remove('hidden');
-    document.getElementById('admin-panel-btn').classList.toggle('hidden', currentUserRole !== 'admin');
-    window.openPage('teacher-dashboard');
-}
-
-// ދަރިވަރު ލޮގިން ކާމިޔާބުވުން
-window.loginSuccessStudent = () => {
-    // ސެޝަން ސޭވްކުރުން
-    localStorage.setItem('hifz_session', JSON.stringify({
-        type: 'student',
-        id: currentStudentObj.id
-    }));
-
-    currentUserType = 'student';
-    document.body.classList.add('student-mode');
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-container').classList.remove('hidden');
-    document.getElementById('studentDashName').innerText = currentStudentObj.name;
-    window.calculateStudentProgress(currentStudentObj);
-    window.openPage('student-dashboard');
-};
+        window.handleGradingMenuBack = () => {
+            if (typeof navigationSource !== 'undefined' && navigationSource === 'progress') {
+                window.openPage('progress-page');
+            } else {
+                window.openPage('grading-student-page');
+            }
+        };
         window.logout = () => {
     if(confirm("ލޮގްއައުޓް ވާން ބޭނުންތަ؟")) {
         localStorage.removeItem('hifz_session'); // ސޭވްވެފައި ހުރި ސެޝަން ފުހެލުން
