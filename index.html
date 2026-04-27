@@ -237,6 +237,26 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     </div>
                 </div>
             </div>
+    <!-- ދިގު މުރާޖަޢާ މަސައްކަތް ހަވާލުކުރާ ބައި -->
+            <div class="action-card" style="margin-top: 15px; border-top: 5px solid #8e44ad; text-align: right;">
+                <h4 style="margin-top: 0; color: #8e44ad;">📅 ދިގު މުރާޖަޢާ ހަވާލުކުރުން</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label class="form-label" style="font-size: 12px;">ތާރީޚް</label>
+                        <input type="date" id="assign_date" class="form-input" style="margin-bottom: 0;">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 12px;">ނިމޭ ޞަފްޙާ</label>
+                        <input type="number" id="assign_end" class="form-input" style="margin-bottom: 0; text-align: center;">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 12px;">ފެށޭ ޞަފްޙާ</label>
+                        <input type="number" id="assign_start" class="form-input" style="margin-bottom: 0; text-align: center;">
+                    </div>
+                </div>
+                <button class="big-btn" style="background: #8e44ad; margin-top: 15px; width: 100%;" onclick="window.saveLongRevAssignment()">✅ މަސައްކަތް ހަވާލުކުރޭ</button>
+                <div id="assign_status_msg" style="margin-top: 10px; font-size: 13px; color: #27ae60; font-weight: bold; text-align: center;"></div>
+            </div>
     <!-- އެކްސެލް ރިޕޯޓް ޑައުންލޯޑް ކުރާ ބައި (މުދައްރިސް ބަޔަށް) -->
             <div class="action-card" style="margin-top: 15px; border-top: 4px solid #2980b9; text-align: right;">
                 <h4 style="margin-top: 0; color: #2c3e50;">📊 ރިޕޯޓް ޑައުންލޯޑް ކުރައްވާ</h4>
@@ -407,6 +427,16 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
         <div id="student-dashboard" class="container hidden">
             <div class="app-header"><div class="header-title">ދަރިވަރު ޕެނަލް</div><button class="icon-btn logout-btn" onclick="window.logout()">⏻</button></div>
             <div style="background:white; padding:30px; border-radius:15px; text-align:center; margin-bottom:20px;"><h2 style="color:var(--st-primary);">މަރުޙަބާ!</h2><h3 id="studentDashName"></h3></div>
+            <!-- ދަރިވަރަށް ފެންނަ ނޯޓިފިކޭޝަން ބައި -->
+            <div id="longrev-notification" class="hidden" style="margin-bottom: 20px; animation: fadeIn 0.5s ease;">
+                <div style="background: #f4ecf7; border: 2px solid #8e44ad; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; right: 0; background: #8e44ad; color: white; padding: 4px 15px; border-radius: 0 0 0 15px; font-size: 12px; font-weight: bold;">އާ މަސައްކަތެއް! 🔔</div>
+                    <h3 style="color: #8e44ad; margin-top: 10px; font-family: var(--font-heading);">މިއަދުގެ ދިގު މުރާޖަޢާ</h3>
+                    <div id="notif-details" style="font-size: 20px; font-weight: bold; color: #2c3e50; margin: 10px 0;"></div>
+                    <p id="notif-date" style="font-size: 13px; color: #7f8c8d; margin-bottom: 15px;"></p>
+                    <button class="big-btn" style="background: #8e44ad; font-size: 14px; width: auto; padding: 10px 30px;" onclick="window.openCategoryPage('long_rev')">📖 މުރާޖަޢާ ފަށާ</button>
+                </div>
+            </div>
             <div class="student-stat-container">
                 <div class="target-box"><div class="target-header"><span id="targetLabel">މި ޓާމްގެ ޓާރގެޓް: 0 ޖުޒުއު</span><span id="targetPercent">0%</span></div><div class="progress-bar-bg"><div id="targetProgress" class="progress-bar-fill"></div></div><div id="targetMsg" class="target-msg">ހިއްވަރުކުރޭ!</div></div><br>
                 <div class="st-stats-grid">
@@ -1601,6 +1631,44 @@ window.goToStudentFromProgress = (cIdx, sIdx) => {
     
     const fileName = `${student.name.replace(/\s+/g, '_')}_Report.xlsx`;
     XLSX.writeFile(wb, fileName);
+};
+        // މަސައްކަތް ހަވާލުކުރާ ފަންކްޝަން
+window.saveLongRevAssignment = () => {
+    const start = document.getElementById('assign_start').value;
+    const end = document.getElementById('assign_end').value;
+    const date = document.getElementById('assign_date').value;
+    const msgDiv = document.getElementById('assign_status_msg');
+
+    if (!start || !end || !date) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ!");
+
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
+    student.longRevTask = {
+        startPage: start,
+        endPage: end,
+        dueDate: date,
+        assignedOn: window.getFormattedDate(),
+        status: 'pending'
+    };
+
+    updateFirebase();
+    msgDiv.innerText = "✓ މަސައްކަތް ހަވާލުކުރެވިއްޖެ";
+    setTimeout(() => { msgDiv.innerText = ""; }, 3000);
+};
+
+// ދަރިވަރުގެ ސްކްރީނުން މަސައްކަތް ދައްކައިދޭ ފަންކްޝަން
+window.checkLongRevAssignment = (student) => {
+    const notifBox = document.getElementById('longrev-notification');
+    const details = document.getElementById('notif-details');
+    const dateEl = document.getElementById('notif-date');
+
+    if (student.longRevTask) {
+        const task = student.longRevTask;
+        notifBox.classList.remove('hidden');
+        details.innerText = `ޞަފްޙާ ${task.startPage} އިން ${task.endPage} އަށް`;
+        dateEl.innerText = `ސުންގަޑި: ${task.dueDate}`;
+    } else {
+        notifBox.classList.add('hidden');
+    }
 };
     </script>
 </body>
