@@ -237,25 +237,35 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     </div>
                 </div>
             </div>
-    <!-- ދިގު މުރާޖަޢާ މަސައްކަތް ހަވާލުކުރާ ބައި -->
-            <div class="action-card" style="margin-top: 15px; border-top: 5px solid #8e44ad; text-align: right;">
-                <h4 style="margin-top: 0; color: #8e44ad;">📅 ދިގު މުރާޖަޢާ ހަވާލުކުރުން</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
-                    <div>
-                        <label class="form-label" style="font-size: 12px;">ތާރީޚް</label>
-                        <input type="date" id="assign_date" class="form-input" style="margin-bottom: 0;">
+    <!-- ދިގު މުރާޖަޢާ އެސައިންމަންޓް ބައި (ކުށުގެ ޢަދަދު ހިމެނޭހެން) -->
+            <div id="cat-long-rev-box" class="hidden" style="margin-bottom: 20px;">
+                <div class="action-card" style="border-right: 5px solid #8e44ad; background: #fdfefe; text-align: right;">
+                    <h4 style="margin-top: 0; color: #8e44ad;">📅 ދިގު މުރާޖަޢާ މަސައްކަތް</h4>
+                    
+                    <div id="teacher-cat-assign-controls" class="hidden">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
+                            <div><label class="form-label" style="font-size:11px;">ތާރީޚް</label><input type="date" id="cat_assign_date" class="form-input" style="margin-bottom:0;"></div>
+                            <div><label class="form-label" style="font-size:11px;">ނިމޭ ޞަފްޙާ</label><input type="number" id="cat_assign_end" class="form-input" style="margin-bottom:0; text-align:center;"></div>
+                            <div><label class="form-label" style="font-size:11px;">ފެށޭ ޞަފްޙާ</label><input type="number" id="cat_assign_start" class="form-input" style="margin-bottom:0; text-align:center;"></div>
+                        </div>
+                        <button class="big-btn" style="background: #8e44ad; width: 100%; margin-top: 15px;" onclick="window.saveLongRevAssignmentFromCat()">✅ މަސައްކަތް ހަވާލުކުރޭ</button>
                     </div>
-                    <div>
-                        <label class="form-label" style="font-size: 12px;">ނިމޭ ޞަފްޙާ</label>
-                        <input type="number" id="assign_end" class="form-input" style="margin-bottom: 0; text-align: center;">
-                    </div>
-                    <div>
-                        <label class="form-label" style="font-size: 12px;">ފެށޭ ޞަފްޙާ</label>
-                        <input type="number" id="assign_start" class="form-input" style="margin-bottom: 0; text-align: center;">
+
+                    <div id="student-cat-assign-display" class="hidden" style="padding: 15px; background: #f4ecf7; border-radius: 10px; text-align: center;">
+                        <div id="cat-assign-details" style="font-size: 20px; font-weight: bold; color: #2c3e50; margin-bottom: 5px;"></div>
+                        <p id="cat-assign-date-text" style="font-size: 13px; color: #7f8c8d; margin-bottom: 15px;"></p>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                            <label style="font-size: 14px; font-weight: bold; color: #8e44ad;">ކުށުގެ ޢަދަދު:</label>
+                            <input type="number" id="cat_assign_mistakes" value="0" min="0" class="form-input" style="width: 70px; margin: 0; text-align: center; border-color: #8e44ad;">
+                        </div>
+
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="big-btn" style="background: #27ae60; width: auto; padding: 10px 20px;" onclick="window.startAssignedLongRevNow()">📖 ކިޔަން ފަށާ</button>
+                            <button class="big-btn" style="background: #8e44ad; width: auto; padding: 10px 20px;" onclick="window.completeAssignedLongRev()">✅ ނިންމައިފީމް</button>
+                        </div>
                     </div>
                 </div>
-                <button class="big-btn" style="background: #8e44ad; margin-top: 15px; width: 100%;" onclick="window.saveLongRevAssignment()">✅ މަސައްކަތް ހަވާލުކުރޭ</button>
-                <div id="assign_status_msg" style="margin-top: 10px; font-size: 13px; color: #27ae60; font-weight: bold; text-align: center;"></div>
             </div>
     <!-- އެކްސެލް ރިޕޯޓް ޑައުންލޯޑް ކުރާ ބައި (މުދައްރިސް ބަޔަށް) -->
             <div class="action-card" style="margin-top: 15px; border-top: 4px solid #2980b9; text-align: right;">
@@ -1681,6 +1691,68 @@ window.checkLongRevAssignment = (student) => {
         dateEl.innerText = `ސުންގަޑި: ${task.dueDate}`;
     } else {
         notifBox.classList.add('hidden');
+    }
+};
+        // ކެޓަގަރީ ޕޭޖްގެ UI އަޕްޑޭޓްކުރުން
+window.refreshCategoryAssignmentUI = (student) => {
+    const box = document.getElementById('cat-long-rev-box');
+    if (!box) return;
+    if (currentSessionType !== 'long_rev') { box.classList.add('hidden'); return; }
+    
+    box.classList.remove('hidden');
+    const task = student.longRevTask;
+    if (currentUserType === 'teacher') {
+        document.getElementById('teacher-cat-assign-controls').classList.remove('hidden');
+        document.getElementById('student-cat-assign-display').classList.add('hidden');
+        if (task) {
+            document.getElementById('cat_assign_start').value = task.startPage;
+            document.getElementById('cat_assign_end').value = task.endPage;
+            document.getElementById('cat_assign_date').value = task.dueDate;
+        }
+    } else {
+        document.getElementById('teacher-cat-assign-controls').classList.add('hidden');
+        if (task) {
+            document.getElementById('student-cat-assign-display').classList.remove('hidden');
+            document.getElementById('cat-assign-details').innerText = `ޞަފްޙާ ${task.startPage} އިން ${task.endPage} އަށް`;
+            document.getElementById('cat-assign-date-text').innerText = `ސުންގަޑި: ${task.dueDate}`;
+        } else {
+            document.getElementById('student-cat-assign-display').classList.add('hidden');
+        }
+    }
+};
+
+// މަސައްކަތް ނިންމައި ހިސްޓްރީއަށް ބަދަލުކުރުން
+window.completeAssignedLongRev = () => {
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    const task = student.longRevTask;
+    const mistakes = document.getElementById('cat_assign_mistakes').value;
+
+    if (!task) return;
+
+    if (confirm("މި މަސައްކަތް ނިންމާލަން ބޭނުންތަ؟ އޭރުން މިއޮތީ ހިސްޓްރީއަށް ބަދަލުވެފައެވެ.")) {
+        if (!student.history) student.history = [];
+
+        // ހިސްޓްރީއަށް އާ ރެކޯޑެއް އިތުރުކުރުން
+        const historyEntry = {
+            type: 'long_rev',
+            date: window.getFormattedDate(),
+            page: task.startPage,
+            endPage: task.endPage,
+            mistakesCount: parseInt(mistakes) || 0,
+            status: 'completed'
+        };
+
+        student.history.push(historyEntry);
+        
+        // މިހާރު އޮތް އެސައިންމަންޓް ފުހެލުން
+        delete student.longRevTask;
+
+        updateFirebase();
+        alert("މާޝާﷲ! މަސައްކަތް ނިންމައި ހިސްޓްރީއަށް ރެކޯޑް ކުރެވިއްޖެ.");
+        
+        // ޞަފްޙާ ރިފްރެޝްކޮށް ހިސްޓްރީ ދެއްކުން
+        window.renderHistory(student, 'categoryHistoryList', 'long_rev');
+        window.refreshCategoryAssignmentUI(student);
     }
 };
     </script>
