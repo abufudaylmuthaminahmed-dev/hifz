@@ -16,7 +16,7 @@
 *{box-sizing:border-box;}
 body{font-family:var(--font-main);margin:0;height:100vh;height:100dvh;color:#333;background-color:var(--bg-light);overflow:hidden;display:flex;flex-direction:column;}
 body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{border-bottom:3px solid var(--st-primary);} body.student-mode .header-title{color:var(--st-primary);}
-.hidden{display:none !important;}
+.hidden{display:none !imponValueortant;}
 .container{width:100%;padding:20px;padding-bottom:120px;max-width:1200px;margin:0 auto;animation:fadeIn 0.3s ease;height:calc(100vh - 65px);overflow-y:auto;flex-grow:1;-webkit-overflow-scrolling:touch;}
 .app-header{background:white;height:65px;padding:0 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e0e0e0;flex-shrink:0;z-index:100;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
 .header-title{font-family:var(--font-heading);font-size:24px;color:var(--primary);}
@@ -618,8 +618,7 @@ if (localStorage.getItem('hifz_session')) {
             if (savedSession && document.getElementById('app-container').classList.contains('hidden')) {
                 const session = JSON.parse(savedSession);
                 if (session.type === 'teacher') {
-                    currentUserType = 'teacher';
-                    currentUserRole = session.role;
+                    currentUserType = 'teacher'; currentUserRole = session.role;
                     document.body.classList.remove('student-mode');
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('app-container').classList.remove('hidden');
@@ -632,8 +631,7 @@ if (localStorage.getItem('hifz_session')) {
                         if (s.id === session.id) { found = s; currentClassIdx = ci; currentStudentIdx = si; }
                     }));
                     if (found) {
-                        currentStudentObj = found;
-                        currentUserType = 'student';
+                        currentStudentObj = found; currentUserType = 'student';
                         document.body.classList.add('student-mode');
                         document.getElementById('login-screen').classList.add('hidden');
                         document.getElementById('app-container').classList.remove('hidden');
@@ -641,10 +639,7 @@ if (localStorage.getItem('hifz_session')) {
                         window.calculateStudentProgress(found, false);
                         if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(found, false);
                         window.openPage('student-dashboard');
-                    } else {
-                        localStorage.removeItem('hifz_session');
-                        location.reload();
-                    }
+                    } else { localStorage.removeItem('hifz_session'); location.reload(); }
                 }
             } else if (!savedSession) {
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -656,7 +651,7 @@ if (localStorage.getItem('hifz_session')) {
             if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
             
-            // 1. ދަރިވަރު އަމިއްލައަށް ވަދެފައި ހުރިނަމަ ޑޭޓާ އަޕްޑޭޓްކުރުން
+            // 1. ދަރިވަރު ވަދެފައި ހުރިނަމަ މަޢުލޫމާތު އާކުރުން
             if(currentUserType === 'student' && currentStudentObj) { 
                 let sId = currentStudentObj.id; 
                 for(let c of classesData) { 
@@ -665,24 +660,18 @@ if (localStorage.getItem('hifz_session')) {
                         currentStudentObj = f;
                         window.calculateStudentProgress(f, false); 
                         if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(f, false);
-                        // ދިގު މުރާޖަޢާ ބައި އަޕްޑޭޓްކުރުން
-                        if (typeof window.refreshCategoryAssignmentUI === 'function') {
-                            window.refreshCategoryAssignmentUI(f);
-                        }
+                        if (typeof window.refreshCategoryAssignmentUI === 'function') window.refreshCategoryAssignmentUI(f);
                         break; 
                     } 
                 } 
             }
 
-            // 2. މުދައްރިސް ދަރިވަރުގެ ބައި ބަލާނަމަ އަޕްޑޭޓްކުރުން
+            // 2. މުދައްރިސް ދަރިވަރުގެ ބައި ބަލާނަމަ އާކުރުން
             if(currentUserType === 'teacher' && currentStudentIdx !== -1 && !document.getElementById('grading-menu-page').classList.contains('hidden')) {
                 const s = classesData[currentClassIdx].students[currentStudentIdx];
                 window.calculateStudentProgress(s, true);
                 if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(s, true);
-                // މުދައްރިސަށްވެސް އެސައިންމަންޓް ސްޓޭޓަސް ދެއްކުން
-                if (typeof window.refreshCategoryAssignmentUI === 'function') {
-                    window.refreshCategoryAssignmentUI(s);
-                }
+                if (typeof window.refreshCategoryAssignmentUI === 'function') window.refreshCategoryAssignmentUI(s);
             }
         });
 
