@@ -16,7 +16,7 @@
 *{box-sizing:border-box;}
 body{font-family:var(--font-main);margin:0;height:100vh;height:100dvh;color:#333;background-color:var(--bg-light);overflow:hidden;display:flex;flex-direction:column;}
 body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{border-bottom:3px solid var(--st-primary);} body.student-mode .header-title{color:var(--st-primary);}
-.hidden{display:none !imponValueortant;}
+.hidden{display:none !important;}
 .container{width:100%;padding:20px;padding-bottom:120px;max-width:1200px;margin:0 auto;animation:fadeIn 0.3s ease;height:calc(100vh - 65px);overflow-y:auto;flex-grow:1;-webkit-overflow-scrolling:touch;}
 .app-header{background:white;height:65px;padding:0 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e0e0e0;flex-shrink:0;z-index:100;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
 .header-title{font-family:var(--font-heading);font-size:24px;color:var(--primary);}
@@ -237,40 +237,37 @@ body.student-mode{background-color:#e8f6f3;} body.student-mode .app-header{borde
                     </div>
                 </div>
             </div>
-    <!-- ދިގު މުރާޖަޢާ އެސައިންމަންޓް ބައި (Complete Version) -->
+    <!-- ދިގު މުރާޖަޢާ އެސައިންމަންޓް ބައި (ކުށުގެ ޢަދަދު ހިމެނޭހެން) -->
             <div id="cat-long-rev-box" class="hidden" style="margin-bottom: 20px;">
                 <div class="action-card" style="border-right: 5px solid #8e44ad; background: #fdfefe; text-align: right;">
-                    <h4 style="margin-top: 0; color: #8e44ad; font-family: var(--font-heading);">📅 ދިގު މުރާޖަޢާ މަސައްކަތް</h4>
+                    <h4 style="margin-top: 0; color: #8e44ad;">📅 ދިގު މުރާޖަޢާ މަސައްކަތް</h4>
                     
-                    <!-- މުދައްރިސަށް ފެންނަ ބައި -->
                     <div id="teacher-cat-assign-controls" class="hidden">
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
-                            <div><label class="form-label" style="font-size:11px;">ސުންގަޑި</label><input type="date" id="cat_assign_date" class="form-input" style="margin-bottom:0;"></div>
+                            <div><label class="form-label" style="font-size:11px;">ތާރީޚް</label><input type="date" id="cat_assign_date" class="form-input" style="margin-bottom:0;"></div>
                             <div><label class="form-label" style="font-size:11px;">ނިމޭ ޞަފްޙާ</label><input type="number" id="cat_assign_end" class="form-input" style="margin-bottom:0; text-align:center;"></div>
                             <div><label class="form-label" style="font-size:11px;">ފެށޭ ޞަފްޙާ</label><input type="number" id="cat_assign_start" class="form-input" style="margin-bottom:0; text-align:center;"></div>
                         </div>
                         <button class="big-btn" style="background: #8e44ad; width: 100%; margin-top: 15px;" onclick="window.saveLongRevAssignmentFromCat()">✅ މަސައްކަތް ހަވާލުކުރޭ</button>
                     </div>
 
-                    <!-- ދަރިވަރަށް ފެންނަ ބައި -->
                     <div id="student-cat-assign-display" class="hidden" style="padding: 15px; background: #f4ecf7; border-radius: 10px; text-align: center;">
                         <div id="cat-assign-details" style="font-size: 20px; font-weight: bold; color: #2c3e50; margin-bottom: 5px;"></div>
                         <p id="cat-assign-date-text" style="font-size: 13px; color: #7f8c8d; margin-bottom: 15px;"></p>
                         
-                        <!-- ކުށުގެ ޢަދަދު ޖަހާ ބައި -->
                         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
                             <label style="font-size: 14px; font-weight: bold; color: #8e44ad;">ކުށުގެ ޢަދަދު:</label>
                             <input type="number" id="cat_assign_mistakes" value="0" min="0" class="form-input" style="width: 70px; margin: 0; text-align: center; border-color: #8e44ad;">
                         </div>
 
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 10px; justify-content: center;">
                             <button class="big-btn" style="background: #27ae60; width: auto; padding: 10px 20px;" onclick="window.startAssignedLongRevNow()">📖 ކިޔަން ފަށާ</button>
-                            <button class="big-btn" style="background: #8e44ad; width: auto; padding: 10px 20px;" onclick="window.completeAssignedLongRev()">✅ ކިޔާ ނިންމައިފީމް</button>
+                            <button class="big-btn" style="background: #8e44ad; width: auto; padding: 10px 20px;" onclick="window.completeAssignedLongRev()">✅ ނިންމައިފީމް</button>
                         </div>
                     </div>
                 </div>
             </div>
-        <!-- އެކްސެލް ރިޕޯޓް ޑައުންލޯޑް ކުރާ ބައި (މުދައްރިސް ބަޔަށް) -->
+    <!-- އެކްސެލް ރިޕޯޓް ޑައުންލޯޑް ކުރާ ބައި (މުދައްރިސް ބަޔަށް) -->
             <div class="action-card" style="margin-top: 15px; border-top: 4px solid #2980b9; text-align: right;">
                 <h4 style="margin-top: 0; color: #2c3e50;">📊 ރިޕޯޓް ޑައުންލޯޑް ކުރައްވާ</h4>
                 
@@ -618,7 +615,8 @@ if (localStorage.getItem('hifz_session')) {
             if (savedSession && document.getElementById('app-container').classList.contains('hidden')) {
                 const session = JSON.parse(savedSession);
                 if (session.type === 'teacher') {
-                    currentUserType = 'teacher'; currentUserRole = session.role;
+                    currentUserType = 'teacher';
+                    currentUserRole = session.role;
                     document.body.classList.remove('student-mode');
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('app-container').classList.remove('hidden');
@@ -631,15 +629,20 @@ if (localStorage.getItem('hifz_session')) {
                         if (s.id === session.id) { found = s; currentClassIdx = ci; currentStudentIdx = si; }
                     }));
                     if (found) {
-                        currentStudentObj = found; currentUserType = 'student';
+                        currentStudentObj = found;
+                        currentUserType = 'student';
                         document.body.classList.add('student-mode');
                         document.getElementById('login-screen').classList.add('hidden');
                         document.getElementById('app-container').classList.remove('hidden');
                         document.getElementById('studentDashName').innerText = found.name;
                         window.calculateStudentProgress(found, false);
                         if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(found, false);
+                        if (typeof window.checkLongRevAssignment === 'function') window.checkLongRevAssignment(found);
                         window.openPage('student-dashboard');
-                    } else { localStorage.removeItem('hifz_session'); location.reload(); }
+                    } else {
+                        localStorage.removeItem('hifz_session');
+                        location.reload();
+                    }
                 }
             } else if (!savedSession) {
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -651,7 +654,7 @@ if (localStorage.getItem('hifz_session')) {
             if(!document.getElementById('progress-page').classList.contains('hidden')) { window.renderSemesterList(); window.renderPendingApprovals(); window.populateProgClassSelect(); }
             if(!document.getElementById('class-details-page').classList.contains('hidden')) window.renderStudentList();
             
-            // 1. ދަރިވަރު ވަދެފައި ހުރިނަމަ މަޢުލޫމާތު އާކުރުން
+            // 1. ދަރިވަރު އަމިއްލައަށް ވަދެފައި ހުރިނަމަ ޑޭޓާ އަޕްޑޭޓްކުރުން
             if(currentUserType === 'student' && currentStudentObj) { 
                 let sId = currentStudentObj.id; 
                 for(let c of classesData) { 
@@ -660,18 +663,21 @@ if (localStorage.getItem('hifz_session')) {
                         currentStudentObj = f;
                         window.calculateStudentProgress(f, false); 
                         if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(f, false);
-                        if (typeof window.refreshCategoryAssignmentUI === 'function') window.refreshCategoryAssignmentUI(f);
+                        if (typeof window.checkLongRevAssignment === 'function') window.checkLongRevAssignment(f);
                         break; 
                     } 
                 } 
             }
 
-            // 2. މުދައްރިސް ދަރިވަރުގެ ބައި ބަލާނަމަ އާކުރުން
+            // 2. މުދައްރިސް ދަރިވަރުގެ ބައި ބަލާނަމަ އަޕްޑޭޓްކުރުން
             if(currentUserType === 'teacher' && currentStudentIdx !== -1 && !document.getElementById('grading-menu-page').classList.contains('hidden')) {
                 const s = classesData[currentClassIdx].students[currentStudentIdx];
                 window.calculateStudentProgress(s, true);
                 if (typeof window.renderStudentCharts === 'function') window.renderStudentCharts(s, true);
-                if (typeof window.refreshCategoryAssignmentUI === 'function') window.refreshCategoryAssignmentUI(s);
+                if (s.longRevTask) {
+                    const msgDiv = document.getElementById('assign_status_msg');
+                    if(msgDiv) msgDiv.innerHTML = `📌 ހަވާލުކުރެވިފައި: ޞަފްޙާ ${s.longRevTask.startPage} އިން ${s.longRevTask.endPage} އަށް (${s.longRevTask.dueDate})`;
+                }
             }
         });
 
@@ -1649,41 +1655,52 @@ window.goToStudentFromProgress = (cIdx, sIdx) => {
     const fileName = `${student.name.replace(/\s+/g, '_')}_Report.xlsx`;
     XLSX.writeFile(wb, fileName);
 };
-// 1. މުދައްރިސް މަސައްކަތް ހަވާލުކުރުން
-window.saveLongRevAssignmentFromCat = () => {
-    const start = document.getElementById('cat_assign_start').value;
-    const end = document.getElementById('cat_assign_end').value;
-    const date = document.getElementById('cat_assign_date').value;
-    
+        // މަސައްކަތް ހަވާލުކުރާ ފަންކްޝަން
+window.saveLongRevAssignment = () => {
+    const start = document.getElementById('assign_start').value;
+    const end = document.getElementById('assign_end').value;
+    const date = document.getElementById('assign_date').value;
+    const msgDiv = document.getElementById('assign_status_msg');
+
     if (!start || !end || !date) return alert("ހުރިހާ މަޢުލޫމާތެއް ފުރިހަމަކުރައްވާ!");
 
-    const student = currentUserType === 'teacher' ? classesData[currentClassIdx].students[currentStudentIdx] : currentStudentObj;
-    
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
     student.longRevTask = {
         startPage: start,
         endPage: end,
         dueDate: date,
-        assignedOn: window.getFormattedDate()
+        assignedOn: window.getFormattedDate(),
+        status: 'pending'
     };
 
     updateFirebase();
-    alert("މަސައްކަތް ހަވާލުކުރެވިއްޖެ!");
-    window.refreshCategoryAssignmentUI(student);
+    msgDiv.innerText = "✓ މަސައްކަތް ހަވާލުކުރެވިއްޖެ";
+    setTimeout(() => { msgDiv.innerText = ""; }, 3000);
 };
 
-// 2. ދިގު މުރާޖަޢާ ބައިގައި މަސައްކަތް ދެއްކުން
+// ދަރިވަރުގެ ސްކްރީނުން މަސައްކަތް ދައްކައިދޭ ފަންކްޝަން
+window.checkLongRevAssignment = (student) => {
+    const notifBox = document.getElementById('longrev-notification');
+    const details = document.getElementById('notif-details');
+    const dateEl = document.getElementById('notif-date');
+
+    if (student.longRevTask) {
+        const task = student.longRevTask;
+        notifBox.classList.remove('hidden');
+        details.innerText = `ޞަފްޙާ ${task.startPage} އިން ${task.endPage} އަށް`;
+        dateEl.innerText = `ސުންގަޑި: ${task.dueDate}`;
+    } else {
+        notifBox.classList.add('hidden');
+    }
+};
+        // ކެޓަގަރީ ޕޭޖްގެ UI އަޕްޑޭޓްކުރުން
 window.refreshCategoryAssignmentUI = (student) => {
     const box = document.getElementById('cat-long-rev-box');
     if (!box) return;
-    
-    if (currentSessionType !== 'long_rev' || !student) { 
-        box.classList.add('hidden'); 
-        return; 
-    }
+    if (currentSessionType !== 'long_rev') { box.classList.add('hidden'); return; }
     
     box.classList.remove('hidden');
     const task = student.longRevTask;
-    
     if (currentUserType === 'teacher') {
         document.getElementById('teacher-cat-assign-controls').classList.remove('hidden');
         document.getElementById('student-cat-assign-display').classList.add('hidden');
@@ -1704,7 +1721,7 @@ window.refreshCategoryAssignmentUI = (student) => {
     }
 };
 
-// 3. ދަރިވަރު މަސައްކަތް ނިންމައި ހިސްޓްރީއަށް ބަދަލުކުރުން
+// މަސައްކަތް ނިންމައި ހިސްޓްރީއަށް ބަދަލުކުރުން
 window.completeAssignedLongRev = () => {
     const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
     const task = student.longRevTask;
@@ -1727,35 +1744,16 @@ window.completeAssignedLongRev = () => {
 
         student.history.push(historyEntry);
         
-        // މިހާރު އޮތް މަސައްކަތް (Assignment) ފުހެލުން
+        // މިހާރު އޮތް އެސައިންމަންޓް ފުހެލުން
         delete student.longRevTask;
 
         updateFirebase();
         alert("މާޝާﷲ! މަސައްކަތް ނިންމައި ހިސްޓްރީއަށް ރެކޯޑް ކުރެވިއްޖެ.");
         
-        // ޞަފްޙާ އަޕްޑޭޓްކުރުން
+        // ޞަފްޙާ ރިފްރެޝްކޮށް ހިސްޓްރީ ދެއްކުން
         window.renderHistory(student, 'categoryHistoryList', 'long_rev');
         window.refreshCategoryAssignmentUI(student);
     }
-};
-
-// 4. "ކިޔަން ފަށާ" ފިތަށް ފިތުމުން މުޞްޙަފް ހުޅުވުން
-window.startAssignedLongRevNow = () => {
-    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
-    if (!student.longRevTask) return;
-    const task = student.longRevTask;
-
-    window.openRecorder('long_rev');
-
-    setTimeout(() => {
-        const startInput = document.getElementById('startPage');
-        const endInput = document.getElementById('endPage');
-        if (startInput && endInput) {
-            startInput.value = task.startPage;
-            window.handleStartPageChange();
-            endInput.value = task.endPage;
-        }
-    }, 600);
 };
     </script>
 </body>
