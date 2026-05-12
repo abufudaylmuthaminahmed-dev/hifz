@@ -1358,7 +1358,7 @@ window.loadSmartPage = async (applyHighlights=false, isNavigating=false, navigat
         window.stopTimer = () => { clearInterval(examState.timer); examState.timer = null; };
         window.generateQuestions = () => { examState.isMutashabih = true; const list = document.getElementById('questionList'); list.innerHTML = ''; let base = ((examState.juz-1)*20)+2; if(examState.mode === 'part2') base+=10; for(let i=0; i<3; i++) { let p = base + Math.floor(Math.random()*10); list.innerHTML += `<button style="display:block;width:100%;margin-bottom:5px;padding:5px;" onclick="window.loadExamPage(${p})">Q${i+1} - Page ${p}</button>`; } };
 
-        // ޖުޒުއު އިމްތިޙާން ސޭވްކުރުން (Full/Part 1/Part 2)
+        // ޖުޒުއު އިމްތިޙާން ސޭވްކުރުން (Average calculation logic)
 window.saveJuzExamPart = () => { 
     const score = window.calcScore(); 
     const s = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx]; 
@@ -1372,70 +1372,76 @@ window.saveJuzExamPart = () => {
     }; 
     
     const todayISO = window.getFormattedDate();
-    const examMode = examState.mode; 
+    const examMode = examState.mode; // 'full', 'part1', 'part2'
     const currentJuz = examState.juz;
+
+    // އެވްރެޖް ހެދުމަށްޓަކައި juzExams އޮބްޖެކްޓް ހުރިތޯ ބެލުން
+    if(!s.juzExams) s.juzExams = {}; 
+    if(!s.juzExams[currentJuz]) s.juzExams[currentJuz] = { part1: 0, part2: 0 }; 
+
+    let finalScoreToSave = score;
+    let examStatus = 'completed';
+
+    if (examMode === 'part1') {
+        s.juzExams[currentJuz].part1 = score;
+        examStatus = 'partial';
+        finalScoreToSave = score;
+    } else if (examMode === 'part2') {
+        s.juzExams[currentJuz].part2 = score;
+        let p1 = s.juzExams[currentJuz].part1 || 0;
+        // ދެބައިގެ އެވްރެޖް ހޯދުން
+        finalScoreToSave = (p1 + score) / 2;
+        examStatus = 'completed';
+    }
+
+    const examRecord = { 
+        type: 'juz_exam', 
+        status: examStatus, 
+        date: todayISO, 
+        juz: currentJuz, 
+        score: finalScoreToSave, 
+        duration: duration, 
+        details: details, 
+        mistakeDetails: examState.mistakesList || [],
+        examPart: examMode
+    };
 
     // ދަރިވަރު އެޕްރޫވްއަށް ފޮނުވާ ބައި (Peer Exam)
     if(isPeerExam) { 
         const examiner = document.getElementById('examinerName').value || "Unknown"; 
-        const entry = { 
-            type: 'juz_exam', 
-            mode: examMode, 
-            juz: currentJuz, 
-            score: score, 
-            duration: duration, 
-            details: details, 
-            mistakeDetails: examState.mistakesList || [], 
-            recitedTo: examiner, 
-            date: todayISO, 
-            status: (examMode === 'part1' ? 'partial' : 'pending'), 
-            isExternal: true,
-            timestamp: new Date().getTime()
-        }; 
+        examRecord.recitedTo = examiner;
+        examRecord.isExternal = true;
+        examRecord.timestamp = new Date().getTime();
         
         if(!s.pendingData) s.pendingData = []; 
-        s.pendingData.push(entry); 
+        s.pendingData.push(examRecord); 
         updateFirebase(); 
-        alert("އިމްތިޙާން އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!"); 
+        alert(`އިމްތިޙާން (${examMode}) އެޕްރޫވް ކުރަން ފޮނުވިއްޖެ!`); 
         window.closeJuzExam(); 
     } 
     // މުދައްރިސް ސީދާ ސޭވްކުރާ ބައި
     else { 
         if(!s.history) s.history = []; 
-        if(!s.juzExams) s.juzExams = {}; 
-        if(!s.juzExams[currentJuz]) s.juzExams[currentJuz] = {}; 
-
-        const examRecord = { 
-            type: 'juz_exam', 
-            status: examMode === 'part1' ? 'partial' : 'completed', 
-            date: todayISO, 
-            juz: currentJuz, 
-            score: score, 
-            duration: duration, 
-            details: details, 
-            mistakeDetails: examState.mistakesList || [] 
-        };
 
         if (editingRecordIndex > -1) {
             s.history[editingRecordIndex] = examRecord;
             editingRecordIndex = -1;
         } else {
-            if(examMode === 'part1') { 
-                s.juzExams[currentJuz].part1 = score; 
-            } else if(examMode === 'part2') { 
-                let p1 = s.juzExams[currentJuz].part1 || 0; 
-                examRecord.score = (p1 + score) / 2;
-            }
             s.history.push(examRecord); 
         }
 
         updateFirebase(); 
-        alert("އިމްތިޙާން ސޭވް ކުރެވިއްޖެ!"); 
+        
+        let msg = (examMode === 'part2') 
+            ? `ޖުޒުއު ${currentJuz} ނިމިއްޖެ! އެވްރެޖް ނަތީޖާއަކީ: ${finalScoreToSave}%` 
+            : `އިމްތިޙާން (${examMode}) ސޭވް ކުރެވިއްޖެ! ނަތީޖާ: ${finalScoreToSave}%`;
+            
+        alert(msg); 
         window.closeJuzExam(); 
         window.openCategoryPage('juz_exam'); 
     }
 };
-
+        
 window.viewJuzRecord = (rec) => { document.getElementById('juzExamTitle').innerText = "View Exam"; document.getElementById('juz-exam-page').classList.remove('hidden'); document.getElementById('liveScore').innerText = rec.score + "%"; document.getElementById('saveExamBtn').style.display = 'none'; document.getElementById('stopwatchDisplay').value = rec.duration || "00:00:00"; document.getElementById('countTeacher').value = rec.details?.teacherMistakes||0; document.getElementById('countSelf').value = rec.details?.selfMistakes||0; document.getElementById('scoreTajweed').value = rec.details?.tajweed||10; document.getElementById('scoreFluency').value = rec.details?.fluency||5; document.getElementById('examinerNameField').style.display = 'none'; isViewMode = true; examState.mistakesList = rec.mistakeDetails ||[]; let startP = ((rec.juz-1)*20)+2; window.loadExamPage(startP); };
 
 window.openFinalExam = () => { const s = classesData[currentClassIdx].students[currentStudentIdx]; finalExamState = { currentQ: 1, maxQ: (s.level >= 3 ? 3 : 2), totalMistakesT: 0, totalMistakesS: 0 }; document.getElementById('finalExamScore').innerText = "100%"; document.getElementById('questionIndicator').innerText = `ސުވާލު 1 / ${finalExamState.maxQ}`; document.getElementById('finalTeacherCount').innerText = 0; document.getElementById('finalSelfCount').innerText = 0; const finalJuzSel = document.getElementById('finalJuzSelect'); finalJuzSel.innerHTML = ''; for(let i=1; i<=30; i++) finalJuzSel.add(new Option(`ޖުޒުއު ${i}`, i)); document.getElementById('final-exam-page').classList.remove('hidden'); };
