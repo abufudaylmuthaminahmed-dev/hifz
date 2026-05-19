@@ -1517,6 +1517,130 @@ window.handleGradingMenuBack = () => {
     if (navigationSource === 'progress') window.openPage('progress-page');
     else window.openPage('grading-student-page');
 };
+        // --- ރިޕޯޓް ޑައުންލޯޑް ކުރުމުގެ ފަންކްޝަންތައް އިޞްލާޙުކުރުން ---
+
+// 1. މުޅި ކްލާހުގެ ޕްރޮގްރެސް ރިޕޯޓް (Excel)
+window.downloadProgressExcel = () => {
+    const table = document.getElementById("progressTable");
+    if (!table) {
+        alert("ކްލާހެއް އިޚްތިޔާރު ކުރައްވާ ނުވަތަ ޑޭޓާ ލޯޑުވަންދެން މަޑުކޮށްލައްވާ!");
+        return;
+    }
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Progress Report" });
+    XLSX.writeFile(wb, "Class_Progress_Report.xlsx");
+};
+
+// 2. ދަރިވަރުގެ ހުރިހާ ރެކޯޑެއް އެއް ޝީޓަކަށް (Full History)
+window.downloadFullStudentExcel = () => {
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    if (!student || !student.history || student.history.length === 0) {
+        alert("ޑައުންލޯޑް ކުރާނެ އެއްވެސް ރެކޯޑެއް ނެތް!");
+        return;
+    }
+
+    const data = student.history.map(rec => ({
+        "ތާރީޚް": rec.date,
+        "ބާވަތް": rec.type === 'new_lesson' ? 'އާ ފިލާވަޅު' : (rec.type === 'short_rev' ? 'ކުރު މުރާޖަޢާ' : (rec.type === 'long_rev' ? 'ދިގު މުރާޖަޢާ' : 'އިމްތިޙާން')),
+        "ފެށުނު ޞަފްޙާ": rec.page || "-",
+        "ނިމުނު ޞަފްޙާ": rec.endPage || rec.page || "-",
+        "ކުށް": rec.mistakesCount || 0,
+        "މާކްސް/ޖުޒުއު": rec.juz ? "Juz " + rec.juz : (rec.score ? rec.score + "%" : "-"),
+        "ކިޔައިދިނީ": rec.recitedTo || "މުދައްރިސް"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "History");
+    XLSX.writeFile(wb, `${student.name}_History.xlsx`);
+};
+
+// 3. ވަކިވަކި ބައިތަކަށް ބަހާލައިގެން ރިޕޯޓް ޑައުންލޯޑް ކުރުން (Categorized)
+window.downloadCategorizedStudentExcel = () => {
+    const student = currentUserType === 'student' ? currentStudentObj : classesData[currentClassIdx].students[currentStudentIdx];
+    if (!student || !student.history) return;
+
+    const wb = XLSX.utils.book_new();
+    const categories = [
+        { key: 'new_lesson', name: 'New Lesson' },
+        { key: 'short_rev', name: 'Short Revision' },
+        { key: 'long_rev', name: 'Long Revision' },
+        { key: 'juz_exam', name: 'Exams' }
+    ];
+
+    categories.forEach(cat => {
+        const filtered = student.history.filter(r => r.type === cat.key);
+        if (filtered.length > 0) {
+            const data = filtered.map(r => ({
+                "Date": r.date,
+                "Start Page": r.page || "-",
+                "End Page": r.endPage || "-",
+                "Mistakes": r.mistakesCount || 0,
+                "Score/Details": r.juz ? "Juz " + r.juz + " (" + r.score + "%)" : (r.recitedTo ? "To: " + r.recitedTo : "-")
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, cat.name);
+        }
+    });
+
+    if (wb.SheetNames.length === 0) {
+        alert("ޑައުންލޯޑް ކުރާނެ ޑޭޓާއެއް ނެތް");
+        return;
+    }
+    XLSX.writeFile(wb, `${student.name}_Categorized_Report.xlsx`);
+};
+
+// 4. ފިލްޓަރ ބޭނުންކޮށްގެން ރިޕޯޓް ޑައުންލޯޑް ކުރުން (Date Range Filter)
+window.downloadStudentExcelFiltered = () => {
+    const start = document.getElementById('dl_start_date').value;
+    const end = document.getElementById('dl_end_date').value;
+    const cat = document.getElementById('dl_category').value;
+    const student = classesData[currentClassIdx].students[currentStudentIdx];
+
+    if (!start || !end) {
+        alert("ފެށޭ ތާރީޚާއި ނިމޭ ތާރީޚް އިޚްތިޔާރު ކުރައްވާ!");
+        return;
+    }
+
+    let records = student.history.filter(r => {
+        const rDate = new Date(r.date);
+        return rDate >= new Date(start) && rDate <= new Date(end);
+    });
+
+    if (cat !== 'all' && cat !== 'categorized') {
+        records = records.filter(r => r.type === cat);
+    }
+
+    if (records.length === 0) {
+        alert("މި މުއްދަތުގެ ތެރޭގައި އެއްވެސް ރެކޯޑެއް ނެތް!");
+        return;
+    }
+
+    const data = records.map(r => ({
+        "Date": r.date,
+        "Type": r.type,
+        "Page": r.page || "-",
+        "End Page": r.endPage || "-",
+        "Mistakes": r.mistakesCount || 0,
+        "Score": r.score || "-"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Filtered Report");
+    XLSX.writeFile(wb, `${student.name}_Filtered_Report.xlsx`);
+};
+
+// 5. ދަރިވަރުން އިތުރުކުރާ އެކްސެލް ޓެމްލެޓް ޑައުންލޯޑް ކުރުން
+window.downloadTemplate = () => {
+    const data = [
+        { "ID": "1001", "Name": "Ahmed Mohamed", "Module": "Hifz", "Level": "1", "Direction": "top_down", "Remarks": "New student" },
+        { "ID": "1002", "Name": "Aishath Ali", "Module": "Hifz", "Level": "2", "Direction": "bottom_up", "Remarks": "" }
+    ];
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    XLSX.writeFile(wb, "Student_Import_Template.xlsx");
+};
     </script>
 </body>
 </html>
